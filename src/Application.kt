@@ -1,6 +1,9 @@
 package org.entur
 
 import io.ktor.application.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.response.respondText
 import io.ktor.routing.get
@@ -12,13 +15,11 @@ fun main(args: Array<String>) {
     val server = embeddedServer(Jetty, port = 8080) {
         routing {
             get("/") {
-                call.respondText("Hello World!", ContentType.Text.Plain)
-            }
-            get("/demo") {
-                call.respondText("HELLO WORLD!")
+                call.respondText(bysykkelRequest(), ContentType.Application.Json)
             }
         }
     }
+
     server.start(wait = true)
 }
 
@@ -27,3 +28,13 @@ fun main(args: Array<String>) {
 fun Application.module(testing: Boolean = false) {
 }
 
+suspend fun bysykkelRequest(): String {
+    val client = HttpClient()
+
+    val response = client.get<String>(
+        "https://gbfs.urbansharing.com/oslobysykkel.no/gbfs.json"
+    ) {header("Client-Identifier", "entur-bikeservice")}
+    client.close()
+
+    return response
+}
