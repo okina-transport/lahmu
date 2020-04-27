@@ -1,5 +1,6 @@
 package org.entur
 
+import com.google.gson.Gson
 import io.ktor.application.*
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -15,7 +16,7 @@ fun main(args: Array<String>) {
     val server = embeddedServer(Jetty, port = 8080) {
         routing {
             get("/") {
-                call.respondText(bysykkelRequest(), ContentType.Application.Json)
+                call.respondText(Gson().toJson(bysykkelRequest().data), ContentType.Application.Json)
             }
         }
     }
@@ -28,13 +29,9 @@ fun main(args: Array<String>) {
 fun Application.module(testing: Boolean = false) {
 }
 
-suspend fun bysykkelRequest(): String {
-    val client = HttpClient()
-
-    val response = client.get<String>(
-        "https://gbfs.urbansharing.com/oslobysykkel.no/gbfs.json"
-    ) {header("Client-Identifier", "entur-bikeservice")}
-    client.close()
-
-    return response
+suspend fun bysykkelRequest(): BikeResponse {
+    with(HttpClient()) {
+        val response = get<String>(osloBysykkelIndexUrl) {header("Client-Identifier", "entur-bikeservice")}
+        return Gson().fromJson(response, BikeResponse::class.java)
+    }
 }
