@@ -16,7 +16,13 @@ fun main(args: Array<String>) {
     val server = embeddedServer(Jetty, port = 8080) {
         routing {
             get("/") {
-                call.respondText(Gson().toJson(bysykkelRequest().data), ContentType.Application.Json)
+                call.respondText(Gson().toJson(parseResponse<BikeResponse>(osloBysykkelIndexUrl).data), ContentType.Application.Json)
+            }
+            get("/gbfs.json") {
+                call.respondText(Gson().toJson(parseResponse<BikeResponse>(osloBysykkelIndexUrl)), ContentType.Application.Json)
+            }
+            get("/system_information.json") {
+                call.respondText(Gson().toJson(parseResponse<SystemInformationResponse>("http://gbfs.urbansharing.com/oslobysykkel.no/system_information.json")), ContentType.Application.Json)
             }
         }
     }
@@ -29,9 +35,9 @@ fun main(args: Array<String>) {
 fun Application.module(testing: Boolean = false) {
 }
 
-suspend fun bysykkelRequest(): BikeResponse {
+suspend inline fun <reified T>parseResponse(url: String): T {
     with(HttpClient()) {
-        val response = get<String>(osloBysykkelIndexUrl) {header("Client-Identifier", "entur-bikeservice")}
-        return Gson().fromJson(response, BikeResponse::class.java)
+        val response = get<String>(url) {header("Client-Identifier", "entur-bikeservice")}
+        return Gson().fromJson(response, T::class.java)
     }
 }
