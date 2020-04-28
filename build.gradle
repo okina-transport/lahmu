@@ -8,7 +8,7 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jlleitschuh.gradle:ktlint-gradle:7.1.0"
+        classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlint_version"
     }
 }
 
