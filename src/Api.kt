@@ -2,7 +2,12 @@ package org.entur
 
 import java.math.BigDecimal
 
-val osloBysykkelIndexUrl = "https://gbfs.urbansharing.com/oslobysykkel.no/gbfs.json"
+object OsloBysykkelURL {
+    val gbfs: String = "https://gbfs.urbansharing.com/oslobysykkel.no/gbfs.json"
+    val system_information: String = "https://gbfs.urbansharing.com/oslobysykkel.no/system_information.json"
+    val station_information: String = "https://gbfs.urbansharing.com/oslobysykkel.no/station_information.json"
+    val station_status: String = "https://gbfs.urbansharing.com/oslobysykkel.no/station_status.json"
+}
 
 interface GBFSResponse<T> {
     val last_updated: Long

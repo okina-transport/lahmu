@@ -17,19 +17,19 @@ fun main(args: Array<String>) {
     val server = embeddedServer(Jetty, port = 8080) {
         routing {
             get("/") {
-                call.respondText(Gson().toJson(parseResponse<BikeResponse>(osloBysykkelIndexUrl).data), ContentType.Application.Json)
+                call.respondText("Hello and welcome to Entur BikeService!", ContentType.Application.Json)
             }
             get("/gbfs.json") {
-                call.respondText(Gson().toJson(parseResponse<BikeResponse>(osloBysykkelIndexUrl)), ContentType.Application.Json)
+                call.respondText(Gson().toJson(parseResponse<BikeResponse>(OsloBysykkelURL.gbfs)), ContentType.Application.Json)
             }
             get("/system_information.json") {
-                call.respondText(Gson().toJson(parseResponse<SystemInformationResponse>("http://gbfs.urbansharing.com/oslobysykkel.no/system_information.json")), ContentType.Application.Json)
+                call.respondText(Gson().toJson(parseResponse<SystemInformationResponse>(OsloBysykkelURL.system_information)), ContentType.Application.Json)
             }
             get("/station_information.json") {
-                call.respondText(Gson().toJson(parseResponse<StationInformationResponse>("http://gbfs.urbansharing.com/oslobysykkel.no/station_information.json")), ContentType.Application.Json)
+                call.respondText(Gson().toJson(parseResponse<StationInformationResponse>(OsloBysykkelURL.station_information)), ContentType.Application.Json)
             }
             get("/station_status.json") {
-                call.respondText(Gson().toJson(parseResponse<StationStatusResponse>("http://gbfs.urbansharing.com/oslobysykkel.no/station_status.json")), ContentType.Application.Json)
+                call.respondText(Gson().toJson(parseResponse<StationStatusResponse>(OsloBysykkelURL.station_status)), ContentType.Application.Json)
             }
         }
     }
