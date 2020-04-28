@@ -1,7 +1,8 @@
 package org.entur
 
 import com.google.gson.Gson
-import io.ktor.application.*
+import io.ktor.application.Application
+import io.ktor.application.call
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -41,9 +42,9 @@ fun main(args: Array<String>) {
 fun Application.module(testing: Boolean = false) {
 }
 
-suspend inline fun <reified T>parseResponse(url: String): T {
+suspend inline fun <reified T> parseResponse(url: String): T {
     with(HttpClient()) {
-        val response = get<String>(url) {header("Client-Identifier", "entur-bikeservice")}
+        val response = get<String>(url) { header("Client-Identifier", "entur-bikeservice") }
         return Gson().fromJson(response, T::class.java)
     }
 }
