@@ -24,6 +24,12 @@ fun main(args: Array<String>) {
             get("/system_information.json") {
                 call.respondText(Gson().toJson(parseResponse<SystemInformationResponse>("http://gbfs.urbansharing.com/oslobysykkel.no/system_information.json")), ContentType.Application.Json)
             }
+            get("/station_information.json") {
+                call.respondText(Gson().toJson(parseResponse<StationInformationResponse>("http://gbfs.urbansharing.com/oslobysykkel.no/station_information.json")), ContentType.Application.Json)
+            }
+            get("/station_status.json") {
+                call.respondText(Gson().toJson(parseResponse<StationStatusResponse>("http://gbfs.urbansharing.com/oslobysykkel.no/station_status.json")), ContentType.Application.Json)
+            }
         }
     }
 
