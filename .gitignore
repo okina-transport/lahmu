@@ -24,6 +24,9 @@ hs_err_pid*
 
 # IntelliJ
 .idea/
+!.idea/runConfigurations/ApplicationKt.xml
+!.idea/runConfigurations/AutoReload.xml
+!.idea/runConfigurations/Bikeservice.xml
 build/
 
 # Gradle

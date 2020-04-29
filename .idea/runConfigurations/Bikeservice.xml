@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Bikeservice" type="CompoundRunConfigurationType">
+    <toRun name="AutoReload" type="GradleRunConfiguration" />
+    <toRun name="ApplicationKt" type="JetRunConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>
