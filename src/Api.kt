@@ -2,11 +2,40 @@ package org.entur
 
 import java.math.BigDecimal
 
-object OsloBysykkelURL {
-    val gbfs: String = "https://gbfs.urbansharing.com/oslobysykkel.no/gbfs.json"
-    val system_information: String = "https://gbfs.urbansharing.com/oslobysykkel.no/system_information.json"
-    val station_information: String = "https://gbfs.urbansharing.com/oslobysykkel.no/station_information.json"
-    val station_status: String = "https://gbfs.urbansharing.com/oslobysykkel.no/station_status.json"
+fun getOperatorFromPathParam(param: String? = ""): GbfsStandard =
+    when(param) {
+        "oslobysykkel" -> OsloBysykkelURL
+        "bergenbysykkel" -> BergenBysykkelURL
+        "trondheimbysykkel" -> TrondheimBysykkelURL
+        else -> throw Error("Not implemented")
+    }
+
+interface GbfsStandard {
+    val gbfs: String
+    val system_information: String
+    val station_information: String
+    val station_status: String
+}
+
+object OsloBysykkelURL : GbfsStandard {
+    override val gbfs: String = "https://gbfs.urbansharing.com/oslobysykkel.no/gbfs.json"
+    override val system_information: String = "https://gbfs.urbansharing.com/oslobysykkel.no/system_information.json"
+    override val station_information: String = "https://gbfs.urbansharing.com/oslobysykkel.no/station_information.json"
+    override val station_status: String = "https://gbfs.urbansharing.com/oslobysykkel.no/station_status.json"
+}
+
+object BergenBysykkelURL : GbfsStandard{
+    override val gbfs: String = "https://gbfs.urbansharing.com/bergenbysykkel.no/gbfs.json"
+    override val system_information: String = "https://gbfs.urbansharing.com/bergenbysykkel.no/system_information.json"
+    override val station_information: String = "https://gbfs.urbansharing.com/bergenbysykkel.no/station_information.json"
+    override val station_status: String = "https://gbfs.urbansharing.com/bergenbysykkel.no/station_status.json"
+}
+
+object TrondheimBysykkelURL : GbfsStandard{
+    override val gbfs: String = "https://gbfs.urbansharing.com/trondheimbysykkel.no/gbfs.json"
+    override val system_information: String = "https://gbfs.urbansharing.com/trondheimbysykkel.no/system_information.json"
+    override val station_information: String = "https://gbfs.urbansharing.com/trondheimbysykkel.no/station_information.json"
+    override val station_status: String = "https://gbfs.urbansharing.com/trondheimbysykkel.no/station_status.json"
 }
 
 interface GBFSResponse<T> {

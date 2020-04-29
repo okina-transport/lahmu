@@ -13,7 +13,7 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.jetty.Jetty
 
-fun main(args: Array<String>) {
+fun main() {
     val server = embeddedServer(Jetty, watchPaths = listOf("bikeservice"), port = 8080, module = Application::module)
     server.start(wait = true)
 }
@@ -23,17 +23,21 @@ fun Application.module() {
         get("/") {
             call.respondText("Hello and welcome to Entur Bikeservice!", ContentType.Application.Json)
         }
-        get("/gbfs.json") {
-            call.respondText(Gson().toJson(parseResponse<BikeResponse>(OsloBysykkelURL.gbfs)), ContentType.Application.Json)
+        get("{operator}/gbfs.json") {
+            val operator = getOperatorFromPathParam(call.parameters["operator"])
+            call.respondText(Gson().toJson(parseResponse<BikeResponse>(operator.gbfs)), ContentType.Application.Json)
         }
-        get("/system_information.json") {
-            call.respondText(Gson().toJson(parseResponse<SystemInformationResponse>(OsloBysykkelURL.system_information)), ContentType.Application.Json)
+        get("{operator}/system_information.json") {
+            val operator = getOperatorFromPathParam(call.parameters["operator"])
+            call.respondText(Gson().toJson(parseResponse<SystemInformationResponse>(operator.system_information)), ContentType.Application.Json)
         }
-        get("/station_information.json") {
-            call.respondText(Gson().toJson(parseResponse<StationInformationResponse>(OsloBysykkelURL.station_information)), ContentType.Application.Json)
+        get("{operator}/station_information.json") {
+            val operator = getOperatorFromPathParam(call.parameters["operator"])
+            call.respondText(Gson().toJson(parseResponse<StationInformationResponse>(operator.station_information)), ContentType.Application.Json)
         }
-        get("/station_status.json") {
-            call.respondText(Gson().toJson(parseResponse<StationStatusResponse>(OsloBysykkelURL.station_status)), ContentType.Application.Json)
+        get("{operator}/station_status.json") {
+            val operator = getOperatorFromPathParam(call.parameters["operator"])
+            call.respondText(Gson().toJson(parseResponse<StationStatusResponse>(operator.station_status)), ContentType.Application.Json)
         }
     }
 }
