@@ -1,13 +1,15 @@
 package org.entur
-
 import java.math.BigDecimal
 
-fun getOperatorFromPathParam(param: String? = ""): GbfsStandard =
-    when (param) {
-        "oslobysykkel" -> OsloBysykkelURL
-        "bergenbysykkel" -> BergenBysykkelURL
-        "trondheimbysykkel" -> TrondheimBysykkelURL
-        else -> throw Error("Not implemented")
+enum class BikeOperator {
+    OSLOBYSYKKEL, BERGENBYSYKKEL, TRONDHEIMBYSYKKEL
+}
+
+fun getOperatorGbfs(operator: BikeOperator): GbfsStandard =
+    when (operator) {
+        BikeOperator.OSLOBYSYKKEL -> OsloBysykkelURL
+        BikeOperator.BERGENBYSYKKEL -> BergenBysykkelURL
+        BikeOperator.TRONDHEIMBYSYKKEL -> TrondheimBysykkelURL
     }
 
 interface GbfsStandard {
