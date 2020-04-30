@@ -7,8 +7,10 @@ interface Cache {
     val lastUpdated: LocalDateTime
 }
 
-class InMemoryCache(override val cacheMap: HashMap<BikeOperator, BikeResponse>,
-                    override var lastUpdated: LocalDateTime) : Cache {
+class InMemoryCache(
+    override val cacheMap: HashMap<BikeOperator, BikeResponse>,
+    override var lastUpdated: LocalDateTime
+) : Cache {
     fun getResponseFromCache(bikeOperator: BikeOperator) =
         cacheMap[bikeOperator]
 

@@ -32,7 +32,7 @@ fun Application.module() {
         }
         get("{operator}/gbfs.json") {
             val operator = BikeOperator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
-            val result = if (gbfsCache.isValidCache(operator)){
+            val result = if (gbfsCache.isValidCache(operator)) {
                 gbfsCache.getResponseFromCache(operator)
             } else {
                 val response = parseResponse<BikeResponse>(getOperatorGbfs(operator).gbfs)
@@ -43,7 +43,7 @@ fun Application.module() {
         }
         get("{operator}/system_information.json") {
             val operator = BikeOperator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
-            val result = if (systemInformationCache.isValidCache(operator)){
+            val result = if (systemInformationCache.isValidCache(operator)) {
                 systemInformationCache.getResponseFromCache(operator)
             } else {
                 val response = parseResponse<BikeResponse>(getOperatorGbfs(operator).gbfs)
@@ -54,7 +54,7 @@ fun Application.module() {
         }
         get("{operator}/station_information.json") {
             val operator = BikeOperator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
-            val result = if (stationInformationCache.isValidCache(operator)){
+            val result = if (stationInformationCache.isValidCache(operator)) {
                 stationInformationCache.getResponseFromCache(operator)
             } else {
                 val response = parseResponse<BikeResponse>(getOperatorGbfs(operator).gbfs)
@@ -65,7 +65,7 @@ fun Application.module() {
         }
         get("{operator}/station_status.json") {
             val operator = BikeOperator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
-            val result = if (stationStatusCache.isValidCache(operator)){
+            val result = if (stationStatusCache.isValidCache(operator)) {
                 stationStatusCache.getResponseFromCache(operator)
             } else {
                 val response = parseResponse<BikeResponse>(getOperatorGbfs(operator).gbfs)
