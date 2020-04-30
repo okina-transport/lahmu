@@ -14,9 +14,9 @@ deployment:
     prometheus.io/port: "9090"
   podLabels: []
   replicaCount: 3
-  strategy: 
+  strategy:
     type: RollingUpdate
-  terminationGracePeriodSeconds: 30s
+  terminationGracePeriodSeconds: 30
 
 service:
   type: ClusterIP
@@ -34,7 +34,8 @@ container:
   #  - "-jar"
   #  - "-Xmx512"
   #  - "seatmap.jar"
-  env: [] # environment variables
+  env:
+    [] # environment variables
     # - name: PG_DB_USERNAME
     #   valueFrom:
     #     secretKeyRef:
@@ -45,7 +46,8 @@ container:
     #     secretKeyRef:
     #       name: seatmap-db-credentials
     #       key: password
-  envFrom: [] # Envfrom variables
+  envFrom:
+    [] # Envfrom variables
     # - configMapRef:
     #     name: {{ .Release.Name }}-config
   livenessProbe:
@@ -65,7 +67,8 @@ container:
     #   subPath: ""
     #   readOnly: true
 
-extraContainers: [] #|
+extraContainers:
+  [] #|
   # - name: seatmap-sql-proxy
   #   image: gcr.io/cloudsql-docker/gce-proxy:1.13
   #   env:
@@ -93,7 +96,8 @@ extraContainers: [] #|
 
 extraInitContainers: []
 
-extraVolumes: []
+extraVolumes:
+  []
   # - name: seatmap-instance-credentials
   #   secret:
   #     secretName: seatmap-instance-credentials
@@ -110,9 +114,9 @@ affinity:
   enabled: true
   weight: 100
 
-rbac: 
+rbac:
   enabled: false
-  # rules: 
+  # rules:
   #   - apiGroups: [""]
   #     resources:
   #       - pods
