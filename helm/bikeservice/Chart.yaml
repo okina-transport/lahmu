@@ -1,0 +1,14 @@
+apiVersion: v1
+name: bikeservice
+version: 1.0.0
+appVersion: "{{ .Values.appVersion }}"
+description: A Helm chart for the bikeservice module
+keywords:
+  - bikeservice
+home: https://{{ .Release.Name }}{{ .Values.domain }}
+sources:
+  - https://bitbucket.org/enturas/bikeservice
+maintainers:
+  - name: mobilitet
+    email: mobilitet@entur.org
+engine: gotpl

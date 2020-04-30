@@ -1,0 +1,126 @@
+{{- if .Values.deployment.enabled -}}
+apiVersion: {{ template "app.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+{{- if .Values.deployment.deploymentAnnotations }}
+  annotations:
+{{ toYaml .Values.deployment.deploymentAnnotations | indent 4 }}
+{{- end }}
+  labels:
+    {{- include "common.labels" . | indent 4 }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+  name: {{ template "name.name" . }}
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "common.matchLabels" . | indent 6 }}
+  replicas: {{ .Values.deployment.replicaCount }}
+  {{- if .Values.deployment.strategy }}
+  strategy:
+{{ toYaml .Values.deployment.strategy | indent 4 }}
+  {{- if eq .Values.deployment.strategy.type "Recreate" }}
+  rollingUpdate: null
+  {{- end }}
+  {{- end }}
+  template:
+    metadata:
+    {{- if .Values.deployment.podAnnotations }}
+      annotations:
+{{ toYaml .Values.deployment.podAnnotations | indent 8 }}
+    {{- end }}
+      labels:
+        {{- include "common.labels" . | indent 8 }}
+        {{- if .Values.deployment.podLabels}}
+        {{ toYaml .Values.deployment.podLabels | indent 8 }}
+        {{- end}}
+      #checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      {{- if .Values.rbac.true }}
+      serviceAccountName: {{ template "name.name" . }}
+      {{- end }}
+      {{- if .Values.extraInitContainers }}
+      initContainers:
+{{ toYaml .Values.extraInitContainers | indent 8 }}
+      {{- end }}
+      containers:
+      - name: {{ template "name.name" . }}
+        image: {{ .Values.container.image.identifier }}
+        imagePullPolicy: {{ .Values.container.image.pullPolicy }}
+        command:
+        {{- range .Values.container.extraCommand }}
+          - {{ . }}
+        {{- end }}
+        args:
+        {{- range .Values.container.extraFlags }}
+          - {{ . }}
+        {{- end }}
+        {{- if .Values.container.envFrom }}
+        envFrom:
+{{ toYaml .Values.container.envFrom | indent 8}}
+        {{- end }}
+        {{- if .Values.container.env }}
+        env:
+{{ toYaml .Values.container.env | indent 8}}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.service.internalPort }}
+        livenessProbe:
+          exec:
+            command:
+            - echo
+            - "1"
+          # initialDelaySeconds: {{ .Values.container.livenessProbe.initialDelaySeconds }}
+          # httpGet:
+          #   path: /health
+          #   port: {{ .Values.service.internalPort }}
+        readinessProbe:
+          exec:
+            command:
+            - echo
+            - "1"
+#          initialDelaySeconds: {{ .Values.container.readinessProbe.initialDelaySeconds }}
+#          httpGet:
+#            path: /health
+#            port: {{ .Values.service.internalPort }}
+        resources:
+          limits:
+            cpu: {{ .Values.container.resources.limits.cpu }}
+            memory: {{ .Values.container.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.container.resources.requests.cpu }}
+            memory: {{ .Values.container.resources.requests.memory }}
+        {{- if .Values.container.volumeMounts }}
+        volumeMounts:
+        {{- range .Values.container.volumeMounts }}
+        - name: {{ .name }}
+          mountPath: {{ .mountPath }}
+          subPath: {{ .subPath }}
+          readOnly: {{ .readOnly }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.extraContainers }}
+        {{- ( tpl (toYaml .Values.extraContainers) . ) | indent 4 }}
+        {{- end }}
+    {{- if .Values.affinity.enabled }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ .Chart.Name }}
+              topologyKey: kubernetes.io/hostname
+            weight: {{ .Values.affinity.weight }}
+    {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      {{- with .Values.extraVolumes }}
+      {{- toYaml . | indent 6}}
+      {{- end }}
+{{- end }}

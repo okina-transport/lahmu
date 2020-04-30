@@ -27,11 +27,26 @@ workflows:
     jobs:
       - Build
       - docker/publish:
+          name: release
           registry: $DOCKER_REGISTRY
           image: $CIRCLE_PROJECT_REPONAME
+          tag: $VERSION
+          deploy: true
           context: global
           after_checkout:
             - attach_workspace:
                 at: .
+          before_build:
+            - checkout
+            - run: echo "export VERSION=$(echo ${CIRCLE_BRANCH}-$(date '+%Y-%m-%d-%H%M')-${CIRCLE_SHA1:0:7}-${CIRCLE_WORKFLOW_ID:0:4} | tr '/' '.' )" >> $BASH_ENV
+            - run:
+                name: Tag git commit with build version and push to github
+                command: |
+                  git config --global push.default simple
+                  git config --global user.email "circleci@entur.no"
+                  git config --global user.name "circleci"
+                  echo $VERSION
+                  git tag $VERSION
+                  git push origin $VERSION
           requires:
             - Build
