@@ -66,15 +66,23 @@ spec:
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         livenessProbe:
-          initialDelaySeconds: {{ .Values.container.livenessProbe.initialDelaySeconds }}
-          httpGet:
-            path: /health
-            port: {{ .Values.service.internalPort }}
+          exec:
+            command:
+            - echo
+            - "1"
+          # initialDelaySeconds: {{ .Values.container.livenessProbe.initialDelaySeconds }}
+          # httpGet:
+          #   path: /health
+          #   port: {{ .Values.service.internalPort }}
         readinessProbe:
-          initialDelaySeconds: {{ .Values.container.readinessProbe.initialDelaySeconds }}
-          httpGet:
-            path: /health
-            port: {{ .Values.service.internalPort }}
+          exec:
+            command:
+            - echo
+            - "1"
+#          initialDelaySeconds: {{ .Values.container.readinessProbe.initialDelaySeconds }}
+#          httpGet:
+#            path: /health
+#            port: {{ .Values.service.internalPort }}
         resources:
           limits:
             cpu: {{ .Values.container.resources.limits.cpu }}
