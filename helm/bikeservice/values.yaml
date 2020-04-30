@@ -7,12 +7,6 @@ namespace: dev
 
 deployment:
   enabled: true
-  deploymentAnnotations: []
-  podAnnotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/path: "/prometheus"
-    prometheus.io/port: "9090"
-  podLabels: []
   replicaCount: 3
   strategy:
     type: RollingUpdate
@@ -28,28 +22,28 @@ container:
     identifier: ${artifact.metadata.image}
     pullPolicy: IfNotPresent
   appVersion: ${regex.extract('(?<=\:)(.*$)', artifact.metadata.image)}
-  extraCommand: []
+  #extraCommand: []
   # - "java"
-  extraFlags: []
+  #extraFlags: []
   #  - "-jar"
   #  - "-Xmx512"
   #  - "seatmap.jar"
-  env:
-    [] # environment variables
-    # - name: PG_DB_USERNAME
-    #   valueFrom:
-    #     secretKeyRef:
-    #       name: seatmap-db-credentials
-    #       key: username
-    # - name: PG_DB_PASSWORD
-    #   valueFrom:
-    #     secretKeyRef:
-    #       name: seatmap-db-credentials
-    #       key: password
-  envFrom:
-    [] # Envfrom variables
-    # - configMapRef:
-    #     name: {{ .Release.Name }}-config
+  #env:
+  #  [] # environment variables
+  # - name: PG_DB_USERNAME
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: seatmap-db-credentials
+  #       key: username
+  # - name: PG_DB_PASSWORD
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: seatmap-db-credentials
+  #       key: password
+  #envFrom:
+  #[] # Envfrom variables
+  # - configMapRef:
+  #     name: {{ .Release.Name }}-config
   livenessProbe:
     initialDelaySeconds: 30
   readinessProbe:
@@ -67,48 +61,48 @@ container:
     #   subPath: ""
     #   readOnly: true
 
-extraContainers:
-  [] #|
-  # - name: seatmap-sql-proxy
-  #   image: gcr.io/cloudsql-docker/gce-proxy:1.13
-  #   env:
-  #   - name: INSTANCES
-  #     valueFrom:
-  #       secretKeyRef:
-  #         name: seatmap-instance-credentials
-  #         key: INSTANCES
-  #     command: ["/cloud_sql_proxy", "--dir=/cloudsql", "-credential_file=/secrets/cloudsql/credentials.json", "-verbose=false"]
-  #     resources:
-  #       limits:
-  #         cpu: 75m
-  #         memory: 60Mi
-  #       requests:
-  #         cpu: 50m
-  #         memory: 40Mi
-  #     volumeMounts:
-  #       - name: seatmap-instance-credentials
-  #         mountPath: /secrets/cloudsql
-  #         readOnly: true
-  #       - name: ssl-certs
-  #         mountPath: /etc/ssl/certs
-  #       - name: cloudsql
-  #         mountPath: /cloudsql
+#extraContainers:
+#[] #|
+# - name: seatmap-sql-proxy
+#   image: gcr.io/cloudsql-docker/gce-proxy:1.13
+#   env:
+#   - name: INSTANCES
+#     valueFrom:
+#       secretKeyRef:
+#         name: seatmap-instance-credentials
+#         key: INSTANCES
+#     command: ["/cloud_sql_proxy", "--dir=/cloudsql", "-credential_file=/secrets/cloudsql/credentials.json", "-verbose=false"]
+#     resources:
+#       limits:
+#         cpu: 75m
+#         memory: 60Mi
+#       requests:
+#         cpu: 50m
+#         memory: 40Mi
+#     volumeMounts:
+#       - name: seatmap-instance-credentials
+#         mountPath: /secrets/cloudsql
+#         readOnly: true
+#       - name: ssl-certs
+#         mountPath: /etc/ssl/certs
+#       - name: cloudsql
+#         mountPath: /cloudsql
 
-extraInitContainers: []
+#extraInitContainers: []
 
-extraVolumes:
-  []
-  # - name: seatmap-instance-credentials
-  #   secret:
-  #     secretName: seatmap-instance-credentials
-  # - name: ssl-certs
-  #   hostPath:
-  #     path: /etc/ssl/certs
-  # - name: cloudsql
-  #   emptyDir:
-  # - name: oidc-auth-volume
-  #   configMap:
-  #     name: oidc-auth-config
+#extraVolumes:
+#[]
+# - name: seatmap-instance-credentials
+#   secret:
+#     secretName: seatmap-instance-credentials
+# - name: ssl-certs
+#   hostPath:
+#     path: /etc/ssl/certs
+# - name: cloudsql
+#   emptyDir:
+# - name: oidc-auth-volume
+#   configMap:
+#     name: oidc-auth-config
 
 affinity:
   enabled: true
