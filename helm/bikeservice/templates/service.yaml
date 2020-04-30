@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels: 
+    {{- include "common.labels" . | indent 4 }}
+  name: {{ template "name.name" . }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+  - name: http
+    port: {{ .Values.service.externalPort }}
+    protocol: TCP
+    targetPort: {{ .Values.service.internalPort }}
+  selector:
+    {{- include "common.matchLabels" . | indent 4 }}
+  sessionAffinity: None
+  type: {{ .Values.service.type }}

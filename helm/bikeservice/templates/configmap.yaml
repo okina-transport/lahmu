@@ -1,0 +1,15 @@
+{{- if .Values.configmap.enabled -}}
+apiVersion: v1
+data:
+  example.yaml: |
+    example:
+      http:
+        prober: http
+        timeout: 5s
+kind: ConfigMap
+metadata:
+  labels: 
+    {{- include "common.labels" . | indent 4 }}
+  name: {{ template "name.name" . }}
+  namespace: {{ .Values.namespace }}
+  {{- end }}

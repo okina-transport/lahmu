@@ -1,0 +1,140 @@
+labels:
+  team: mobilitet
+  slack: talk-mobilitet
+  type: backend
+
+namespace: dev
+
+deployment:
+  enabled: true
+  deploymentAnnotations: []
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/prometheus"
+    prometheus.io/port: "9090"
+  podLabels: []
+  replicaCount: 3
+  strategy: 
+    type: RollingUpdate
+  terminationGracePeriodSeconds: 30s
+
+service:
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 8080
+
+container:
+  image:
+    identifier: ${artifact.metadata.image}
+    pullPolicy: IfNotPresent
+  appVersion: ${regex.extract('(?<=\:)(.*$)', artifact.metadata.image)}
+  extraCommand: []
+  # - "java"
+  extraFlags: []
+  #  - "-jar"
+  #  - "-Xmx512"
+  #  - "seatmap.jar"
+  env: [] # environment variables
+    # - name: PG_DB_USERNAME
+    #   valueFrom:
+    #     secretKeyRef:
+    #       name: seatmap-db-credentials
+    #       key: username
+    # - name: PG_DB_PASSWORD
+    #   valueFrom:
+    #     secretKeyRef:
+    #       name: seatmap-db-credentials
+    #       key: password
+  envFrom: [] # Envfrom variables
+    # - configMapRef:
+    #     name: {{ .Release.Name }}-config
+  livenessProbe:
+    initialDelaySeconds: 30
+  readinessProbe:
+    initialDelaySeconds: 30
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 200m
+      memory: 1024Mi
+  volumeMounts:
+    # - name: oidc-auth-volume
+    #   mountPath: /etc/entur/oidc-auth
+    #   subPath: ""
+    #   readOnly: true
+
+extraContainers: [] #|
+  # - name: seatmap-sql-proxy
+  #   image: gcr.io/cloudsql-docker/gce-proxy:1.13
+  #   env:
+  #   - name: INSTANCES
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: seatmap-instance-credentials
+  #         key: INSTANCES
+  #     command: ["/cloud_sql_proxy", "--dir=/cloudsql", "-credential_file=/secrets/cloudsql/credentials.json", "-verbose=false"]
+  #     resources:
+  #       limits:
+  #         cpu: 75m
+  #         memory: 60Mi
+  #       requests:
+  #         cpu: 50m
+  #         memory: 40Mi
+  #     volumeMounts:
+  #       - name: seatmap-instance-credentials
+  #         mountPath: /secrets/cloudsql
+  #         readOnly: true
+  #       - name: ssl-certs
+  #         mountPath: /etc/ssl/certs
+  #       - name: cloudsql
+  #         mountPath: /cloudsql
+
+extraInitContainers: []
+
+extraVolumes: []
+  # - name: seatmap-instance-credentials
+  #   secret:
+  #     secretName: seatmap-instance-credentials
+  # - name: ssl-certs
+  #   hostPath:
+  #     path: /etc/ssl/certs
+  # - name: cloudsql
+  #   emptyDir:
+  # - name: oidc-auth-volume
+  #   configMap:
+  #     name: oidc-auth-config
+
+affinity:
+  enabled: true
+  weight: 100
+
+rbac: 
+  enabled: false
+  # rules: 
+  #   - apiGroups: [""]
+  #     resources:
+  #       - pods
+  #     verbs: ["get", "list"]
+
+configmap: # remember to edit name and add to volumemounts
+  enabled: false
+
+horizontalPodAutoscaler:
+  enabled: true
+  targetCPUUtilizationPercentage: 80
+  minReplicas: 3
+  maxReplicas: 5
+
+PodDisruptionBudget:
+  enabled: true
+  minAvailable: 50%
+
+ingress:
+  enabled: true
+  loadBalancerIp: 35.205.170.68 # kubectl get svc -n kube-system (the external ip of service named traefik-apigee)
+  host: bikeservice.entur.io
+
+podSecurityPolicy:
+  enabled: false
