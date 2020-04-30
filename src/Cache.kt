@@ -17,9 +17,6 @@ class InMemoryCache(override val cacheMap: HashMap<BikeOperator, BikeResponse>,
         cacheMap[bikeOperator] = response
         lastUpdated = LocalDateTime.now()
     }
-    fun isValidCache(): Boolean =
-        lastUpdated > LocalDateTime.now().minusSeconds(5)
-
-    fun hasCachedResponse(bikeOperator: BikeOperator): Boolean =
-        cacheMap[bikeOperator] != null
+    fun isValidCache(bikeOperator: BikeOperator): Boolean =
+        cacheMap[bikeOperator] != null && lastUpdated > LocalDateTime.now().minusSeconds(5)
 }
