@@ -5,6 +5,9 @@ enum class BikeOperator {
     OSLOBYSYKKEL, BERGENBYSYKKEL, TRONDHEIMBYSYKKEL
 }
 
+fun getAllOperatorsWithGbfs(): Map<String, List<Map<String, String>>> =
+    mapOf("operators" to BikeOperator.values().map { mapOf("$it".toLowerCase() to getOperatorGbfs(it).gbfs) })
+
 fun getOperatorGbfs(operator: BikeOperator): GbfsStandard =
     when (operator) {
         BikeOperator.OSLOBYSYKKEL -> OsloBysykkelURL

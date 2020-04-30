@@ -40,8 +40,8 @@ fun Application.module() {
             val operator = BikeOperator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
             call.respondText(Gson().toJson(parseResponse<StationStatusResponse>(getOperatorGbfs(operator).station_status)), ContentType.Application.Json)
         }
-        get("/all"){
-
+        get("/all") {
+            call.respondText(Gson().toJson(getAllOperatorsWithGbfs()), ContentType.Application.Json)
         }
     }
 }
