@@ -9,7 +9,7 @@ metadata:
   labels:
     {{- include "common.labels" . | indent 4 }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-  name: {{ template "name.name" . }} 
+  name: {{ template "name.name" . }}
   namespace: {{ .Values.namespace }}
 spec:
   selector:
@@ -34,20 +34,20 @@ spec:
         {{- if .Values.deployment.podLabels}}
         {{ toYaml .Values.deployment.podLabels | indent 8 }}
         {{- end}}
-      checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      #checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
       {{- if .Values.rbac.true }}
-      serviceAccountName: {{ template "name.name" . }} 
+      serviceAccountName: {{ template "name.name" . }}
       {{- end }}
       {{- if .Values.extraInitContainers }}
       initContainers:
 {{ toYaml .Values.extraInitContainers | indent 8 }}
       {{- end }}
       containers:
-      - name: {{ template "name.name" . }} 
+      - name: {{ template "name.name" . }}
         image: {{ .Values.container.image.identifier }}
         imagePullPolicy: {{ .Values.container.image.pullPolicy }}
-        command: 
+        command:
         {{- range .Values.container.extraCommand }}
           - {{ . }}
         {{- end }}
@@ -83,7 +83,7 @@ spec:
             cpu: {{ .Values.container.resources.requests.cpu }}
             memory: {{ .Values.container.resources.requests.memory }}
         {{- if .Values.container.volumeMounts }}
-        volumeMounts:  
+        volumeMounts:
         {{- range .Values.container.volumeMounts }}
         - name: {{ .name }}
           mountPath: {{ .mountPath }}
@@ -104,7 +104,7 @@ spec:
                 - key: app
                   operator: In
                   values:
-                  - {{ .Chart.Name }} 
+                  - {{ .Chart.Name }}
               topologyKey: kubernetes.io/hostname
             weight: {{ .Values.affinity.weight }}
     {{- end }}
