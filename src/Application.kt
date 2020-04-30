@@ -13,6 +13,7 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.jetty.Jetty
 import java.lang.NullPointerException
+import java.time.LocalDateTime
 
 fun main() {
     val server = embeddedServer(Jetty, watchPaths = listOf("bikeservice"), port = 8080, module = Application::module)
@@ -20,13 +21,22 @@ fun main() {
 }
 
 fun Application.module() {
+    val bikeCache = InMemoryCache(HashMap(), LocalDateTime.now())
+
     routing {
         get("/") {
             call.respondText("Hello and welcome to Entur Bikeservice!", ContentType.Application.Json)
         }
         get("{operator}/gbfs.json") {
             val operator = BikeOperator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
-            call.respondText(Gson().toJson(parseResponse<BikeResponse>(getOperatorGbfs(operator).gbfs)), ContentType.Application.Json)
+            val result = if (bikeCache.hasCachedResponse(operator) && bikeCache.isValidCache()){
+                bikeCache.getResponseFromCache(operator)
+            } else {
+                val response = parseResponse<BikeResponse>(getOperatorGbfs(operator).gbfs)
+                bikeCache.setResponseInCache(operator, response)
+                response
+            }
+            call.respondText(Gson().toJson(result), ContentType.Application.Json)
         }
         get("{operator}/system_information.json") {
             val operator = BikeOperator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
