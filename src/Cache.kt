@@ -2,19 +2,19 @@ package org.entur
 
 import java.time.LocalDateTime
 
-interface Cache {
-    val cacheMap: HashMap<BikeOperator, BikeResponse>
+interface Cache<T> {
+    val cacheMap: HashMap<BikeOperator, T>
     val lastUpdated: LocalDateTime
 }
 
-class InMemoryCache(
-    override val cacheMap: HashMap<BikeOperator, BikeResponse>,
+class InMemoryCache<T>(
+    override val cacheMap: HashMap<BikeOperator, T>,
     override var lastUpdated: LocalDateTime
-) : Cache {
+) : Cache<T> {
     fun getResponseFromCache(bikeOperator: BikeOperator) =
         cacheMap[bikeOperator]
 
-    fun setResponseInCache(bikeOperator: BikeOperator, response: BikeResponse) {
+    fun setResponseInCache(bikeOperator: BikeOperator, response: T) {
         println("$bikeOperator - Setting response in cache")
         cacheMap[bikeOperator] = response
         lastUpdated = LocalDateTime.now()
