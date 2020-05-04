@@ -1,5 +1,9 @@
 package org.entur
 
+import BikeResponse
+import StationInformationResponse
+import StationStatusResponse
+import SystemInformationResponse
 import com.google.gson.Gson
 import io.ktor.application.Application
 import io.ktor.application.call
@@ -14,10 +18,6 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.jetty.Jetty
 import java.lang.NullPointerException
 import java.time.LocalDateTime
-import org.entur.bikeOperators.BikeResponse
-import org.entur.bikeOperators.StationInformationResponse
-import org.entur.bikeOperators.StationStatusResponse
-import org.entur.bikeOperators.SystemInformationResponse
 import org.entur.bikeOperators.UrbanSharingOperator
 import org.entur.bikeOperators.getUrbanSharingOperator
 import org.entur.bikeOperators.getUrbanSharingOperators
