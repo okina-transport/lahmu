@@ -15,7 +15,6 @@ class InMemoryCache<T>(
         cacheMap[bikeOperator]
 
     fun setResponseInCache(bikeOperator: BikeOperator, response: T) {
-        println("$bikeOperator - Setting response in cache")
         cacheMap[bikeOperator] = response
         lastUpdated = LocalDateTime.now()
     }
