@@ -30,6 +30,9 @@ fun Application.module() {
         get("/") {
             call.respondText("Hello and welcome to Entur Bikeservice!", ContentType.Application.Json)
         }
+        get("/health") {
+            call.respondText("OK")
+        }
         get("{operator}/gbfs.json") {
             val operator = BikeOperator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
             val result = if (gbfsCache.isValidCache(operator)) {
