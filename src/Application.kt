@@ -13,6 +13,7 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.jetty.Jetty
 import java.lang.NullPointerException
+import java.time.LocalDateTime
 
 fun main() {
     val server = embeddedServer(Jetty, watchPaths = listOf("bikeservice"), port = 8080, module = Application::module)
@@ -20,25 +21,58 @@ fun main() {
 }
 
 fun Application.module() {
+    val gbfsCache = InMemoryCache<BikeResponse>(HashMap(), LocalDateTime.now())
+    val systemInformationCache = InMemoryCache<SystemInformation>(HashMap(), LocalDateTime.now())
+    val stationInformationCache = InMemoryCache<StationInformationResponse>(HashMap(), LocalDateTime.now())
+    val stationStatusCache = InMemoryCache<StationStatusResponse>(HashMap(), LocalDateTime.now())
+
     routing {
         get("/") {
             call.respondText("Hello and welcome to Entur Bikeservice!", ContentType.Application.Json)
         }
         get("{operator}/gbfs.json") {
             val operator = BikeOperator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
-            call.respondText(Gson().toJson(parseResponse<BikeResponse>(getOperatorGbfs(operator).gbfs)), ContentType.Application.Json)
+            val result = if (gbfsCache.isValidCache(operator)) {
+                gbfsCache.getResponseFromCache(operator)
+            } else {
+                val response = parseResponse<BikeResponse>(getOperatorGbfs(operator).gbfs)
+                gbfsCache.setResponseInCache(operator, response)
+                response
+            }
+            call.respondText(Gson().toJson(result), ContentType.Application.Json)
         }
         get("{operator}/system_information.json") {
             val operator = BikeOperator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
-            call.respondText(Gson().toJson(parseResponse<SystemInformationResponse>(getOperatorGbfs(operator).system_information)), ContentType.Application.Json)
+            val result = if (systemInformationCache.isValidCache(operator)) {
+                systemInformationCache.getResponseFromCache(operator)
+            } else {
+                val response = parseResponse<SystemInformation>(getOperatorGbfs(operator).system_information)
+                systemInformationCache.setResponseInCache(operator, response)
+                response
+            }
+            call.respondText(Gson().toJson(result), ContentType.Application.Json)
         }
         get("{operator}/station_information.json") {
             val operator = BikeOperator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
-            call.respondText(Gson().toJson(parseResponse<StationInformationResponse>(getOperatorGbfs(operator).station_information)), ContentType.Application.Json)
+            val result = if (stationInformationCache.isValidCache(operator)) {
+                stationInformationCache.getResponseFromCache(operator)
+            } else {
+                val response = parseResponse<StationInformationResponse>(getOperatorGbfs(operator).station_information)
+                stationInformationCache.setResponseInCache(operator, response)
+                response
+            }
+            call.respondText(Gson().toJson(result), ContentType.Application.Json)
         }
         get("{operator}/station_status.json") {
             val operator = BikeOperator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
-            call.respondText(Gson().toJson(parseResponse<StationStatusResponse>(getOperatorGbfs(operator).station_status)), ContentType.Application.Json)
+            val result = if (stationStatusCache.isValidCache(operator)) {
+                stationStatusCache.getResponseFromCache(operator)
+            } else {
+                val response = parseResponse<StationStatusResponse>(getOperatorGbfs(operator).station_status)
+                stationStatusCache.setResponseInCache(operator, response)
+                response
+            }
+            call.respondText(Gson().toJson(result), ContentType.Application.Json)
         }
         get("/all") {
             call.respondText(Gson().toJson(getAllOperatorsWithGbfs()), ContentType.Application.Json)
