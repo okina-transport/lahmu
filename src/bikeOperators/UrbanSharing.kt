@@ -1,22 +1,6 @@
 package org.entur.bikeOperators
 import GbfsStandard
 
-enum class UrbanSharingOperator {
-    OSLOBYSYKKEL, BERGENBYSYKKEL, TRONDHEIMBYSYKKEL
-}
-
-fun getUrbanSharingOperators(): Map<String, List<Map<String, String>>> =
-    mapOf("operators" to UrbanSharingOperator.values().map { mapOf("$it".toLowerCase() to getUrbanSharingOperator(
-        it
-    ).gbfs) })
-
-fun getUrbanSharingOperator(operator: UrbanSharingOperator): GbfsStandard =
-    when (operator) {
-        UrbanSharingOperator.OSLOBYSYKKEL -> OsloBysykkelURL
-        UrbanSharingOperator.BERGENBYSYKKEL -> BergenBysykkelURL
-        UrbanSharingOperator.TRONDHEIMBYSYKKEL -> TrondheimBysykkelURL
-    }
-
 object OsloBysykkelURL : GbfsStandard {
     override val gbfs: String = "https://gbfs.urbansharing.com/oslobysykkel.no/gbfs.json"
     override val system_information: String = "https://gbfs.urbansharing.com/oslobysykkel.no/system_information.json"
