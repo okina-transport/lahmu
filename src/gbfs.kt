@@ -53,7 +53,8 @@ fun getGbfsJson(gbfsStandard: GbfsStandard): GbfsJsonResponse =
     )
 
 fun getGbfsEndpoint(operators: Operators, host: String, port: Int): GbfsStandard {
-    val urlHost = if (host == "localhost") "$host:$port" else host
+    val modifiedHost = host.replace("bikeservice", "api")
+    val urlHost = if (modifiedHost == "localhost") "http://$modifiedHost:$port" else "https://$modifiedHost/bikeservice"
     return GbfsStandard(
         gbfs = "$urlHost/$operators/gbfs.json".toLowerCase(),
         system_information = "$urlHost/$operators/system_information.json".toLowerCase(),
