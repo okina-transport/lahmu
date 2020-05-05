@@ -45,6 +45,10 @@ fun Application.module() {
             call.respondText("Hello and welcome to Entur Bikeservice!", ContentType.Application.Json)
         }
 
+        get("/health") {
+            call.respondText("OK")
+        }
+
         get("{operator}/gbfs.json") {
             val operator = Operators.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
             val result = when {
