@@ -10,43 +10,34 @@ data class GbfsStandard(
     val station_status: String
 )
 
-interface GBFSResponse<T> {
-    val last_updated: Long
-    val ttl: Long
+data class GBFSResponse<T> (
+    val last_updated: Long,
+    val ttl: Long,
     val data: T
-}
+)
 
-data class GbfsJsonResponse(override val last_updated: Long, override val ttl: Long, override val data: GbfsJsonData) :
-    GBFSResponse<GbfsJsonData>
-data class GbfsJsonData(val nb: GbfsJsonLanguage)
-data class GbfsJsonLanguage(val feeds: List<GbfsJsonFeed>)
-data class GbfsJsonFeed(val name: String, val url: String)
+data class Discovery(val nb: DiscoveryLanguage)
+data class DiscoveryLanguage(val feeds: List<DiscoveryFeed>)
+data class DiscoveryFeed(val name: String, val url: String)
 
-data class SystemInformationResponse(override val last_updated: Long, override val ttl: Long, override val data: SystemInformation) :
-    GBFSResponse<SystemInformation>
 data class SystemInformation(val system_id: String, val language: String, val name: String, val operator: String?, val timezone: String, val phone_number: String?, val email: String?)
 
-data class StationInformationResponse(override val last_updated: Long, override val ttl: Long, override val data: Stations) :
-    GBFSResponse<Stations>
 data class Stations(val stations: List<Station>)
 data class Station(val station_id: String, val name: String, val address: String?, val lat: BigDecimal, val lon: BigDecimal, val capacity: Int)
 
-data class StationStatusResponse(override val last_updated: Long, override val ttl: Long, override val data: StationStatuses) :
-    GBFSResponse<StationStatuses>
 data class StationStatuses(val stations: List<StationStatus>)
 data class StationStatus(val station_id: String, val is_installed: Int, val is_renting: Int, val is_returning: Int, val last_reported: BigDecimal, val num_bikes_available: Int, val num_docks_available: Int)
 
-fun getGbfsJson(gbfsStandard: GbfsStandard): GbfsJsonResponse =
-    GbfsJsonResponse(
+fun getDiscovery(gbfsStandard: GbfsStandard): GBFSResponse<Discovery> =
+    GBFSResponse(
         last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
         ttl = 15,
-        data = GbfsJsonData(
-            nb = GbfsJsonLanguage(
+        data = Discovery(
+            nb = DiscoveryLanguage(
                 feeds = listOf(
-                    GbfsJsonFeed(name = "gbfs", url = gbfsStandard.gbfs),
-                    GbfsJsonFeed(name = "system_information", url = gbfsStandard.system_information),
-                    GbfsJsonFeed(name = "station_information", url = gbfsStandard.station_information),
-                    GbfsJsonFeed(name = "station_status", url = gbfsStandard.station_status)
+                    DiscoveryFeed(name = "system_information", url = gbfsStandard.system_information),
+                    DiscoveryFeed(name = "station_information", url = gbfsStandard.station_information),
+                    DiscoveryFeed(name = "station_status", url = gbfsStandard.station_status)
                 )
             )
         )

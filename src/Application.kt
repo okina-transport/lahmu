@@ -1,15 +1,16 @@
 package org.entur
 
-import StationInformationResponse
-import StationStatusResponse
-import SystemInformationResponse
+import GBFSResponse
+import StationStatuses
+import Stations
+import SystemInformation
 import bikeOperators.Operators
 import bikeOperators.getOperator
-import bikeOperators.getOperators
+import bikeOperators.getOperatorsWithDiscovery
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import getDiscovery
 import getGbfsEndpoint
-import getGbfsJson
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.client.HttpClient
@@ -36,9 +37,9 @@ fun main() {
 }
 
 fun Application.module() {
-    val systemInformationCache = InMemoryCache<SystemInformationResponse>(HashMap(), LocalDateTime.now())
-    val stationInformationCache = InMemoryCache<StationInformationResponse>(HashMap(), LocalDateTime.now())
-    val stationStatusCache = InMemoryCache<StationStatusResponse>(HashMap(), LocalDateTime.now())
+    val systemInformationCache = InMemoryCache<GBFSResponse<SystemInformation>>(HashMap(), LocalDateTime.now())
+    val stationInformationCache = InMemoryCache<GBFSResponse<Stations>>(HashMap(), LocalDateTime.now())
+    val stationStatusCache = InMemoryCache<GBFSResponse<StationStatuses>>(HashMap(), LocalDateTime.now())
 
     routing {
         get("/") {
@@ -52,7 +53,7 @@ fun Application.module() {
         get("{operator}/gbfs.json") {
             val operator = Operators.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
             val gbfsEndpoints = getGbfsEndpoint(operator, call.request.host(), call.request.port())
-            val response = getGbfsJson(gbfsEndpoints)
+            val response = getDiscovery(gbfsEndpoints)
             call.respondText(Gson().toJson(response), ContentType.Application.Json)
         }
 
@@ -65,7 +66,7 @@ fun Application.module() {
                     systemInformationCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
-                    val response = parseResponse<SystemInformationResponse>(
+                    val response = parseResponse<GBFSResponse<SystemInformation>>(
                         getOperator(operator).system_information
                     )
                     systemInformationCache.setResponseInCacheAndGet(operator, response)
@@ -87,7 +88,7 @@ fun Application.module() {
                     stationInformationCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
-                    val response = parseResponse<StationInformationResponse>(
+                    val response = parseResponse<GBFSResponse<Stations>>(
                         getOperator(operator).station_information
                     )
                     stationInformationCache.setResponseInCacheAndGet(operator, response)
@@ -108,7 +109,7 @@ fun Application.module() {
                     stationStatusCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
-                    val response = parseResponse<StationStatusResponse>(
+                    val response = parseResponse<GBFSResponse<StationStatuses>>(
                         getOperator(operator).station_status
                     )
                     stationStatusCache.setResponseInCacheAndGet(operator, response)
@@ -119,7 +120,7 @@ fun Application.module() {
         get("/all") {
             val host = call.request.host()
             val port = call.request.port()
-            call.respondText(Gson().toJson(getOperators(host, port)), ContentType.Application.Json)
+            call.respondText(Gson().toJson(getOperatorsWithDiscovery(host, port)), ContentType.Application.Json)
         }
     }
 }

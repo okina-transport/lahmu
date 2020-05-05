@@ -15,9 +15,9 @@ enum class Operators {
     }
 }
 
-fun getOperators(port: String, host: Int): Map<String, List<Map<String, GbfsStandard>>> =
+fun getOperatorsWithDiscovery(port: String, host: Int): Map<String, List<Map<String, String>>> =
     mapOf("operators" to Operators.values().map {
-        mapOf("$it".toLowerCase() to getGbfsEndpoint(it, port, host))
+        mapOf("$it".toLowerCase() to getGbfsEndpoint(it, port, host).gbfs)
     })
 
 fun getOperator(operator: Operators): GbfsStandard =
