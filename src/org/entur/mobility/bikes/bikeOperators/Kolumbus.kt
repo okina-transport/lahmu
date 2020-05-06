@@ -27,8 +27,8 @@ data class KolumbusStation(
     val longitude: BigDecimal
 )
 
-fun KolumbusResponse.toSystemInformation(): GBFSResponse<SystemInformation> =
-    GBFSResponse(
+fun KolumbusResponse.toSystemInformation(): GBFSResponse.SystemInformationResponse =
+    GBFSResponse.SystemInformationResponse(
         last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
         ttl = 15,
         data = SystemInformation(
@@ -42,13 +42,13 @@ fun KolumbusResponse.toSystemInformation(): GBFSResponse<SystemInformation> =
         )
     )
 
-fun KolumbusResponse.toStationStatus(): GBFSResponse<StationStatuses> =
-    GBFSResponse(
+fun KolumbusResponse.toStationStatus(): GBFSResponse.StationStatusesResponse =
+    GBFSResponse.StationStatusesResponse(
         last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
         ttl = 15,
         data = StationStatuses(stations = data.map {
             StationStatus(
-                station_id = it.id,
+                station_id = it.external_id,
                 is_installed = 1,
                 is_renting = 1,
                 is_returning = 1,
@@ -59,13 +59,13 @@ fun KolumbusResponse.toStationStatus(): GBFSResponse<StationStatuses> =
         })
     )
 
-fun KolumbusResponse.toStationInformation(): GBFSResponse<Stations> =
-    GBFSResponse(
+fun KolumbusResponse.toStationInformation(): GBFSResponse.StationsResponse =
+    GBFSResponse.StationsResponse(
         last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
         ttl = 15,
         data = Stations(stations = data.map {
             Station(
-                station_id = it.id,
+                station_id = it.external_id,
                 name = it.name,
                 address = null,
                 lat = it.latitude,

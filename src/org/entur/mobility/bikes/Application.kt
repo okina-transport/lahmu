@@ -32,17 +32,17 @@ fun main() {
 
 fun Application.module() {
     val systemInformationCache =
-        InMemoryCache<GBFSResponse<SystemInformation>>(
+        InMemoryCache<GBFSResponse.SystemInformationResponse>(
             HashMap(),
             LocalDateTime.now()
         )
     val stationInformationCache =
-        InMemoryCache<GBFSResponse<Stations>>(
+        InMemoryCache<GBFSResponse.StationsResponse>(
             HashMap(),
             LocalDateTime.now()
         )
     val stationStatusCache =
-        InMemoryCache<GBFSResponse<StationStatuses>>(
+        InMemoryCache<GBFSResponse.StationStatusesResponse>(
             HashMap(),
             LocalDateTime.now()
         )
@@ -74,12 +74,13 @@ fun Application.module() {
                 operator === Operators.KOLUMBUSBYSYKKEL -> {
                     val response = KolumbusResponse(data = parseKolumbusResponse(
                         getOperator(operator).system_information
-                    )).toSystemInformation()
+                    )
+                    ).toSystemInformation()
                     systemInformationCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
                     val response =
-                        parseResponse<GBFSResponse<SystemInformation>>(
+                        parseResponse<GBFSResponse.SystemInformationResponse>(
                             getOperator(operator).system_information
                         )
                     systemInformationCache.setResponseInCacheAndGet(operator, response)
@@ -95,15 +96,17 @@ fun Application.module() {
                     operator
                 )
                 operator === Operators.KOLUMBUSBYSYKKEL -> {
-                    val response = KolumbusResponse(data = parseKolumbusResponse(
-                        getOperator(operator).station_information
-                    )).toStationInformation()
+                    val response = KolumbusResponse(
+                        data = parseKolumbusResponse(
+                            getOperator(operator).station_information
+                        )
+                    ).toStationInformation().toNeTEx(operator)
                     stationInformationCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
-                    val response = parseResponse<GBFSResponse<Stations>>(
+                    val response = parseResponse<GBFSResponse.StationsResponse>(
                         getOperator(operator).station_information
-                    )
+                    ).toNeTEx(operator)
                     stationInformationCache.setResponseInCacheAndGet(operator, response)
                 }
             }
@@ -115,15 +118,16 @@ fun Application.module() {
             val result = when {
                 (stationStatusCache.isValidCache(operator)) -> stationStatusCache.getResponseFromCache(operator)
                 operator === Operators.KOLUMBUSBYSYKKEL -> {
-                    val response = KolumbusResponse(data = parseKolumbusResponse(
-                        getOperator(operator).station_status
-                    )).toStationStatus()
+                    val response = KolumbusResponse(
+                        data = parseKolumbusResponse(
+                            getOperator(operator).station_status
+                        )).toStationStatus().toNeTEx(operator)
                     stationStatusCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
-                    val response = parseResponse<GBFSResponse<StationStatuses>>(
+                    val response = parseResponse<GBFSResponse.StationStatusesResponse>(
                         getOperator(operator).station_status
-                    )
+                    ).toNeTEx(operator)
                     stationStatusCache.setResponseInCacheAndGet(operator, response)
                 }
             }
