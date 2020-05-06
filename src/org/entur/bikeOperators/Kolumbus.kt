@@ -56,8 +56,7 @@ fun KolumbusResponse.toStationStatus(): GBFSResponse<StationStatuses> =
                 num_bikes_available = it.available_vehicles,
                 num_docks_available = it.available_slots
             )
-        }
-        )
+        })
     )
 
 fun KolumbusResponse.toStationInformation(): GBFSResponse<Stations> =
@@ -73,8 +72,7 @@ fun KolumbusResponse.toStationInformation(): GBFSResponse<Stations> =
                 lon = it.longitude,
                 capacity = it.capacity
             )
-        }
-        )
+        })
     )
 
 val kolumbusBysykkelURL = GbfsStandard(
