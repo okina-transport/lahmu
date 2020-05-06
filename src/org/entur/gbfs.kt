@@ -1,7 +1,9 @@
-import bikeOperators.Operators
+package org.entur
+
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import org.entur.bikeOperators.Operators
 
 data class GbfsStandard(
     val gbfs: String,
@@ -35,9 +37,18 @@ fun getDiscovery(gbfsStandard: GbfsStandard): GBFSResponse<Discovery> =
         data = Discovery(
             nb = DiscoveryLanguage(
                 feeds = listOf(
-                    DiscoveryFeed(name = "system_information", url = gbfsStandard.system_information),
-                    DiscoveryFeed(name = "station_information", url = gbfsStandard.station_information),
-                    DiscoveryFeed(name = "station_status", url = gbfsStandard.station_status)
+                    DiscoveryFeed(
+                        name = "system_information",
+                        url = gbfsStandard.system_information
+                    ),
+                    DiscoveryFeed(
+                        name = "station_information",
+                        url = gbfsStandard.station_information
+                    ),
+                    DiscoveryFeed(
+                        name = "station_status",
+                        url = gbfsStandard.station_status
+                    )
                 )
             )
         )

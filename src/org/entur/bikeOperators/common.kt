@@ -1,11 +1,7 @@
-package bikeOperators
+package org.entur.bikeOperators
 
-import GbfsStandard
-import getGbfsEndpoint
-import org.entur.bikeOperators.bergenBysykkelURL
-import org.entur.bikeOperators.kolumbusBysykkelURL
-import org.entur.bikeOperators.osloBysykkelURL
-import org.entur.bikeOperators.trondheimBysykkelURL
+import org.entur.GbfsStandard
+import org.entur.getGbfsEndpoint
 
 enum class Operators {
     OSLOBYSYKKEL, BERGENBYSYKKEL, TRONDHEIMBYSYKKEL, KOLUMBUSBYSYKKEL;

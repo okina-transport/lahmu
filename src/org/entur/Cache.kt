@@ -1,7 +1,7 @@
 package org.entur
 
-import bikeOperators.Operators
 import java.time.LocalDateTime
+import org.entur.bikeOperators.Operators
 
 interface Cache<T> {
     val cacheMap: HashMap<Operators, T>

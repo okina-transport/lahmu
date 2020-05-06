@@ -1,16 +1,7 @@
 package org.entur
 
-import GBFSResponse
-import StationStatuses
-import Stations
-import SystemInformation
-import bikeOperators.Operators
-import bikeOperators.getOperator
-import bikeOperators.getOperatorsWithDiscovery
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import getDiscovery
-import getGbfsEndpoint
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.client.HttpClient
@@ -27,6 +18,9 @@ import io.ktor.server.jetty.Jetty
 import java.time.LocalDateTime
 import org.entur.bikeOperators.KolumbusResponse
 import org.entur.bikeOperators.KolumbusStation
+import org.entur.bikeOperators.Operators
+import org.entur.bikeOperators.getOperator
+import org.entur.bikeOperators.getOperatorsWithDiscovery
 import org.entur.bikeOperators.toStationInformation
 import org.entur.bikeOperators.toStationStatus
 import org.entur.bikeOperators.toSystemInformation
@@ -104,8 +98,7 @@ fun Application.module() {
                 operator === Operators.KOLUMBUSBYSYKKEL -> {
                     val response = KolumbusResponse(data = parseKolumbusResponse(
                         getOperator(operator).station_status
-                    )
-                    ).toStationStatus()
+                    )).toStationStatus()
                     stationStatusCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
