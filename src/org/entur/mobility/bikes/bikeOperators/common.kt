@@ -8,6 +8,12 @@ enum class Operators {
 
     companion object {
         fun isUrbanSharing(operators: Operators) = operators !== KOLUMBUSBYSYKKEL
+        fun getCodeSpace(operator: Operators) = when (operator) {
+            OSLOBYSYKKEL -> "YOS"
+            BERGENBYSYKKEL -> "YBE"
+            TRONDHEIMBYSYKKEL -> "YTR"
+            KOLUMBUSBYSYKKEL -> "YKO"
+        }
     }
 }
 
@@ -23,3 +29,5 @@ fun getOperator(operator: Operators): GbfsStandard =
         Operators.TRONDHEIMBYSYKKEL -> trondheimBysykkelURL
         Operators.KOLUMBUSBYSYKKEL -> kolumbusBysykkelURL
     }
+
+fun mapIdToNeTEx(id: String, operator: Operators) = "${Operators.getCodeSpace(operator)}:BikeStation:$id"
