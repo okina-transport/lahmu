@@ -3,7 +3,7 @@ package org.entur.mobility.bikes
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import org.entur.mobility.bikes.bikeOperators.Operators
+import org.entur.mobility.bikes.bikeOperators.Operator
 import org.entur.mobility.bikes.bikeOperators.mapIdToNeTEx
 
 data class GbfsStandard(
@@ -26,7 +26,7 @@ sealed class GBFSResponse<T>(
 
     class StationsResponse(last_updated: Long, ttl: Long, data: Stations) :
         GBFSResponse<Stations>(last_updated, ttl, data) {
-        fun toNeTEx(operator: Operators): StationsResponse =
+        fun toNeTEx(operator: Operator): StationsResponse =
             StationsResponse(
                 last_updated = last_updated,
                 ttl = ttl,
@@ -36,7 +36,7 @@ sealed class GBFSResponse<T>(
 
     class StationStatusesResponse(last_updated: Long, ttl: Long, data: StationStatuses) :
         GBFSResponse<StationStatuses>(last_updated, ttl, data) {
-        fun toNeTEx(operator: Operators) = StationStatusesResponse(
+        fun toNeTEx(operator: Operator) = StationStatusesResponse(
             last_updated = last_updated,
             ttl = ttl,
             data = data.toNeTEx(operator)
@@ -79,14 +79,14 @@ data class StationStatus(
     val num_docks_available: Int
 )
 
-fun Stations.toNeTEx(operator: Operators): Stations =
+fun Stations.toNeTEx(operator: Operator): Stations =
     Stations(
         stations = stations.map { station ->
             station.toNeTEx(operator)
         }
     )
 
-fun Station.toNeTEx(operator: Operators): Station =
+fun Station.toNeTEx(operator: Operator): Station =
     Station(
         station_id = mapIdToNeTEx(station_id, operator),
         name = name,
@@ -96,12 +96,12 @@ fun Station.toNeTEx(operator: Operators): Station =
         capacity = capacity
     )
 
-fun StationStatuses.toNeTEx(operator: Operators): StationStatuses =
+fun StationStatuses.toNeTEx(operator: Operator): StationStatuses =
     StationStatuses(
         stations = stations.map { stationStatus -> stationStatus.toNeTEx(operator) }
     )
 
-fun StationStatus.toNeTEx(operator: Operators): StationStatus =
+fun StationStatus.toNeTEx(operator: Operator): StationStatus =
     StationStatus(
         station_id = mapIdToNeTEx(station_id, operator),
         is_installed = is_installed,
@@ -136,13 +136,13 @@ fun getDiscovery(gbfsStandard: GbfsStandard): GBFSResponse<Discovery> =
         )
     )
 
-fun getGbfsEndpoint(operators: Operators, host: String, port: Int): GbfsStandard {
+fun getGbfsEndpoint(operator: Operator, host: String, port: Int): GbfsStandard {
     val modifiedHost = host.replace("bikeservice", "api")
     val urlHost = if (modifiedHost == "localhost") "http://$modifiedHost:$port" else "https://$modifiedHost/bikeservice"
     return GbfsStandard(
-        gbfs = "$urlHost/$operators/gbfs.json".toLowerCase(),
-        system_information = "$urlHost/$operators/system_information.json".toLowerCase(),
-        station_information = "$urlHost/$operators/station_information.json".toLowerCase(),
-        station_status = "$urlHost/$operators/station_status.json".toLowerCase()
+        gbfs = "$urlHost/$operator/gbfs.json".toLowerCase(),
+        system_information = "$urlHost/$operator/system_information.json".toLowerCase(),
+        station_information = "$urlHost/$operator/station_information.json".toLowerCase(),
+        station_status = "$urlHost/$operator/station_status.json".toLowerCase()
     )
 }

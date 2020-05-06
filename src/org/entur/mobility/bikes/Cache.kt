@@ -1,25 +1,25 @@
 package org.entur.mobility.bikes
 
 import java.time.LocalDateTime
-import org.entur.mobility.bikes.bikeOperators.Operators
+import org.entur.mobility.bikes.bikeOperators.Operator
 
 interface Cache<T> {
-    val cacheMap: HashMap<Operators, T>
+    val cacheMap: HashMap<Operator, T>
     val lastUpdated: LocalDateTime
 }
 
 class InMemoryCache<T>(
-    override val cacheMap: HashMap<Operators, T>,
+    override val cacheMap: HashMap<Operator, T>,
     override var lastUpdated: LocalDateTime
 ) : Cache<T> {
-    fun getResponseFromCache(bikeOperator: Operators) =
+    fun getResponseFromCache(bikeOperator: Operator) =
         cacheMap[bikeOperator]
 
-    fun setResponseInCacheAndGet(bikeOperator: Operators, response: T): T {
+    fun setResponseInCacheAndGet(bikeOperator: Operator, response: T): T {
         cacheMap[bikeOperator] = response
         lastUpdated = LocalDateTime.now()
         return response
     }
-    fun isValidCache(bikeOperator: Operators): Boolean =
+    fun isValidCache(bikeOperator: Operator): Boolean =
         cacheMap[bikeOperator] != null && lastUpdated > LocalDateTime.now().minusSeconds(5)
 }
