@@ -18,8 +18,8 @@ import io.ktor.server.jetty.Jetty
 import java.time.LocalDateTime
 import org.entur.mobility.bikes.bikeOperators.KolumbusResponse
 import org.entur.mobility.bikes.bikeOperators.KolumbusStation
-import org.entur.mobility.bikes.bikeOperators.Operators
-import org.entur.mobility.bikes.bikeOperators.getOperator
+import org.entur.mobility.bikes.bikeOperators.Operator
+import org.entur.mobility.bikes.bikeOperators.Operator.Companion.getFetchUrls
 import org.entur.mobility.bikes.bikeOperators.getOperatorsWithDiscovery
 import org.entur.mobility.bikes.bikeOperators.toStationInformation
 import org.entur.mobility.bikes.bikeOperators.toStationStatus
@@ -57,7 +57,7 @@ fun Application.module() {
         }
 
         get("{operator}/gbfs.json") {
-            val operator = Operators.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
+            val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
             val gbfsEndpoints = getGbfsEndpoint(
                 operator,
                 call.request.host(),
@@ -68,20 +68,21 @@ fun Application.module() {
         }
 
         get("{operator}/system_information.json") {
-            val operator = Operators.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
+            val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
             val result = when {
                 systemInformationCache.isValidCache(operator) -> systemInformationCache.getResponseFromCache(operator)
-                operator === Operators.KOLUMBUSBYSYKKEL -> {
-                    val response = KolumbusResponse(data = parseKolumbusResponse(
-                        getOperator(operator).system_information
-                    )
+                operator === Operator.KOLUMBUSBYSYKKEL -> {
+                    val response = KolumbusResponse(
+                        data = parseKolumbusResponse(
+                            operator.getFetchUrls().system_information
+                        )
                     ).toSystemInformation()
                     systemInformationCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
                     val response =
                         parseResponse<GBFSResponse.SystemInformationResponse>(
-                            getOperator(operator).system_information
+                            operator.getFetchUrls().system_information
                         )
                     systemInformationCache.setResponseInCacheAndGet(operator, response)
                 }
@@ -90,22 +91,22 @@ fun Application.module() {
         }
 
         get("{operator}/station_information.json") {
-            val operator = Operators.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
+            val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
             val result = when {
                 (stationInformationCache.isValidCache(operator)) -> stationInformationCache.getResponseFromCache(
                     operator
                 )
-                operator === Operators.KOLUMBUSBYSYKKEL -> {
+                operator === Operator.KOLUMBUSBYSYKKEL -> {
                     val response = KolumbusResponse(
                         data = parseKolumbusResponse(
-                            getOperator(operator).station_information
+                            operator.getFetchUrls().station_information
                         )
                     ).toStationInformation().toNeTEx(operator)
                     stationInformationCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
                     val response = parseResponse<GBFSResponse.StationsResponse>(
-                        getOperator(operator).station_information
+                        operator.getFetchUrls().station_information
                     ).toNeTEx(operator)
                     stationInformationCache.setResponseInCacheAndGet(operator, response)
                 }
@@ -114,19 +115,20 @@ fun Application.module() {
         }
 
         get("{operator}/station_status.json") {
-            val operator = Operators.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
+            val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
             val result = when {
                 (stationStatusCache.isValidCache(operator)) -> stationStatusCache.getResponseFromCache(operator)
-                operator === Operators.KOLUMBUSBYSYKKEL -> {
+                operator === Operator.KOLUMBUSBYSYKKEL -> {
                     val response = KolumbusResponse(
                         data = parseKolumbusResponse(
-                            getOperator(operator).station_status
-                        )).toStationStatus().toNeTEx(operator)
+                            operator.getFetchUrls().station_status
+                        )
+                    ).toStationStatus().toNeTEx(operator)
                     stationStatusCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
                     val response = parseResponse<GBFSResponse.StationStatusesResponse>(
-                        getOperator(operator).station_status
+                        operator.getFetchUrls().station_status
                     ).toNeTEx(operator)
                     stationStatusCache.setResponseInCacheAndGet(operator, response)
                 }
