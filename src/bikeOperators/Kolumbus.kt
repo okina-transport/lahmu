@@ -1,17 +1,12 @@
 package org.entur.bikeOperators
-import GbfsJsonData
-import GbfsJsonFeed
-import GbfsJsonLanguage
-import GbfsJsonResponse
+
+import GBFSResponse
 import GbfsStandard
 import Station
-import StationInformationResponse
 import StationStatus
-import StationStatusResponse
 import StationStatuses
 import Stations
 import SystemInformation
-import SystemInformationResponse
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -32,7 +27,7 @@ data class KolumbusStation(
     val longitude: BigDecimal
 )
 
-fun KolumbusResponse.toSystemInformation() = SystemInformationResponse(
+fun KolumbusResponse.toSystemInformation(): GBFSResponse<SystemInformation> = GBFSResponse(
     last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
     ttl = 15,
     data = SystemInformation(
@@ -46,7 +41,7 @@ fun KolumbusResponse.toSystemInformation() = SystemInformationResponse(
     )
 )
 
-fun KolumbusResponse.toStationStatus() = StationStatusResponse(
+fun KolumbusResponse.toStationStatus(): GBFSResponse<StationStatuses> = GBFSResponse(
     last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
     ttl = 15,
     data = StationStatuses(stations = data.map {
@@ -62,7 +57,7 @@ fun KolumbusResponse.toStationStatus() = StationStatusResponse(
     )
 )
 
-fun KolumbusResponse.toStationInformation() = StationInformationResponse(
+fun KolumbusResponse.toStationInformation(): GBFSResponse<Stations> = GBFSResponse(
     last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
     ttl = 15,
     data = Stations(stations = data.map {
@@ -74,18 +69,6 @@ fun KolumbusResponse.toStationInformation() = StationInformationResponse(
             lon = it.longitude,
             capacity = it.capacity
         ) }
-    )
-)
-
-fun kolumbusGBBFSResponse() = GbfsJsonResponse(
-    last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-    ttl = 15,
-    data = GbfsJsonData(nb =
-        GbfsJsonLanguage(feeds = listOf(
-            GbfsJsonFeed(name = "system_information", url = "kolumbusbysykkel/system_information.json"),
-            GbfsJsonFeed(name = "station_information", url = "kolumbusbysykkel/station_information.json"),
-            GbfsJsonFeed(name = "station_status", url = "kolumbusbysykkel/station_status.json")
-        ))
     )
 )
 
