@@ -4,7 +4,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import org.entur.mobility.bikes.GBFSResponse
-import org.entur.mobility.bikes.GbfsStandard
+import org.entur.mobility.bikes.GbfsStandardEnum
 import org.entur.mobility.bikes.Station
 import org.entur.mobility.bikes.StationStatus
 import org.entur.mobility.bikes.StationStatuses
@@ -75,9 +75,9 @@ fun KolumbusResponse.toStationInformation(): GBFSResponse.StationsResponse =
         })
     )
 
-val kolumbusBysykkelURL = GbfsStandard(
-    gbfs = "",
-    system_information = "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike",
-    station_information = "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike",
-    station_status = "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike"
+val kolumbusBysykkelURL = mapOf(
+    GbfsStandardEnum.gbfs to "",
+    GbfsStandardEnum.system_information to "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike",
+    GbfsStandardEnum.station_information to "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike",
+    GbfsStandardEnum.station_status to "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike"
 )

@@ -1,6 +1,6 @@
 package org.entur.mobility.bikes.bikeOperators
 
-import org.entur.mobility.bikes.GbfsStandard
+import org.entur.mobility.bikes.GbfsStandardEnum
 import org.entur.mobility.bikes.bikeOperators.Operator.Companion.getCodeSpace
 import org.entur.mobility.bikes.getGbfsEndpoint
 
@@ -16,7 +16,7 @@ enum class Operator {
             KOLUMBUSBYSYKKEL -> "YKO"
         }
 
-        fun Operator.getFetchUrls(): GbfsStandard = when (this) {
+        fun Operator.getFetchUrls() = when (this) {
             OSLOBYSYKKEL -> osloBysykkelURL
             BERGENBYSYKKEL -> bergenBysykkelURL
             TRONDHEIMBYSYKKEL -> trondheimBysykkelURL
@@ -27,7 +27,7 @@ enum class Operator {
 
 fun getOperatorsWithDiscovery(port: String, host: Int): Map<String, List<Map<String, String>>> =
     mapOf("operators" to Operator.values().map {
-        mapOf("$it".toLowerCase() to getGbfsEndpoint(it, port, host).gbfs)
+        mapOf("$it".toLowerCase() to getGbfsEndpoint(it, port, host)[GbfsStandardEnum.gbfs]!!)
     })
 
 fun mapIdToNeTEx(id: String, operator: Operator) = "${operator.getCodeSpace()}:BikeStation:$id"

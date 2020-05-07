@@ -3,24 +3,34 @@ package org.entur.mobility.bikes
 import java.time.LocalDateTime
 import org.entur.mobility.bikes.bikeOperators.Operator
 
-interface Cache<T> {
-    val cacheMap: HashMap<Operator, T>
+interface Cache {
+    val cacheMap: HashMap<Operator, HashMap<GbfsStandardEnum, GBFSResponse>>
     val lastUpdated: LocalDateTime
 }
 
-class InMemoryCache<T>(
-    override val cacheMap: HashMap<Operator, T>,
+class InMemoryCache(
+    override val cacheMap: HashMap<Operator, HashMap<GbfsStandardEnum, GBFSResponse>>,
     override var lastUpdated: LocalDateTime
+) : Cache {
+    fun getResponseFromCache(bikeOperator: Operator, gbfsStandardEnum: GbfsStandardEnum): GBFSResponse? {
+        return cacheMap[bikeOperator]?.get(gbfsStandardEnum)
+    }
 
-) : Cache<T> {
-    fun getResponseFromCache(bikeOperator: Operator): T? =
-        cacheMap[bikeOperator]
-
-    fun setResponseInCacheAndGet(bikeOperator: Operator, response: T): T {
-        cacheMap[bikeOperator] = response
+    fun setResponseInCacheAndGet(
+        operator: Operator,
+        gbfsStandardEnum: GbfsStandardEnum,
+        response: GBFSResponse
+    ): GBFSResponse {
+        if (cacheMap[operator] == null) {
+            cacheMap[operator] = hashMapOf(gbfsStandardEnum to response)
+        } else {
+            cacheMap[operator]!![gbfsStandardEnum] = response
+        }
         lastUpdated = LocalDateTime.now()
         return response
     }
-    fun isValidCache(bikeOperator: Operator): Boolean =
-        cacheMap[bikeOperator] != null && lastUpdated > LocalDateTime.now().minusSeconds(15)
+
+    fun isValidCache(bikeOperator: Operator, gbfsStandardEnum: GbfsStandardEnum): Boolean =
+        cacheMap[bikeOperator]?.get(gbfsStandardEnum) != null && lastUpdated > LocalDateTime.now()
+            .minusSeconds(TIME_TO_LIVE_CACHE)
 }
