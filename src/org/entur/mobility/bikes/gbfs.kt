@@ -14,11 +14,11 @@ enum class GbfsStandardEnum {
     station_status;
 
     companion object {
-        fun GbfsStandardEnum.getFetchUrl(operator: Operator): String? = when (this) {
-            gbfs -> operator.getFetchUrls()[this]
-            system_information -> operator.getFetchUrls()[this]
-            station_information -> operator.getFetchUrls()[this]
-            station_status -> operator.getFetchUrls()[this]
+        fun GbfsStandardEnum.getFetchUrl(operator: Operator): String = when (this) {
+            gbfs -> operator.getFetchUrls().getValue(this)
+            system_information -> operator.getFetchUrls().getValue(this)
+            station_information -> operator.getFetchUrls().getValue(this)
+            station_status -> operator.getFetchUrls().getValue(this)
         }
     }
 }
@@ -130,15 +130,15 @@ fun getDiscovery(gbfsStandard: Map<GbfsStandardEnum, String>): GBFSResponse =
                 feeds = listOf(
                     DiscoveryFeed(
                         name = "system_information",
-                        url = gbfsStandard[GbfsStandardEnum.system_information]!!
+                        url = gbfsStandard.getValue(GbfsStandardEnum.system_information)
                     ),
                     DiscoveryFeed(
                         name = "station_information",
-                        url = gbfsStandard[GbfsStandardEnum.station_information]!!
+                        url = gbfsStandard.getValue(GbfsStandardEnum.station_information)
                     ),
                     DiscoveryFeed(
                         name = "station_status",
-                        url = gbfsStandard[GbfsStandardEnum.station_status]!!
+                        url = gbfsStandard.getValue(GbfsStandardEnum.station_status)
                     )
                 )
             )
