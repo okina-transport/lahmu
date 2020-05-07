@@ -16,14 +16,21 @@ import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.jetty.Jetty
 import java.time.LocalDateTime
+import kotlin.concurrent.thread
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.entur.mobility.bikes.bikeOperators.KolumbusResponse
 import org.entur.mobility.bikes.bikeOperators.KolumbusStation
 import org.entur.mobility.bikes.bikeOperators.Operator
 import org.entur.mobility.bikes.bikeOperators.Operator.Companion.getFetchUrls
+import org.entur.mobility.bikes.bikeOperators.Operator.Companion.isUrbanSharing
 import org.entur.mobility.bikes.bikeOperators.getOperatorsWithDiscovery
+import org.entur.mobility.bikes.bikeOperators.kolumbusBysykkelURL
 import org.entur.mobility.bikes.bikeOperators.toStationInformation
 import org.entur.mobility.bikes.bikeOperators.toStationStatus
 import org.entur.mobility.bikes.bikeOperators.toSystemInformation
+
+const val POLL_INTERVAL = 15000L
 
 fun main() {
     val server = embeddedServer(Jetty, watchPaths = listOf("bikeservice"), port = 8080, module = Application::module)
@@ -31,21 +38,15 @@ fun main() {
 }
 
 fun Application.module() {
-    val systemInformationCache =
-        InMemoryCache<GBFSResponse.SystemInformationResponse>(
-            HashMap(),
-            LocalDateTime.now()
-        )
-    val stationInformationCache =
-        InMemoryCache<GBFSResponse.StationsResponse>(
-            HashMap(),
-            LocalDateTime.now()
-        )
-    val stationStatusCache =
-        InMemoryCache<GBFSResponse.StationStatusesResponse>(
-            HashMap(),
-            LocalDateTime.now()
-        )
+    val systemInformationCache = InMemoryCache<GBFSResponse.SystemInformationResponse>(HashMap(), LocalDateTime.now())
+    val stationInformationCache = InMemoryCache<GBFSResponse.StationsResponse>(HashMap(), LocalDateTime.now())
+    val stationStatusCache = InMemoryCache<GBFSResponse.StationStatusesResponse>(HashMap(), LocalDateTime.now())
+
+    thread(start = true) {
+        launch { poll(systemInformationCache) { it.toSystemInformation() } }
+        launch { poll(stationInformationCache) { it.toStationInformation() } }
+        launch { poll(stationStatusCache) { it.toStationStatus() } }
+    }
 
     routing {
         get("/") {
@@ -60,11 +61,7 @@ fun Application.module() {
 
         get("{operator}/gbfs.json") {
             val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
-            val gbfsEndpoints = getGbfsEndpoint(
-                operator,
-                call.request.host(),
-                call.request.port()
-            )
+            val gbfsEndpoints = getGbfsEndpoint(operator, call.request.host(), call.request.port())
             val response = getDiscovery(gbfsEndpoints)
             call.respondText(Gson().toJson(response), ContentType.Application.Json)
         }
@@ -74,18 +71,16 @@ fun Application.module() {
             val result = when {
                 systemInformationCache.isValidCache(operator) -> systemInformationCache.getResponseFromCache(operator)
                 operator === Operator.KOLUMBUSBYSYKKEL -> {
-                    val response = KolumbusResponse(
-                        data = parseKolumbusResponse(
-                            operator.getFetchUrls().system_information
-                        )
-                    ).toSystemInformation()
+                    val response =
+                        KolumbusResponse(
+                            data = parseKolumbusResponse(operator.getFetchUrls().system_information)
+                        ).toSystemInformation()
                     systemInformationCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
-                    val response =
-                        parseResponse<GBFSResponse.SystemInformationResponse>(
-                            operator.getFetchUrls().system_information
-                        )
+                    val response = parseResponse<GBFSResponse.SystemInformationResponse>(
+                        operator.getFetchUrls().system_information
+                    )
                     systemInformationCache.setResponseInCacheAndGet(operator, response)
                 }
             }
@@ -103,7 +98,8 @@ fun Application.module() {
                         data = parseKolumbusResponse(
                             operator.getFetchUrls().station_information
                         )
-                    ).toStationInformation().toNeTEx(operator)
+                    )
+                        .toStationInformation().toNeTEx(operator)
                     stationInformationCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
@@ -125,7 +121,8 @@ fun Application.module() {
                         data = parseKolumbusResponse(
                             operator.getFetchUrls().station_status
                         )
-                    ).toStationStatus().toNeTEx(operator)
+                    )
+                        .toStationStatus().toNeTEx(operator)
                     stationStatusCache.setResponseInCacheAndGet(operator, response)
                 }
                 else -> {
@@ -152,5 +149,20 @@ suspend inline fun parseKolumbusResponse(url: String): List<KolumbusStation> {
         val response = get<String>(url) { header("Client-Identifier", "entur-bikeservice") }
         val itemType = object : TypeToken<List<KolumbusStation>>() {}.type
         return Gson().fromJson(response, itemType)
+    }
+}
+
+suspend inline fun <reified T> poll(cache: InMemoryCache<T>, parseNonGbfsFn: (KolumbusResponse) -> T) {
+    while (true) {
+        delay(POLL_INTERVAL)
+        Operator.values().forEach {
+            if (it.isUrbanSharing()) {
+                val response = parseResponse<T>(it.getFetchUrls().getGbfsEndpoint<T>())
+                cache.setResponseInCacheAndGet(it, response)
+            } else {
+                val response = parseKolumbusResponse(kolumbusBysykkelURL.system_information)
+                cache.setResponseInCacheAndGet(it, parseNonGbfsFn(KolumbusResponse(response)))
+            }
+        }
     }
 }
