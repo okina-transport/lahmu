@@ -29,7 +29,7 @@ sourceSets {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'org.entur.ApplicationKt'
+        attributes 'Main-Class': 'org.entur.mobility.bikes.ApplicationKt'
     }
     from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 }
