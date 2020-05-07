@@ -4,38 +4,37 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import org.entur.mobility.bikes.bikeOperators.Operator
+import org.entur.mobility.bikes.bikeOperators.Operator.Companion.getFetchUrls
 import org.entur.mobility.bikes.bikeOperators.mapIdToNeTEx
 
-data class GbfsStandard(
-    val gbfs: String,
-    val system_information: String,
-    val station_information: String,
-    val station_status: String
-)
+enum class GbfsStandardEnum {
+    gbfs,
+    system_information,
+    station_information,
+    station_status;
 
-inline fun <reified T> GbfsStandard.getGbfsEndpoint(): String {
-    return when (T::class) {
-        GBFSResponse.DiscoveryResponse::class -> this.gbfs
-        GBFSResponse.SystemInformationResponse::class -> this.system_information
-        GBFSResponse.StationsResponse::class -> this.station_information
-        GBFSResponse.StationStatusesResponse::class -> this.station_status
-        else -> throw Exception("Not a valid GBFS response.")
+    companion object {
+        fun GbfsStandardEnum.getFetchUrl(operator: Operator): String? = when (this) {
+            gbfs -> operator.getFetchUrls()[this]
+            system_information -> operator.getFetchUrls()[this]
+            station_information -> operator.getFetchUrls()[this]
+            station_status -> operator.getFetchUrls()[this]
+        }
     }
 }
 
-sealed class GBFSResponse<T>(
+sealed class GBFSResponse(
     val last_updated: Long,
-    val ttl: Long,
-    val data: T
+    val ttl: Long
 ) {
-    class DiscoveryResponse(last_updated: Long, ttl: Long, data: Discovery) :
-        GBFSResponse<Discovery>(last_updated, ttl, data)
+    class DiscoveryResponse(last_updated: Long, ttl: Long, val data: Discovery) :
+        GBFSResponse(last_updated, ttl)
 
-    class SystemInformationResponse(last_updated: Long, ttl: Long, data: SystemInformation) :
-        GBFSResponse<SystemInformation>(last_updated, ttl, data)
+    class SystemInformationResponse(last_updated: Long, ttl: Long, val data: SystemInformation) :
+        GBFSResponse(last_updated, ttl)
 
-    class StationsResponse(last_updated: Long, ttl: Long, data: Stations) :
-        GBFSResponse<Stations>(last_updated, ttl, data) {
+    class StationsResponse(last_updated: Long, ttl: Long, val data: Stations) :
+        GBFSResponse(last_updated, ttl) {
         fun toNeTEx(operator: Operator): StationsResponse =
             StationsResponse(
                 last_updated = last_updated,
@@ -44,8 +43,8 @@ sealed class GBFSResponse<T>(
             )
     }
 
-    class StationStatusesResponse(last_updated: Long, ttl: Long, data: StationStatuses) :
-        GBFSResponse<StationStatuses>(last_updated, ttl, data) {
+    class StationStatusesResponse(last_updated: Long, ttl: Long, val data: StationStatuses) :
+        GBFSResponse(last_updated, ttl) {
         fun toNeTEx(operator: Operator) = StationStatusesResponse(
             last_updated = last_updated,
             ttl = ttl,
@@ -122,7 +121,7 @@ fun StationStatus.toNeTEx(operator: Operator): StationStatus =
         num_docks_available = num_docks_available
     )
 
-fun getDiscovery(gbfsStandard: GbfsStandard): GBFSResponse<Discovery> =
+fun getDiscovery(gbfsStandard: Map<GbfsStandardEnum, String>): GBFSResponse =
     GBFSResponse.DiscoveryResponse(
         last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
         ttl = 15,
@@ -131,28 +130,28 @@ fun getDiscovery(gbfsStandard: GbfsStandard): GBFSResponse<Discovery> =
                 feeds = listOf(
                     DiscoveryFeed(
                         name = "system_information",
-                        url = gbfsStandard.system_information
+                        url = gbfsStandard[GbfsStandardEnum.system_information]!!
                     ),
                     DiscoveryFeed(
                         name = "station_information",
-                        url = gbfsStandard.station_information
+                        url = gbfsStandard[GbfsStandardEnum.station_information]!!
                     ),
                     DiscoveryFeed(
                         name = "station_status",
-                        url = gbfsStandard.station_status
+                        url = gbfsStandard[GbfsStandardEnum.station_status]!!
                     )
                 )
             )
         )
     )
 
-fun getGbfsEndpoint(operator: Operator, host: String, port: Int): GbfsStandard {
+fun getGbfsEndpoint(operator: Operator, host: String, port: Int): Map<GbfsStandardEnum, String> {
     val modifiedHost = host.replace("bikeservice", "api")
     val urlHost = if (modifiedHost == "localhost") "http://$modifiedHost:$port" else "https://$modifiedHost/bikeservice"
-    return GbfsStandard(
-        gbfs = "$urlHost/$operator/gbfs.json".toLowerCase(),
-        system_information = "$urlHost/$operator/system_information.json".toLowerCase(),
-        station_information = "$urlHost/$operator/station_information.json".toLowerCase(),
-        station_status = "$urlHost/$operator/station_status.json".toLowerCase()
+    return mapOf(
+        GbfsStandardEnum.gbfs to "$urlHost/$operator/gbfs.json".toLowerCase(),
+        GbfsStandardEnum.system_information to "$urlHost/$operator/system_information.json".toLowerCase(),
+        GbfsStandardEnum.station_information to "$urlHost/$operator/station_information.json".toLowerCase(),
+        GbfsStandardEnum.station_status to "$urlHost/$operator/station_status.json".toLowerCase()
     )
 }

@@ -19,13 +19,12 @@ import java.time.LocalDateTime
 import kotlin.concurrent.thread
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.entur.mobility.bikes.GbfsStandardEnum.Companion.getFetchUrl
 import org.entur.mobility.bikes.bikeOperators.KolumbusResponse
 import org.entur.mobility.bikes.bikeOperators.KolumbusStation
 import org.entur.mobility.bikes.bikeOperators.Operator
-import org.entur.mobility.bikes.bikeOperators.Operator.Companion.getFetchUrls
 import org.entur.mobility.bikes.bikeOperators.Operator.Companion.isUrbanSharing
 import org.entur.mobility.bikes.bikeOperators.getOperatorsWithDiscovery
-import org.entur.mobility.bikes.bikeOperators.kolumbusBysykkelURL
 import org.entur.mobility.bikes.bikeOperators.toStationInformation
 import org.entur.mobility.bikes.bikeOperators.toStationStatus
 import org.entur.mobility.bikes.bikeOperators.toSystemInformation
@@ -38,14 +37,10 @@ fun main() {
 }
 
 fun Application.module() {
-    val systemInformationCache = InMemoryCache<GBFSResponse.SystemInformationResponse>(HashMap(), LocalDateTime.now())
-    val stationInformationCache = InMemoryCache<GBFSResponse.StationsResponse>(HashMap(), LocalDateTime.now())
-    val stationStatusCache = InMemoryCache<GBFSResponse.StationStatusesResponse>(HashMap(), LocalDateTime.now())
+    val cache = InMemoryCache(HashMap(), LocalDateTime.now())
 
     thread(start = true) {
-        launch { poll(systemInformationCache) { it.toSystemInformation() } }
-        launch { poll(stationInformationCache) { it.toStationInformation() } }
-        launch { poll(stationStatusCache) { it.toStationStatus() } }
+        launch { poll(cache) }
     }
 
     routing {
@@ -68,20 +63,21 @@ fun Application.module() {
 
         get("{operator}/system_information.json") {
             val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
+            val gbfsEnum = GbfsStandardEnum.valueOf("system_information")
             val result = when {
-                systemInformationCache.isValidCache(operator) -> systemInformationCache.getResponseFromCache(operator)
+                cache.isValidCache(operator, GbfsStandardEnum.system_information) -> cache.getResponseFromCache(operator, GbfsStandardEnum.system_information)
                 operator === Operator.KOLUMBUSBYSYKKEL -> {
                     val response =
                         KolumbusResponse(
-                            data = parseKolumbusResponse(operator.getFetchUrls().system_information)
+                            data = parseKolumbusResponse(gbfsEnum.getFetchUrl(operator)!!)
                         ).toSystemInformation()
-                    systemInformationCache.setResponseInCacheAndGet(operator, response)
+                    cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.station_information, response)
                 }
                 else -> {
                     val response = parseResponse<GBFSResponse.SystemInformationResponse>(
-                        operator.getFetchUrls().system_information
+                        gbfsEnum.getFetchUrl(operator)!!
                     )
-                    systemInformationCache.setResponseInCacheAndGet(operator, response)
+                    cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.station_information, response)
                 }
             }
             call.respondText(Gson().toJson(result), ContentType.Application.Json)
@@ -89,24 +85,26 @@ fun Application.module() {
 
         get("{operator}/station_information.json") {
             val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
+            val gbfsEnum = GbfsStandardEnum.valueOf("station_information")
             val result = when {
-                (stationInformationCache.isValidCache(operator)) -> stationInformationCache.getResponseFromCache(
-                    operator
+                (cache.isValidCache(operator, GbfsStandardEnum.station_information)) -> cache.getResponseFromCache(
+                    operator,
+                    GbfsStandardEnum.station_information
                 )
                 operator === Operator.KOLUMBUSBYSYKKEL -> {
                     val response = KolumbusResponse(
                         data = parseKolumbusResponse(
-                            operator.getFetchUrls().station_information
+                            gbfsEnum.getFetchUrl(operator)!!
                         )
                     )
                         .toStationInformation().toNeTEx(operator)
-                    stationInformationCache.setResponseInCacheAndGet(operator, response)
+                    cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.station_information, response)
                 }
                 else -> {
                     val response = parseResponse<GBFSResponse.StationsResponse>(
-                        operator.getFetchUrls().station_information
+                        gbfsEnum.getFetchUrl(operator)!!
                     ).toNeTEx(operator)
-                    stationInformationCache.setResponseInCacheAndGet(operator, response)
+                    cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.station_information, response)
                 }
             }
             call.respondText(Gson().toJson(result), ContentType.Application.Json)
@@ -114,22 +112,23 @@ fun Application.module() {
 
         get("{operator}/station_status.json") {
             val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
+            val gbfsEnum = GbfsStandardEnum.valueOf("station_status")
             val result = when {
-                (stationStatusCache.isValidCache(operator)) -> stationStatusCache.getResponseFromCache(operator)
+                (cache.isValidCache(operator, GbfsStandardEnum.station_status)) -> cache.getResponseFromCache(operator, GbfsStandardEnum.station_status)
                 operator === Operator.KOLUMBUSBYSYKKEL -> {
                     val response = KolumbusResponse(
                         data = parseKolumbusResponse(
-                            operator.getFetchUrls().station_status
+                            gbfsEnum.getFetchUrl(operator)!!
                         )
                     )
                         .toStationStatus().toNeTEx(operator)
-                    stationStatusCache.setResponseInCacheAndGet(operator, response)
+                    cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.station_status, response)
                 }
                 else -> {
                     val response = parseResponse<GBFSResponse.StationStatusesResponse>(
-                        operator.getFetchUrls().station_status
+                        gbfsEnum.getFetchUrl(operator)!!
                     ).toNeTEx(operator)
-                    stationStatusCache.setResponseInCacheAndGet(operator, response)
+                    cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.station_status, response)
                 }
             }
             call.respondText(Gson().toJson(result), ContentType.Application.Json)
@@ -152,17 +151,49 @@ suspend inline fun parseKolumbusResponse(url: String): List<KolumbusStation> {
     }
 }
 
-suspend inline fun <reified T> poll(cache: InMemoryCache<T>, parseNonGbfsFn: (KolumbusResponse) -> T) {
+suspend inline fun poll(cache: InMemoryCache) {
     while (true) {
-        delay(POLL_INTERVAL)
-        Operator.values().forEach {
-            if (it.isUrbanSharing()) {
-                val response = parseResponse<T>(it.getFetchUrls().getGbfsEndpoint<T>())
-                cache.setResponseInCacheAndGet(it, response)
-            } else {
-                val response = parseKolumbusResponse(kolumbusBysykkelURL.system_information)
-                cache.setResponseInCacheAndGet(it, parseNonGbfsFn(KolumbusResponse(response)))
+        Operator.values().forEach { operator ->
+            GbfsStandardEnum.values().forEach {
+                if (operator.isUrbanSharing()) {
+                    when (it) {
+                        GbfsStandardEnum.gbfs -> {}
+                        GbfsStandardEnum.system_information -> {
+                            val response = parseResponse<GBFSResponse.SystemInformationResponse>(it.getFetchUrl(operator)!!)
+                    cache.setResponseInCacheAndGet(operator, it, response)
+                        }
+                        GbfsStandardEnum.station_information -> {
+                            val response = parseResponse<GBFSResponse.StationsResponse>(it.getFetchUrl(operator)!!)
+                    cache.setResponseInCacheAndGet(operator, it, response)
+                        }
+                        GbfsStandardEnum.station_status -> {
+                            val response = parseResponse<GBFSResponse.StationStatusesResponse>(it.getFetchUrl(operator)!!)
+                    cache.setResponseInCacheAndGet(operator, it, response)
+                        }
+                    }
+                } else {
+                    when (it) {
+                        GbfsStandardEnum.gbfs -> {}
+                        GbfsStandardEnum.system_information -> {
+                            val response = KolumbusResponse(
+                                data = parseKolumbusResponse(it.getFetchUrl(operator)!!)
+                            ).toSystemInformation()
+                            cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.station_information, response)
+                        }
+                        GbfsStandardEnum.station_information -> {
+                            val response = KolumbusResponse(
+                                data = parseKolumbusResponse(
+                                    it.getFetchUrl(operator)!!
+                                )
+                            )
+                            cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.station_status, response.toStationStatus().toNeTEx(operator))
+                            cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.station_information, response.toStationInformation().toNeTEx(operator))
+                        }
+                        GbfsStandardEnum.station_status -> { }
+                    }
+                }
             }
         }
+        delay(POLL_INTERVAL)
     }
 }
