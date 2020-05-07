@@ -123,12 +123,12 @@ suspend fun fetchAndStoreInCache(
                 cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
             }
             GbfsStandardEnum.station_information -> {
-                val response = parseResponse<GBFSResponse.StationsResponse>(gbfsStandardEnum.getFetchUrl(operator))
+                val response = parseResponse<GBFSResponse.StationsResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(operator)
                 cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
             }
             GbfsStandardEnum.station_status -> {
                 val response =
-                    parseResponse<GBFSResponse.StationStatusesResponse>(gbfsStandardEnum.getFetchUrl(operator))
+                    parseResponse<GBFSResponse.StationStatusesResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(operator)
                 cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
             }
         }
