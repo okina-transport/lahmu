@@ -16,7 +16,11 @@ class InMemoryCache(
         return cacheMap[bikeOperator]?.get(gbfsStandardEnum)
     }
 
-    fun setResponseInCacheAndGet(operator: Operator, gbfsStandardEnum: GbfsStandardEnum, response: GBFSResponse): GBFSResponse {
+    fun setResponseInCacheAndGet(
+        operator: Operator,
+        gbfsStandardEnum: GbfsStandardEnum,
+        response: GBFSResponse
+    ): GBFSResponse {
         if (cacheMap[operator] == null) {
             cacheMap[operator] = hashMapOf(gbfsStandardEnum to response)
         } else {
@@ -25,6 +29,8 @@ class InMemoryCache(
         lastUpdated = LocalDateTime.now()
         return response
     }
+
     fun isValidCache(bikeOperator: Operator, gbfsStandardEnum: GbfsStandardEnum): Boolean =
-        cacheMap[bikeOperator]?.get(gbfsStandardEnum) != null && lastUpdated > LocalDateTime.now().minusSeconds(TIME_TO_LIVE_CACHE)
+        cacheMap[bikeOperator]?.get(gbfsStandardEnum) != null && lastUpdated > LocalDateTime.now()
+            .minusSeconds(TIME_TO_LIVE_CACHE)
 }
