@@ -4,17 +4,27 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.ktor.application.Application
 import io.ktor.application.call
+import io.ktor.application.install
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.ContentType
+import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.request.host
 import io.ktor.request.port
 import io.ktor.response.respondText
 import io.ktor.routing.get
+import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.jetty.Jetty
+import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics
+import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics
+import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics
+import io.micrometer.core.instrument.binder.system.ProcessorMetrics
+import io.micrometer.prometheus.PrometheusConfig
+import io.micrometer.prometheus.PrometheusMeterRegistry
 import java.time.LocalDateTime
 import kotlin.concurrent.thread
 import kotlinx.coroutines.delay
@@ -41,7 +51,24 @@ fun Application.module() {
     thread(start = true) {
         launch { poll(cache) }
     }
+    install(MicrometerMetrics) {
+        registry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+        meterBinders = listOf(
+            ClassLoaderMetrics(),
+            JvmMemoryMetrics(),
+            JvmGcMetrics(),
+            ProcessorMetrics(),
+            JvmThreadMetrics()
+        )
 
+        routing {
+            route("/actuator/prometheus") {
+                get {
+                    call.respondText((registry as PrometheusMeterRegistry).scrape())
+                }
+            }
+        }
+    }
     routing {
         get("/") {
             val host = call.request.host()
