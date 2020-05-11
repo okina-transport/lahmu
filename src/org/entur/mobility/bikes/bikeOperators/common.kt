@@ -30,4 +30,4 @@ fun getOperatorsWithDiscovery(port: String, host: Int): Map<String, List<Map<Str
         mapOf("$it".toLowerCase() to getGbfsEndpoint(it, port, host)[GbfsStandardEnum.gbfs]!!)
     })
 
-fun mapIdToNeTEx(id: String, operator: Operator) = "${operator.getCodeSpace()}:BikeStation:$id"
+fun mapIdToNeTEx(id: String, operator: Operator) = "${operator.getCodeSpace()}:VehicleSharingParkingArea:$id"
