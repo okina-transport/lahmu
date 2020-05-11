@@ -28,6 +28,7 @@ import org.entur.mobility.bikes.bikeOperators.getOperatorsWithDiscovery
 import org.entur.mobility.bikes.bikeOperators.toStationInformation
 import org.entur.mobility.bikes.bikeOperators.toStationStatus
 import org.entur.mobility.bikes.bikeOperators.toSystemInformation
+import org.slf4j.LoggerFactory
 
 fun main() {
     val server = embeddedServer(Jetty, watchPaths = listOf("bikeservice"), port = 8080, module = Application::module)
@@ -92,8 +93,10 @@ suspend inline fun parseKolumbusResponse(url: String): List<KolumbusStation> {
 }
 
 suspend inline fun poll(cache: InMemoryCache) {
+    val logger = LoggerFactory.getLogger("org.entur.mobility.bikes")
     while (true) {
         Operator.values().forEach { operator ->
+            logger.info("Polling $operator")
             GbfsStandardEnum.values().forEach { gbfsEnum ->
                 fetchAndStoreInCache(
                     cache = cache,
