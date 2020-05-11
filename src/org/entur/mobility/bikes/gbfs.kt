@@ -147,7 +147,7 @@ fun getDiscovery(gbfsStandard: Map<GbfsStandardEnum, String>): GBFSResponse =
 
 fun getGbfsEndpoint(operator: Operator, host: String, port: Int): Map<GbfsStandardEnum, String> {
     val modifiedHost = host.replace("bikeservice", "api")
-    val urlHost = if (modifiedHost == "localhost") "http://$modifiedHost:$port" else "https://$modifiedHost/bikeservice"
+    val urlHost = if (modifiedHost == "localhost") "http://$modifiedHost:$port" else "https://$modifiedHost/mobility/v1/bikes"
     return mapOf(
         GbfsStandardEnum.gbfs to "$urlHost/$operator/gbfs.json".toLowerCase(),
         GbfsStandardEnum.system_information to "$urlHost/$operator/system_information.json".toLowerCase(),
