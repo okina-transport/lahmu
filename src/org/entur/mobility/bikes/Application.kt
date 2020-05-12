@@ -15,7 +15,7 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.jetty.Jetty
-import java.time.LocalDateTime
+import java.lang.Exception
 import kotlin.concurrent.thread
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -36,7 +36,7 @@ fun main() {
 }
 
 fun Application.module() {
-    val cache = InMemoryCache(HashMap(), LocalDateTime.now())
+    val cache = InMemoryCache(HashMap())
 
     thread(start = true) {
         launch { poll(cache) }
@@ -64,12 +64,17 @@ fun Application.module() {
             val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
             val gbfsEnum = GbfsStandardEnum.valueOf(call.parameters["service"] ?: throw NullPointerException())
             if (!cache.isValidCache(operator, gbfsEnum)) {
-                fetchAndStoreInCache(
-                    cache = cache,
-                    operator = operator,
-                    gbfsStandardEnum = gbfsEnum,
-                    isPolling = false
-                )
+                val logger = LoggerFactory.getLogger("org.entur.mobility.bikes")
+                try {
+                    fetchAndStoreInCache(
+                        cache = cache,
+                        operator = operator,
+                        gbfsStandardEnum = gbfsEnum,
+                        isPolling = false
+                    )
+                } catch (e: Exception) {
+                    logger.error("Failed to fetch $gbfsEnum from $operator. $e")
+                }
             }
             val result = cache.getResponseFromCache(operator, gbfsEnum)
             call.respondText(Gson().toJson(result), ContentType.Application.Json)
@@ -98,15 +103,19 @@ suspend inline fun poll(cache: InMemoryCache) {
         Operator.values().forEach { operator ->
             logger.info("Polling $operator")
             GbfsStandardEnum.values().forEach { gbfsEnum ->
-                fetchAndStoreInCache(
-                    cache = cache,
-                    operator = operator,
-                    gbfsStandardEnum = gbfsEnum,
-                    isPolling = true
-                )
+                try {
+                    fetchAndStoreInCache(
+                        cache = cache,
+                        operator = operator,
+                        gbfsStandardEnum = gbfsEnum,
+                        isPolling = true
+                    )
+                } catch (e: Exception) {
+                    logger.error("Failed to poll $gbfsEnum from $operator. $e")
+                }
             }
         }
-        delay(POLL_INTERVAL)
+        delay(POLL_INTERVAL_MS)
     }
 }
 
