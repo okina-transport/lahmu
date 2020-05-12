@@ -14,10 +14,10 @@ import io.ktor.request.host
 import io.ktor.request.port
 import io.ktor.response.respondText
 import io.ktor.routing.get
-import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.jetty.Jetty
+import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics
 import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics
@@ -47,12 +47,13 @@ fun main() {
 
 fun Application.module() {
     val cache = InMemoryCache(HashMap(), LocalDateTime.now())
+    val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     thread(start = true) {
-        launch { poll(cache) }
+        launch { poll(cache, meterRegistry) }
     }
     install(MicrometerMetrics) {
-        registry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+        registry = meterRegistry
         meterBinders = listOf(
             ClassLoaderMetrics(),
             JvmMemoryMetrics(),
@@ -60,13 +61,7 @@ fun Application.module() {
             ProcessorMetrics(),
             JvmThreadMetrics()
         )
-
         routing {
-            route("/actuator/prometheus") {
-                get {
-                    call.respondText((registry as PrometheusMeterRegistry).scrape())
-                }
-            }
         }
     }
     routing {
@@ -78,6 +73,10 @@ fun Application.module() {
 
         get("/health") {
             call.respondText("OK")
+        }
+
+        get("/actuator/prometheus") {
+            call.respondText(meterRegistry.scrape())
         }
 
         get("{operator}/gbfs.json") {
@@ -119,10 +118,11 @@ suspend inline fun parseKolumbusResponse(url: String): List<KolumbusStation> {
     }
 }
 
-suspend inline fun poll(cache: InMemoryCache) {
+suspend inline fun poll(cache: InMemoryCache, meterRegistry: MeterRegistry) {
     val logger = LoggerFactory.getLogger("org.entur.mobility.bikes")
     while (true) {
         Operator.values().forEach { operator ->
+            meterRegistry.counter("poll", "operator", operator.toString()).increment()
             logger.info("Polling $operator")
             GbfsStandardEnum.values().forEach { gbfsEnum ->
                 fetchAndStoreInCache(
@@ -153,12 +153,17 @@ suspend fun fetchAndStoreInCache(
                 cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
             }
             GbfsStandardEnum.station_information -> {
-                val response = parseResponse<GBFSResponse.StationsResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(operator)
+                val response =
+                    parseResponse<GBFSResponse.StationsResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(
+                        operator
+                    )
                 cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
             }
             GbfsStandardEnum.station_status -> {
                 val response =
-                    parseResponse<GBFSResponse.StationStatusesResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(operator)
+                    parseResponse<GBFSResponse.StationStatusesResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(
+                        operator
+                    )
                 cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
             }
         }
