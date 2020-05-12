@@ -4,10 +4,12 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.ktor.application.Application
 import io.ktor.application.call
+import io.ktor.application.install
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.ContentType
+import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.request.host
 import io.ktor.request.port
 import io.ktor.response.respondText
@@ -15,6 +17,9 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.jetty.Jetty
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.prometheus.PrometheusConfig
+import io.micrometer.prometheus.PrometheusMeterRegistry
 import java.lang.Exception
 import kotlin.concurrent.thread
 import kotlinx.coroutines.delay
@@ -37,11 +42,14 @@ fun main() {
 
 fun Application.module() {
     val cache = InMemoryCache(HashMap())
+    val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     thread(start = true) {
-        launch { poll(cache) }
+        launch { poll(cache, meterRegistry) }
     }
-
+    install(MicrometerMetrics) {
+        registry = meterRegistry
+    }
     routing {
         get("/") {
             val host = call.request.host()
@@ -51,6 +59,10 @@ fun Application.module() {
 
         get("/health") {
             call.respondText("OK")
+        }
+
+        get("/actuator/prometheus") {
+            call.respondText(meterRegistry.scrape())
         }
 
         get("{operator}/gbfs.json") {
@@ -97,10 +109,11 @@ suspend inline fun parseKolumbusResponse(url: String): List<KolumbusStation> {
     }
 }
 
-suspend inline fun poll(cache: InMemoryCache) {
+suspend inline fun poll(cache: InMemoryCache, meterRegistry: MeterRegistry) {
     val logger = LoggerFactory.getLogger("org.entur.mobility.bikes")
     while (true) {
         Operator.values().forEach { operator ->
+            meterRegistry.counter("poll", "operator", operator.toString()).increment()
             logger.info("Polling $operator")
             GbfsStandardEnum.values().forEach { gbfsEnum ->
                 try {
@@ -135,12 +148,17 @@ suspend fun fetchAndStoreInCache(
                 cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
             }
             GbfsStandardEnum.station_information -> {
-                val response = parseResponse<GBFSResponse.StationsResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(operator)
+                val response =
+                    parseResponse<GBFSResponse.StationsResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(
+                        operator
+                    )
                 cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
             }
             GbfsStandardEnum.station_status -> {
                 val response =
-                    parseResponse<GBFSResponse.StationStatusesResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(operator)
+                    parseResponse<GBFSResponse.StationStatusesResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(
+                        operator
+                    )
                 cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
             }
         }
