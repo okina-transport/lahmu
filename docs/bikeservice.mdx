@@ -45,6 +45,8 @@ Get the different GBFS endpoints for a specific operator.
 
 `GET https://api.entur.io/mobility/v1/bikes/{operator}/gbfs.json`
 
+Where `{operator}` is one of the above mentioned operators, i.e either `oslobysykkel`, `kolombusbysykkel`, `bergenbysykkel`, `trondheimbysykkel`.
+
 ### Example response
 
 ```
@@ -73,7 +75,7 @@ Get the different GBFS endpoints for a specific operator.
 
 ## System information
 
-Get the information about the system for a operator.
+Get the information about the system for an operator.
 
 ### HTTP Request
 
@@ -99,7 +101,7 @@ Get the information about the system for a operator.
 
 ## Station information
 
-All currently implemented operators and their respective GBFS endpoints will be listed under the root endpoint.
+List a specific operator's stations' capacities and locations.
 
 ### HTTP Request
 
@@ -153,7 +155,7 @@ All currently implemented operators and their respective GBFS endpoints will be 
 
 ## Station status
 
-All currently implemented operators and their respective gbfs endpoint will be listed under the root endpoint.
+For a specific operator, get a list of all available bikes and docks at each station and station availability.
 
 ### HTTP Request
 
@@ -198,3 +200,4 @@ All currently implemented operators and their respective gbfs endpoint will be l
     "ttl": 10
 }
 ```
+
