@@ -89,8 +89,7 @@ fun Application.module() {
                     fetchAndStoreInCache(
                         cache = cache,
                         operator = operator,
-                        gbfsStandardEnum = gbfsEnum,
-                        isPolling = false
+                        gbfsStandardEnum = gbfsEnum
                     )
                 } catch (e: Exception) {
                     logger.error("Failed to fetch $gbfsEnum from $operator. $e")
@@ -110,8 +109,9 @@ suspend inline fun <reified T> parseResponse(url: String): T {
     }
 }
 
-suspend inline fun parseKolumbusResponse(url: String): List<KolumbusStation> {
+suspend inline fun parseKolumbusResponse(): List<KolumbusStation> {
     with(HttpClient()) {
+        val url = "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike"
         val response = get<String>(url) { header("Client-Identifier", "entur-bikeservice") }
         val itemType = object : TypeToken<List<KolumbusStation>>() {}.type
         return Gson().fromJson(response, itemType)
@@ -124,17 +124,20 @@ suspend inline fun poll(cache: InMemoryCache, meterRegistry: MeterRegistry) {
         Operator.values().forEach { operator ->
             meterRegistry.counter("poll", "operator", operator.toString()).increment()
             logger.info("Polling $operator")
-            GbfsStandardEnum.values().forEach { gbfsEnum ->
-                try {
-                    fetchAndStoreInCache(
-                        cache = cache,
-                        operator = operator,
-                        gbfsStandardEnum = gbfsEnum,
-                        isPolling = true
-                    )
-                } catch (e: Exception) {
-                    logger.error("Failed to poll $gbfsEnum from $operator. $e")
+            try {
+                if (operator.isUrbanSharing()) {
+                    GbfsStandardEnum.values().forEach { gbfsEnum ->
+                        fetchAndStoreInCache(
+                            cache = cache,
+                            operator = operator,
+                            gbfsStandardEnum = gbfsEnum
+                        )
+                    }
+                } else {
+                    fetchAndStoreInCache(cache, operator, GbfsStandardEnum.gbfs)
                 }
+            } catch (e: Exception) {
+                logger.error("Failed to poll from $operator. $e")
             }
         }
         delay(POLL_INTERVAL_MS)
@@ -144,83 +147,40 @@ suspend inline fun poll(cache: InMemoryCache, meterRegistry: MeterRegistry) {
 suspend fun fetchAndStoreInCache(
     cache: InMemoryCache,
     operator: Operator,
-    gbfsStandardEnum: GbfsStandardEnum,
-    isPolling: Boolean
+    gbfsStandardEnum: GbfsStandardEnum
 ) {
     if (operator.isUrbanSharing()) {
-        when (gbfsStandardEnum) {
+        val response = when (gbfsStandardEnum) {
             GbfsStandardEnum.gbfs -> {
+                null
             }
             GbfsStandardEnum.system_information -> {
-                val response =
-                    parseResponse<GBFSResponse.SystemInformationResponse>(gbfsStandardEnum.getFetchUrl(operator))
-                cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
+                parseResponse<GBFSResponse.SystemInformationResponse>(gbfsStandardEnum.getFetchUrl(operator))
             }
             GbfsStandardEnum.station_information -> {
-                val response =
-                    parseResponse<GBFSResponse.StationsResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(
-                        operator
-                    )
-                cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
+                parseResponse<GBFSResponse.StationsResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(
+                    operator
+                )
             }
             GbfsStandardEnum.station_status -> {
-                val response =
-                    parseResponse<GBFSResponse.StationStatusesResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(
-                        operator
-                    )
-                cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
-            }
-        }
-    } else {
-        when (gbfsStandardEnum) {
-            GbfsStandardEnum.gbfs -> {
-            }
-            GbfsStandardEnum.station_information -> {
-                val response = KolumbusResponse(
-                    data = parseKolumbusResponse(
-                        gbfsStandardEnum.getFetchUrl(operator)
-                    )
-                )
-                cache.setResponseInCacheAndGet(
-                    operator,
-                    GbfsStandardEnum.system_information,
-                    response.toSystemInformation()
-                )
-                cache.setResponseInCacheAndGet(
-                    operator,
-                    GbfsStandardEnum.station_status,
-                    response.toStationStatus().toNeTEx(operator)
-                )
-                cache.setResponseInCacheAndGet(
-                    operator,
-                    GbfsStandardEnum.station_information,
-                    response.toStationInformation().toNeTEx(operator)
-                )
-            }
-            GbfsStandardEnum.system_information -> if (!isPolling) {
-                val response = KolumbusResponse(
-                    data = parseKolumbusResponse(
-                        gbfsStandardEnum.getFetchUrl(operator)
-                    )
-                )
-                cache.setResponseInCacheAndGet(
-                    operator,
-                    GbfsStandardEnum.system_information,
-                    response.toSystemInformation()
-                )
-            }
-            GbfsStandardEnum.station_status -> if (!isPolling) {
-                val response = KolumbusResponse(
-                    data = parseKolumbusResponse(
-                        gbfsStandardEnum.getFetchUrl(operator)
-                    )
-                )
-                cache.setResponseInCacheAndGet(
-                    operator,
-                    GbfsStandardEnum.station_status,
-                    response.toStationStatus().toNeTEx(operator)
+                parseResponse<GBFSResponse.StationStatusesResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(
+                    operator
                 )
             }
         }
+        if (response != null) cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
+    } else { // else it is Kolumbus
+        val response = KolumbusResponse(parseKolumbusResponse())
+        cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.system_information, response.toSystemInformation())
+        cache.setResponseInCacheAndGet(
+            operator,
+            GbfsStandardEnum.station_information,
+            response.toStationInformation().toNeTEx(operator)
+        )
+        cache.setResponseInCacheAndGet(
+            operator,
+            GbfsStandardEnum.station_status,
+            response.toStationStatus().toNeTEx(operator)
+        )
     }
 }
