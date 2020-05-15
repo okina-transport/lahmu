@@ -33,10 +33,10 @@ sealed class GBFSResponse(
     class SystemInformationResponse(last_updated: Long, ttl: Long, val data: SystemInformation) :
         GBFSResponse(last_updated, ttl)
 
-    class StationsResponse(last_updated: Long, ttl: Long, val data: Stations) :
+    class StationsInformationResponse(last_updated: Long, ttl: Long, val data: StationsInformation) :
         GBFSResponse(last_updated, ttl) {
-        fun toNeTEx(operator: Operator): StationsResponse =
-            StationsResponse(
+        fun toNeTEx(operator: Operator): StationsInformationResponse =
+            StationsInformationResponse(
                 last_updated = last_updated,
                 ttl = ttl,
                 data = this.data.toNeTEx(operator)
@@ -67,8 +67,8 @@ data class SystemInformation(
     val email: String?
 )
 
-data class Stations(val stations: List<Station>)
-data class Station(
+data class StationsInformation(val stations: List<StationInformation>)
+data class StationInformation(
     val station_id: String,
     val name: String,
     val address: String?,
@@ -88,15 +88,15 @@ data class StationStatus(
     val num_docks_available: Int
 )
 
-fun Stations.toNeTEx(operator: Operator): Stations =
-    Stations(
+fun StationsInformation.toNeTEx(operator: Operator): StationsInformation =
+    StationsInformation(
         stations = stations.map { station ->
             station.toNeTEx(operator)
         }
     )
 
-fun Station.toNeTEx(operator: Operator): Station =
-    Station(
+fun StationInformation.toNeTEx(operator: Operator): StationInformation =
+    StationInformation(
         station_id = mapIdToNeTEx(station_id, operator),
         name = name,
         address = address,
