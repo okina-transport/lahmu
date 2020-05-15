@@ -8,7 +8,6 @@ import io.ktor.application.install
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.features.DefaultHeaders
 import io.ktor.http.ContentType
 import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.request.host
@@ -51,8 +50,6 @@ fun Application.module() {
     }
     install(MicrometerMetrics) {
         registry = meterRegistry
-    }
-    install(DefaultHeaders) {
     }
     routing {
         get("/") {
