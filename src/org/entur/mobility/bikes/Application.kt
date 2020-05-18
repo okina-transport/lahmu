@@ -31,6 +31,7 @@ import org.entur.mobility.bikes.bikeOperators.KolumbusStation
 import org.entur.mobility.bikes.bikeOperators.Operator
 import org.entur.mobility.bikes.bikeOperators.Operator.Companion.isUrbanSharing
 import org.entur.mobility.bikes.bikeOperators.getOperatorsWithDiscovery
+import org.entur.mobility.bikes.bikeOperators.kolumbusBysykkelURL
 import org.entur.mobility.bikes.bikeOperators.toStationInformation
 import org.entur.mobility.bikes.bikeOperators.toStationStatus
 import org.entur.mobility.bikes.bikeOperators.toSystemInformation
@@ -111,8 +112,12 @@ suspend inline fun <reified T> parseResponse(url: String): T {
 
 suspend inline fun parseKolumbusResponse(): List<KolumbusStation> {
     with(HttpClient()) {
-        val url = "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike"
-        val response = get<String>(url) { header("Client-Identifier", "entur-bikeservice") }
+        val response = get<String>(kolumbusBysykkelURL.getValue(GbfsStandardEnum.system_information)) {
+            header(
+                "Client-Identifier",
+                "entur-bikeservice"
+            )
+        }
         val itemType = object : TypeToken<List<KolumbusStation>>() {}.type
         return Gson().fromJson(response, itemType)
     }
