@@ -5,11 +5,12 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import org.entur.mobility.bikes.GBFSResponse
 import org.entur.mobility.bikes.GbfsStandardEnum
-import org.entur.mobility.bikes.Station
+import org.entur.mobility.bikes.StationInformation
 import org.entur.mobility.bikes.StationStatus
 import org.entur.mobility.bikes.StationStatuses
-import org.entur.mobility.bikes.Stations
+import org.entur.mobility.bikes.StationsInformation
 import org.entur.mobility.bikes.SystemInformation
+import org.entur.mobility.bikes.TTL
 
 data class KolumbusResponse(val data: List<KolumbusStation>)
 data class KolumbusStation(
@@ -30,7 +31,7 @@ data class KolumbusStation(
 fun KolumbusResponse.toSystemInformation(): GBFSResponse.SystemInformationResponse =
     GBFSResponse.SystemInformationResponse(
         last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-        ttl = 15,
+        ttl = TTL,
         data = SystemInformation(
             system_id = "kolumbusbysykkel",
             language = "nb",
@@ -45,7 +46,7 @@ fun KolumbusResponse.toSystemInformation(): GBFSResponse.SystemInformationRespon
 fun KolumbusResponse.toStationStatus(): GBFSResponse.StationStatusesResponse =
     GBFSResponse.StationStatusesResponse(
         last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-        ttl = 15,
+        ttl = TTL,
         data = StationStatuses(stations = data.map {
             StationStatus(
                 station_id = it.external_id,
@@ -59,12 +60,12 @@ fun KolumbusResponse.toStationStatus(): GBFSResponse.StationStatusesResponse =
         })
     )
 
-fun KolumbusResponse.toStationInformation(): GBFSResponse.StationsResponse =
-    GBFSResponse.StationsResponse(
+fun KolumbusResponse.toStationInformation(): GBFSResponse.StationsInformationResponse =
+    GBFSResponse.StationsInformationResponse(
         last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-        ttl = 15,
-        data = Stations(stations = data.map {
-            Station(
+        ttl = TTL,
+        data = StationsInformation(stations = data.map {
+            StationInformation(
                 station_id = it.external_id,
                 name = it.name,
                 address = null,

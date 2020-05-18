@@ -25,12 +25,17 @@ import kotlin.concurrent.thread
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.entur.mobility.bikes.GbfsStandardEnum.Companion.getFetchUrl
+import org.entur.mobility.bikes.bikeOperators.JCDecauxResponse
+import org.entur.mobility.bikes.bikeOperators.JCDecauxStation
 import org.entur.mobility.bikes.bikeOperators.KolumbusResponse
 import org.entur.mobility.bikes.bikeOperators.KolumbusStation
 import org.entur.mobility.bikes.bikeOperators.Operator
+import org.entur.mobility.bikes.bikeOperators.Operator.Companion.isJCDecaux
+import org.entur.mobility.bikes.bikeOperators.Operator.Companion.isKolumbus
 import org.entur.mobility.bikes.bikeOperators.Operator.Companion.isUrbanSharing
 import org.entur.mobility.bikes.bikeOperators.getOperatorsWithDiscovery
 import org.entur.mobility.bikes.bikeOperators.kolumbusBysykkelURL
+import org.entur.mobility.bikes.bikeOperators.lillestromBysykkelURL
 import org.entur.mobility.bikes.bikeOperators.toStationInformation
 import org.entur.mobility.bikes.bikeOperators.toStationStatus
 import org.entur.mobility.bikes.bikeOperators.toSystemInformation
@@ -124,6 +129,19 @@ suspend inline fun parseKolumbusResponse(): List<KolumbusStation> {
     return Gson().fromJson(response, itemType)
 }
 
+suspend inline fun parseJCDecauxResponse(): List<JCDecauxStation> {
+    val client = HttpClient()
+    logger.info("API_KEY: ${LILLESTROM_API_KEY?.get(0) ?: "null"}")
+    val response = client.get<String>(lillestromBysykkelURL.getValue(GbfsStandardEnum.system_information)) {
+        header(
+            "Client-Identifier",
+            "entur-bikeservice"
+        )
+    }
+    val itemType = object : TypeToken<List<JCDecauxStation>>() {}.type
+    return Gson().fromJson(response, itemType)
+}
+
 suspend inline fun poll(cache: InMemoryCache) {
     while (true) {
         Operator.values().forEach { operator ->
@@ -162,7 +180,7 @@ suspend fun fetchAndStoreInCache(
                 parseResponse<GBFSResponse.SystemInformationResponse>(gbfsStandardEnum.getFetchUrl(operator))
             }
             GbfsStandardEnum.station_information -> {
-                parseResponse<GBFSResponse.StationsResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(
+                parseResponse<GBFSResponse.StationsInformationResponse>(gbfsStandardEnum.getFetchUrl(operator)).toNeTEx(
                     operator
                 )
             }
@@ -173,7 +191,7 @@ suspend fun fetchAndStoreInCache(
             }
         }
         if (response != null) cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
-    } else { // else it is Kolumbus
+    } else if (operator.isKolumbus()) {
         val response = KolumbusResponse(parseKolumbusResponse())
         cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.system_information, response.toSystemInformation())
         cache.setResponseInCacheAndGet(
@@ -185,6 +203,23 @@ suspend fun fetchAndStoreInCache(
             operator,
             GbfsStandardEnum.station_status,
             response.toStationStatus().toNeTEx(operator)
+        )
+    } else if (operator.isJCDecaux()) {
+        val response = JCDecauxResponse(data = parseJCDecauxResponse())
+        cache.setResponseInCacheAndGet(
+            operator,
+            GbfsStandardEnum.system_information,
+            response.toSystemInformation()
+        )
+        cache.setResponseInCacheAndGet(
+            operator,
+            GbfsStandardEnum.station_status,
+            response.toStationStatus().toNeTEx(operator)
+        )
+        cache.setResponseInCacheAndGet(
+            operator,
+            GbfsStandardEnum.station_information,
+            response.toStationInformation().toNeTEx(operator)
         )
     }
 }
