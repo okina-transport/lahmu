@@ -130,6 +130,8 @@ suspend inline fun parseKolumbusResponse(): List<KolumbusStation> {
 
 suspend inline fun parseJCDecauxResponse(): List<JCDecauxStation> {
     with(HttpClient()) {
+        val logger = LoggerFactory.getLogger("org.entur.mobility.bikes")
+        logger.info("API_KEY: ${LILLESTROM_API_KEY?.get(0) ?: "null"}")
         val response = get<String>(lillestromBysykkelURL.getValue(GbfsStandardEnum.system_information)) {
             header(
                 "Client-Identifier",

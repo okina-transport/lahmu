@@ -136,3 +136,8 @@ ingress:
 
 podSecurityPolicy:
   enabled: false
+
+secrets:
+  app:
+    name: bikeservice-secrets
+    lillestromApiKey: ${serviceVariable.lillestromApiKey}
