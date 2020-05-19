@@ -11,7 +11,7 @@ deployment:
   strategy:
     type: RollingUpdate
   terminationGracePeriodSeconds: 30
-  podAnnotations: true
+#  podAnnotations: true
 
 service:
   type: ClusterIP
