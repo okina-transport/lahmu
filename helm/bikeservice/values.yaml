@@ -29,8 +29,13 @@ container:
   #  - "-jar"
   #  - "-Xmx512"
   #  - "seatmap.jar"
-  #env:
-  #  [] # environment variables
+  env: #  
+  [] # environment variables
+   - name: LILLESTROM_API_KEY
+     valueFrom:
+       secretKeyRef:
+         name: bikeservice-secrets
+         key: lillestromApiKey
   # - name: PG_DB_USERNAME
   #   valueFrom:
   #     secretKeyRef:
