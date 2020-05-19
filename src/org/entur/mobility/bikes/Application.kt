@@ -25,19 +25,25 @@ import kotlin.concurrent.thread
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.entur.mobility.bikes.GbfsStandardEnum.Companion.getFetchUrl
+import org.entur.mobility.bikes.bikeOperators.DrammenAccessToken
+import org.entur.mobility.bikes.bikeOperators.DrammenStationsResponse
+import org.entur.mobility.bikes.bikeOperators.DrammenStationsStatusResponse
 import org.entur.mobility.bikes.bikeOperators.JCDecauxResponse
 import org.entur.mobility.bikes.bikeOperators.JCDecauxStation
 import org.entur.mobility.bikes.bikeOperators.KolumbusResponse
 import org.entur.mobility.bikes.bikeOperators.KolumbusStation
 import org.entur.mobility.bikes.bikeOperators.Operator
+import org.entur.mobility.bikes.bikeOperators.Operator.Companion.isDrammenSmartBike
 import org.entur.mobility.bikes.bikeOperators.Operator.Companion.isJCDecaux
 import org.entur.mobility.bikes.bikeOperators.Operator.Companion.isKolumbus
 import org.entur.mobility.bikes.bikeOperators.Operator.Companion.isUrbanSharing
+import org.entur.mobility.bikes.bikeOperators.drammenSystemInformation
 import org.entur.mobility.bikes.bikeOperators.getOperatorsWithDiscovery
 import org.entur.mobility.bikes.bikeOperators.kolumbusBysykkelURL
 import org.entur.mobility.bikes.bikeOperators.lillestromBysykkelURL
 import org.entur.mobility.bikes.bikeOperators.toStationInformation
 import org.entur.mobility.bikes.bikeOperators.toStationStatus
+import org.entur.mobility.bikes.bikeOperators.toStationStatuses
 import org.entur.mobility.bikes.bikeOperators.toSystemInformation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -55,8 +61,10 @@ fun Application.module() {
     val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     thread(start = true) {
+        launch { setDrammenAccessToken() }
         launch { poll(cache) }
     }
+
     install(MicrometerMetrics) {
         registry = meterRegistry
     }
@@ -143,7 +151,7 @@ suspend inline fun poll(cache: InMemoryCache) {
         Operator.values().forEach { operator ->
             logger.info("Polling $operator")
             try {
-                if (operator.isUrbanSharing()) {
+                if (operator.isUrbanSharing() || operator.isDrammenSmartBike()) {
                     GbfsStandardEnum.values().forEach { gbfsEnum ->
                         fetchAndStoreInCache(
                             cache = cache,
@@ -217,5 +225,32 @@ suspend fun fetchAndStoreInCache(
             GbfsStandardEnum.station_information,
             response.toStationInformation().toNeTEx(operator)
         )
+    } else if (operator.isDrammenSmartBike()) {
+        val response = when (gbfsStandardEnum) {
+            GbfsStandardEnum.gbfs -> {
+                null
+            }
+            GbfsStandardEnum.system_information -> {
+                drammenSystemInformation()
+            }
+            GbfsStandardEnum.station_information -> {
+                parseResponse<DrammenStationsResponse>(gbfsStandardEnum.getFetchUrl(operator, DRAMMEN_ACCESS_TOKEN)).toStationInformation()
+            }
+            GbfsStandardEnum.station_status -> {
+                parseResponse<DrammenStationsStatusResponse>(gbfsStandardEnum.getFetchUrl(operator, DRAMMEN_ACCESS_TOKEN)).toStationStatuses()
+            }
+        }
+        if (response != null) cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
     }
+}
+
+suspend fun setDrammenAccessToken() {
+    val response = try {
+        parseResponse<DrammenAccessToken>(DRAMMEN_ACCESS_TOKEN_URL)
+    } catch (e: Exception) {
+        logger.error("Failed to fetch Drammen access token. $e")
+        null
+    }
+    DRAMMEN_ACCESS_TOKEN = response?.access_token ?: ""
+    delay(response?.expires_in?.div(2)?.times(1000) ?: 1000)
 }
