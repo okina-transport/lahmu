@@ -3,6 +3,7 @@ package org.entur.mobility.bikes
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.ktor.application.Application
+import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.client.HttpClient
@@ -60,13 +61,15 @@ fun Application.module() {
     install(MicrometerMetrics) {
         registry = meterRegistry
     }
+    intercept(ApplicationCallPipeline.Call) {
+        val correlationId = call.request.headers.get("x-correlation-id")
+        if (correlationId != null) call.response.header("x-correlation-id", correlationId)
+    }
     routing {
         get("/") {
             val host = call.request.host()
             val port = call.request.port()
-            val correlationId = call.request.headers.get("x-correlation-id")
 
-            if (correlationId != null) call.response.header("x-correlation-id", correlationId)
             call.respondText(Gson().toJson(getOperatorsWithDiscovery(host, port)), ContentType.Application.Json)
         }
 
@@ -79,18 +82,15 @@ fun Application.module() {
         }
 
         get("{operator}/gbfs.json") {
-            val correlationId = call.request.headers.get("x-correlation-id")
             val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
             val gbfsEndpoints = getGbfsEndpoint(operator, call.request.host(), call.request.port())
             val response = getDiscovery(gbfsEndpoints)
 
-            if (correlationId != null) call.response.header("x-correlation-id", correlationId)
             call.respondText(Gson().toJson(response), ContentType.Application.Json)
         }
 
         get("{operator}/{service}.json") {
             val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
-            val correlationId = call.request.headers.get("x-correlation-id")
             val gbfsEnum = GbfsStandardEnum.valueOf(call.parameters["service"] ?: throw NullPointerException())
             if (!cache.isValidCache(operator, gbfsEnum)) {
                 try {
@@ -104,7 +104,6 @@ fun Application.module() {
                 }
             }
             val result = cache.getResponseFromCache(operator, gbfsEnum)
-            if (correlationId != null) call.response.header("x-correlation-id", correlationId)
             call.respondText(Gson().toJson(result), ContentType.Application.Json)
         }
     }
