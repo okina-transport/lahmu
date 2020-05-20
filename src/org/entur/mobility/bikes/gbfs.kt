@@ -14,11 +14,11 @@ enum class GbfsStandardEnum {
     station_status;
 
     companion object {
-        fun GbfsStandardEnum.getFetchUrl(operator: Operator): String = when (this) {
-            gbfs -> operator.getFetchUrls().getValue(this)
-            system_information -> operator.getFetchUrls().getValue(this)
-            station_information -> operator.getFetchUrls().getValue(this)
-            station_status -> operator.getFetchUrls().getValue(this)
+        fun GbfsStandardEnum.getFetchUrl(operator: Operator, accessToken: String = ""): String = when (this) {
+            gbfs -> operator.getFetchUrls(accessToken).getValue(this)
+            system_information -> operator.getFetchUrls(accessToken).getValue(this)
+            station_information -> operator.getFetchUrls(accessToken).getValue(this)
+            station_status -> operator.getFetchUrls(accessToken).getValue(this)
         }
     }
 }
