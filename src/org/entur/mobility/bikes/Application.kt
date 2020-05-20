@@ -200,12 +200,12 @@ suspend fun fetchAndStoreInCache(
         cache.setResponseInCacheAndGet(
             operator,
             GbfsStandardEnum.station_information,
-            response.toStationInformation().toNeTEx(operator)
+            response.toStationInformation()
         )
         cache.setResponseInCacheAndGet(
             operator,
             GbfsStandardEnum.station_status,
-            response.toStationStatus().toNeTEx(operator)
+            response.toStationStatus()
         )
     } else if (operator.isJCDecaux()) {
         val response = JCDecauxResponse(data = parseJCDecauxResponse())
@@ -217,12 +217,12 @@ suspend fun fetchAndStoreInCache(
         cache.setResponseInCacheAndGet(
             operator,
             GbfsStandardEnum.station_status,
-            response.toStationStatus().toNeTEx(operator)
+            response.toStationStatus()
         )
         cache.setResponseInCacheAndGet(
             operator,
             GbfsStandardEnum.station_information,
-            response.toStationInformation().toNeTEx(operator)
+            response.toStationInformation()
         )
     } else if (operator.isDrammenSmartBike()) {
         val response = when (gbfsStandardEnum) {
