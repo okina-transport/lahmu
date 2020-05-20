@@ -22,6 +22,7 @@ import io.ktor.server.jetty.Jetty
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import java.lang.Exception
+import java.util.UUID
 import kotlin.concurrent.thread
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,6 +43,7 @@ import org.entur.mobility.bikes.bikeOperators.toStationStatus
 import org.entur.mobility.bikes.bikeOperators.toSystemInformation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 
 val logger: Logger = LoggerFactory.getLogger("org.entur.mobility.bikes")
 val client: HttpClient = HttpClient()
@@ -62,8 +64,19 @@ fun Application.module() {
         registry = meterRegistry
     }
     intercept(ApplicationCallPipeline.Call) {
-        val correlationId = call.request.headers.get("x-correlation-id")
-        if (correlationId != null) call.response.header("x-correlation-id", correlationId)
+        val httpRequestCorrelationId = call.request.headers.get("x-correlation-id")
+        val correlationId = if (httpRequestCorrelationId != null) sanitize(httpRequestCorrelationId) else UUID.randomUUID().toString()
+        val requestId = UUID.randomUUID().toString()
+
+        MDC.put("correlationId", correlationId)
+        MDC.put("requestId", requestId)
+
+        call.response.header("x-correlation-id", correlationId)
+        call.response.header("x-request-id", requestId)
+
+        logger.info("Request received")
+
+        MDC.clear()
     }
     routing {
         get("/") {
@@ -116,11 +129,11 @@ suspend inline fun <reified T> parseResponse(url: String): T {
 
 suspend inline fun parseKolumbusResponse(): List<KolumbusStation> {
     val response = client.get<String>(kolumbusBysykkelURL.getValue(GbfsStandardEnum.system_information)) {
-            header(
-                "Client-Identifier",
-                "entur-bikeservice"
-            )
-        }
+        header(
+            "Client-Identifier",
+            "entur-bikeservice"
+        )
+    }
     val itemType = object : TypeToken<List<KolumbusStation>>() {}.type
     return Gson().fromJson(response, itemType)
 }
