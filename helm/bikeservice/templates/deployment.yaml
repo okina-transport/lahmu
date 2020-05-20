@@ -64,11 +64,6 @@ spec:
         {{- end }}
         {{- if .Values.container.env }}
         env:
-          - name: LILLESTROM_API_KEY
-            valueFrom:
-              secretKeyRef:
-                name: bikeservice-secrets
-                key: lillestromApiKey
 {{ toYaml .Values.container.env | indent 8}}
         {{- end }}
         ports:
