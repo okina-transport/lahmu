@@ -125,11 +125,11 @@ suspend inline fun <reified T> parseResponse(url: String): T {
 
 suspend inline fun parseKolumbusResponse(): List<KolumbusStation> {
     val response = client.get<String>(kolumbusBysykkelURL.getValue(GbfsStandardEnum.system_information)) {
-            header(
-                "Client-Identifier",
-                "entur-bikeservice"
-            )
-        }
+        header(
+            "Client-Identifier",
+            "entur-bikeservice"
+        )
+    }
     val itemType = object : TypeToken<List<KolumbusStation>>() {}.type
     return Gson().fromJson(response, itemType)
 }
@@ -150,7 +150,7 @@ suspend inline fun poll(cache: InMemoryCache) {
         Operator.values().forEach { operator ->
             logger.info("Polling $operator")
             try {
-                if (operator.isUrbanSharing() || operator.isDrammenSmartBike()) {
+                if (operator.isUrbanSharing()) {
                     GbfsStandardEnum.values().forEach { gbfsEnum ->
                         fetchAndStoreInCache(
                             cache = cache,
@@ -158,6 +158,9 @@ suspend inline fun poll(cache: InMemoryCache) {
                             gbfsStandardEnum = gbfsEnum
                         )
                     }
+                } else if (operator.isDrammenSmartBike()) {
+                    fetchAndStoreInCache(cache, operator, GbfsStandardEnum.system_information)
+                    fetchAndStoreInCache(cache, operator, GbfsStandardEnum.station_information)
                 } else {
                     fetchAndStoreInCache(cache, operator, GbfsStandardEnum.gbfs)
                 }
@@ -233,10 +236,27 @@ suspend fun fetchAndStoreInCache(
                 drammenSystemInformation()
             }
             GbfsStandardEnum.station_information -> {
-                parseResponse<DrammenStationsResponse>(gbfsStandardEnum.getFetchUrl(operator, DRAMMEN_ACCESS_TOKEN)).toStationInformation()
+                val stationsStatusResponse = parseResponse<DrammenStationsStatusResponse>(
+                    gbfsStandardEnum.getFetchUrl(
+                        operator,
+                        DRAMMEN_ACCESS_TOKEN
+                    )
+                )
+                cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, stationsStatusResponse.toStationStatuses())
+                parseResponse<DrammenStationsResponse>(
+                    gbfsStandardEnum.getFetchUrl(
+                        operator,
+                        DRAMMEN_ACCESS_TOKEN
+                    )
+                ).toStationInformation(stationsStatusResponse)
             }
             GbfsStandardEnum.station_status -> {
-                parseResponse<DrammenStationsStatusResponse>(gbfsStandardEnum.getFetchUrl(operator, DRAMMEN_ACCESS_TOKEN)).toStationStatuses()
+                parseResponse<DrammenStationsStatusResponse>(
+                    gbfsStandardEnum.getFetchUrl(
+                        operator,
+                        DRAMMEN_ACCESS_TOKEN
+                    )
+                ).toStationStatuses()
             }
         }
         if (response != null) cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)

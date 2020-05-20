@@ -13,12 +13,17 @@ import org.entur.mobility.bikes.TTL
 
 fun drammenBysykkelURL(access_token: String) = mapOf(
     GbfsStandardEnum.gbfs to "",
-    GbfsStandardEnum.system_information to "https://drammen.pub.api.smartbike.com/api/en/v3/stations.json?access_token=$access_token",
+    GbfsStandardEnum.system_information to "",
     GbfsStandardEnum.station_information to "https://drammen.pub.api.smartbike.com/api/en/v3/stations.json?access_token=$access_token",
     GbfsStandardEnum.station_status to "https://drammen.pub.api.smartbike.com/api/en/v3/stations/status.json?access_token=$access_token"
 )
 
-data class DrammenAccessToken(val access_token: String, val expires_in: Long, val token_type: String, val scope: String?)
+data class DrammenAccessToken(
+    val access_token: String,
+    val expires_in: Long,
+    val token_type: String,
+    val scope: String?
+)
 
 data class DrammenStationsStatusResponse(val stationsStatus: List<DrammenStationStatus>)
 data class DrammenStationStatus(
@@ -69,22 +74,24 @@ fun drammenSystemInformation() = GBFSResponse.SystemInformationResponse(
     )
 )
 
-fun DrammenStationsResponse.toStationInformation() = GBFSResponse.StationsInformationResponse(
-    last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-    ttl = TTL,
-    data = StationsInformation(
-        stations.map {
-            StationInformation(
-                station_id = mapIdToNeTEx(it.id, Operator.DRAMMENBYSYKKEL),
-                address = it.address,
-                lat = it.location.lat.toBigDecimal(),
-                lon = it.location.lon.toBigDecimal(),
-                name = it.name,
-                capacity = 0 // TODO
-            )
-        }
+fun DrammenStationsResponse.toStationInformation(statusResponse: DrammenStationsStatusResponse) =
+    GBFSResponse.StationsInformationResponse(
+        last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+        ttl = TTL,
+        data = StationsInformation(
+            stations.map {
+                StationInformation(
+                    station_id = mapIdToNeTEx(it.id, Operator.DRAMMENBYSYKKEL),
+                    address = it.address,
+                    lat = it.location.lat.toBigDecimal(),
+                    lon = it.location.lon.toBigDecimal(),
+                    name = it.name,
+                    capacity = statusResponse.stationsStatus.find { status -> status.id == it.id }
+                        .let { station -> (station?.availability?.slots ?: 0) + (station?.availability?.bikes ?: 0) }
+                )
+            }
+        )
     )
-)
 
 fun DrammenStationsStatusResponse.toStationStatuses() = GBFSResponse.StationStatusesResponse(
     last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
