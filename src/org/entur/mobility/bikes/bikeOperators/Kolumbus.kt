@@ -49,7 +49,7 @@ fun KolumbusResponse.toStationStatus(): GBFSResponse.StationStatusesResponse =
         ttl = TTL,
         data = StationStatuses(stations = data.map {
             StationStatus(
-                station_id = it.external_id,
+                station_id = mapIdToNeTEx(it.external_id, Operator.KOLUMBUSBYSYKKEL),
                 is_installed = 1,
                 is_renting = 1,
                 is_returning = 1,
@@ -66,7 +66,7 @@ fun KolumbusResponse.toStationInformation(): GBFSResponse.StationsInformationRes
         ttl = TTL,
         data = StationsInformation(stations = data.map {
             StationInformation(
-                station_id = it.external_id,
+                station_id = mapIdToNeTEx(it.external_id, Operator.KOLUMBUSBYSYKKEL),
                 name = it.name,
                 address = null,
                 lat = it.latitude,
