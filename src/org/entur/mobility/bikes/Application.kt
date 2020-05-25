@@ -60,7 +60,7 @@ fun Application.module() {
     val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     thread(start = true) {
-        launch { setDrammenAccessToken() }
+        launch { fetchAndSetDrammenAccessToken() }
         launch { poll(cache) }
     }
 
@@ -139,7 +139,7 @@ suspend inline fun poll(cache: InMemoryCache) {
         Operator.values().forEach { operator ->
             logger.info("Polling $operator")
             try {
-                if (operator.isUrbanSharing() || operator.isDrammenSmartBike()) {
+                if (operator.isUrbanSharing()) {
                     GbfsStandardEnum.values().forEach { gbfsEnum ->
                         fetchAndStoreInCache(
                             cache = cache,
@@ -147,6 +147,9 @@ suspend inline fun poll(cache: InMemoryCache) {
                             gbfsStandardEnum = gbfsEnum
                         )
                     }
+                } else if (operator.isDrammenSmartBike()) {
+                    fetchAndStoreInCache(cache, operator, GbfsStandardEnum.system_information)
+                    fetchAndStoreInCache(cache, operator, GbfsStandardEnum.station_information)
                 } else {
                     fetchAndStoreInCache(cache, operator, GbfsStandardEnum.gbfs)
                 }
@@ -222,25 +225,44 @@ suspend fun fetchAndStoreInCache(
                 drammenSystemInformation()
             }
             GbfsStandardEnum.station_information -> {
-                parseResponse<DrammenStationsResponse>(gbfsStandardEnum.getFetchUrl(operator, DRAMMEN_ACCESS_TOKEN)).toStationInformation()
+                val stationsStatusResponse = parseResponse<DrammenStationsStatusResponse>(
+                    gbfsStandardEnum.getFetchUrl(
+                        operator,
+                        DRAMMEN_ACCESS_TOKEN
+                    )
+                )
+                cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, stationsStatusResponse.toStationStatuses())
+                parseResponse<DrammenStationsResponse>(
+                    gbfsStandardEnum.getFetchUrl(
+                        operator,
+                        DRAMMEN_ACCESS_TOKEN
+                    )
+                ).toStationInformation(stationsStatusResponse)
             }
             GbfsStandardEnum.station_status -> {
-                parseResponse<DrammenStationsStatusResponse>(gbfsStandardEnum.getFetchUrl(operator, DRAMMEN_ACCESS_TOKEN)).toStationStatuses()
+                parseResponse<DrammenStationsStatusResponse>(
+                    gbfsStandardEnum.getFetchUrl(
+                        operator,
+                        DRAMMEN_ACCESS_TOKEN
+                    )
+                ).toStationStatuses()
             }
         }
         if (response != null) cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
     }
 }
 
-suspend fun setDrammenAccessToken() {
-    val response = try {
-        parseResponse<DrammenAccessToken>(DRAMMEN_ACCESS_TOKEN_URL)
-    } catch (e: Exception) {
-        logger.error("Failed to fetch Drammen access token. $e")
-        null
+suspend fun fetchAndSetDrammenAccessToken() {
+    while (true) {
+        val response = try {
+            parseResponse<DrammenAccessToken>(DRAMMEN_ACCESS_TOKEN_URL)
+        } catch (e: Exception) {
+            logger.error("Failed to fetch Drammen access token. $e")
+            null
+        }
+        DRAMMEN_ACCESS_TOKEN = response?.access_token ?: ""
+        delay(response?.expires_in?.div(2)?.times(1000) ?: 1000)
     }
-    DRAMMEN_ACCESS_TOKEN = response?.access_token ?: ""
-    delay(response?.expires_in?.div(2)?.times(1000) ?: 1000)
 }
 
 suspend fun fetch(url: String): String {
