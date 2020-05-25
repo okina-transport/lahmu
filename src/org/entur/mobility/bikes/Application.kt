@@ -60,7 +60,7 @@ fun Application.module() {
     val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     thread(start = true) {
-        launch { setDrammenAccessToken() }
+        launch { fetchAndSetDrammenAccessToken() }
         launch { poll(cache) }
     }
 
@@ -252,15 +252,17 @@ suspend fun fetchAndStoreInCache(
     }
 }
 
-suspend fun setDrammenAccessToken() {
-    val response = try {
-        parseResponse<DrammenAccessToken>(DRAMMEN_ACCESS_TOKEN_URL)
-    } catch (e: Exception) {
-        logger.error("Failed to fetch Drammen access token. $e")
-        null
+suspend fun fetchAndSetDrammenAccessToken() {
+    while (true) {
+        val response = try {
+            parseResponse<DrammenAccessToken>(DRAMMEN_ACCESS_TOKEN_URL)
+        } catch (e: Exception) {
+            logger.error("Failed to fetch Drammen access token. $e")
+            null
+        }
+        DRAMMEN_ACCESS_TOKEN = response?.access_token ?: ""
+        delay(response?.expires_in?.div(2)?.times(1000) ?: 1000)
     }
-    DRAMMEN_ACCESS_TOKEN = response?.access_token ?: ""
-    delay(response?.expires_in?.div(2)?.times(1000) ?: 1000)
 }
 
 suspend fun fetch(url: String): String {
