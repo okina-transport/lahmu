@@ -88,7 +88,7 @@ fun JCDecauxResponse.toSystemInformation(): GBFSResponse.SystemInformationRespon
         ttl = TTL,
         data = SystemInformation(
             system_id = "lillestrom",
-            language = "nb",
+            language = "no",
             name = "Lillestrøm bysykkel",
             timezone = "Europe/Oslo",
             operator = null,

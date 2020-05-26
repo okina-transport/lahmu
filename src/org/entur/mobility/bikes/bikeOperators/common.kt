@@ -5,26 +5,29 @@ import org.entur.mobility.bikes.bikeOperators.Operator.Companion.getCodeSpace
 import org.entur.mobility.bikes.getGbfsEndpoint
 
 enum class Operator {
-    OSLOBYSYKKEL, BERGENBYSYKKEL, TRONDHEIMBYSYKKEL, KOLUMBUSBYSYKKEL, LILLESTROMBYSYKKEL;
+    OSLOBYSYKKEL, BERGENBYSYKKEL, TRONDHEIMBYSYKKEL, KOLUMBUSBYSYKKEL, LILLESTROMBYSYKKEL, DRAMMENBYSYKKEL;
 
     companion object {
         fun Operator.isUrbanSharing() = this == OSLOBYSYKKEL || this == BERGENBYSYKKEL || this == TRONDHEIMBYSYKKEL
         fun Operator.isKolumbus() = this == KOLUMBUSBYSYKKEL
         fun Operator.isJCDecaux() = this == LILLESTROMBYSYKKEL
+        fun Operator.isDrammenSmartBike() = this == DRAMMENBYSYKKEL
         fun Operator.getCodeSpace() = when (this) {
             OSLOBYSYKKEL -> "YOS"
             BERGENBYSYKKEL -> "YBE"
             TRONDHEIMBYSYKKEL -> "YTR"
             KOLUMBUSBYSYKKEL -> "YKO"
             LILLESTROMBYSYKKEL -> "YLI"
+            DRAMMENBYSYKKEL -> "YDR"
         }
 
-        fun Operator.getFetchUrls() = when (this) {
+        fun Operator.getFetchUrls(accessToken: String = "") = when (this) {
             OSLOBYSYKKEL -> osloBysykkelURL
             BERGENBYSYKKEL -> bergenBysykkelURL
             TRONDHEIMBYSYKKEL -> trondheimBysykkelURL
             KOLUMBUSBYSYKKEL -> kolumbusBysykkelURL
             LILLESTROMBYSYKKEL -> lillestromBysykkelURL
+            DRAMMENBYSYKKEL -> drammenBysykkelURL(accessToken)
         }
     }
 }
