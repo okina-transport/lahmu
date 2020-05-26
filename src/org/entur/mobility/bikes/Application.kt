@@ -21,9 +21,12 @@ import io.ktor.server.jetty.Jetty
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import java.lang.Exception
+import java.util.Timer
+import kotlin.concurrent.schedule
 import kotlin.concurrent.thread
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import org.entur.mobility.bikes.GbfsStandardEnum.Companion.getFetchUrl
 import org.entur.mobility.bikes.bikeOperators.DrammenAccessToken
 import org.entur.mobility.bikes.bikeOperators.DrammenStationsResponse
@@ -49,6 +52,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 val logger: Logger = LoggerFactory.getLogger("org.entur.mobility.bikes")
+val client = HttpClient()
 
 fun main() {
     val server = embeddedServer(Jetty, watchPaths = listOf("bikeservice"), port = 8080, module = Application::module)
@@ -60,8 +64,12 @@ fun Application.module() {
     val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     thread(start = true) {
-        launch { fetchAndSetDrammenAccessToken() }
-        launch { poll(cache) }
+        Timer().schedule(0L, TIME_TO_LIVE_DRAMMEN_ACCESS_KEY_MS) {
+            fetchAndSetDrammenAccessToken()
+        }
+        Timer().schedule(0L, POLL_INTERVAL_MS) {
+            poll(cache)
+        }
     }
 
     install(MicrometerMetrics) {
@@ -117,26 +125,26 @@ fun Application.module() {
     }
 }
 
-suspend inline fun <reified T> parseResponse(url: String): T {
+inline fun <reified T> parseResponse(url: String): T {
     val response = fetch(url)
     return Gson().fromJson(response, T::class.java)
 }
 
-suspend inline fun parseKolumbusResponse(): List<KolumbusStation> {
+fun parseKolumbusResponse(): List<KolumbusStation> {
     val response = fetch(kolumbusBysykkelURL.getValue(GbfsStandardEnum.system_information))
     val itemType = object : TypeToken<List<KolumbusStation>>() {}.type
     return Gson().fromJson(response, itemType)
 }
 
-suspend inline fun parseJCDecauxResponse(): List<JCDecauxStation> {
+fun parseJCDecauxResponse(): List<JCDecauxStation> {
     val response = fetch(lillestromBysykkelURL.getValue(GbfsStandardEnum.system_information))
     val itemType = object : TypeToken<List<JCDecauxStation>>() {}.type
     return Gson().fromJson(response, itemType)
 }
 
-suspend inline fun poll(cache: InMemoryCache) {
-    while (true) {
-        Operator.values().forEach { operator ->
+fun poll(cache: InMemoryCache) {
+    Operator.values().forEach { operator ->
+        GlobalScope.async {
             logger.info("Polling $operator")
             try {
                 if (operator.isUrbanSharing()) {
@@ -157,11 +165,10 @@ suspend inline fun poll(cache: InMemoryCache) {
                 logger.error("Failed to poll from $operator. $e")
             }
         }
-        delay(POLL_INTERVAL_MS)
     }
 }
 
-suspend fun fetchAndStoreInCache(
+fun fetchAndStoreInCache(
     cache: InMemoryCache,
     operator: Operator,
     gbfsStandardEnum: GbfsStandardEnum
@@ -188,7 +195,11 @@ suspend fun fetchAndStoreInCache(
         if (response != null) cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
     } else if (operator.isKolumbus()) {
         val response = KolumbusResponse(parseKolumbusResponse())
-        cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.system_information, response.toSystemInformation())
+        cache.setResponseInCacheAndGet(
+            operator,
+            GbfsStandardEnum.system_information,
+            response.toSystemInformation()
+        )
         cache.setResponseInCacheAndGet(
             operator,
             GbfsStandardEnum.station_information,
@@ -217,6 +228,7 @@ suspend fun fetchAndStoreInCache(
             response.toStationInformation()
         )
     } else if (operator.isDrammenSmartBike()) {
+        if (DRAMMEN_ACCESS_TOKEN == "") fetchAndSetDrammenAccessToken()
         val response = when (gbfsStandardEnum) {
             GbfsStandardEnum.gbfs -> {
                 null
@@ -226,21 +238,23 @@ suspend fun fetchAndStoreInCache(
             }
             GbfsStandardEnum.station_information -> {
                 val stationsStatusResponse = parseResponse<DrammenStationsStatusResponse>(
-                        GbfsStandardEnum.station_status.getFetchUrl(
-                            operator,
-                            DRAMMEN_ACCESS_TOKEN
-                        )
-                    ).toStationStatuses()
+                    GbfsStandardEnum.station_status.getFetchUrl(
+                        operator,
+                        DRAMMEN_ACCESS_TOKEN
+                    )
+                ).toStationStatuses()
                 cache.setResponseInCacheAndGet(operator, GbfsStandardEnum.station_status, stationsStatusResponse)
                 parseResponse<DrammenStationsResponse>(
                     gbfsStandardEnum.getFetchUrl(
                         operator,
                         DRAMMEN_ACCESS_TOKEN
                     )
-                ).toStationInformation(cache.getResponseFromCache(
-                    Operator.DRAMMENBYSYKKEL,
-                    GbfsStandardEnum.station_status
-                ) as GBFSResponse.StationStatusesResponse)
+                ).toStationInformation(
+                    cache.getResponseFromCache(
+                        Operator.DRAMMENBYSYKKEL,
+                        GbfsStandardEnum.station_status
+                    ) as GBFSResponse.StationStatusesResponse
+                )
             }
             GbfsStandardEnum.station_status -> {
                 parseResponse<DrammenStationsStatusResponse>(
@@ -255,22 +269,18 @@ suspend fun fetchAndStoreInCache(
     }
 }
 
-suspend fun fetchAndSetDrammenAccessToken() {
-    while (true) {
-        val response = try {
-            parseResponse<DrammenAccessToken>(DRAMMEN_ACCESS_TOKEN_URL)
-        } catch (e: Exception) {
-            logger.error("Failed to fetch Drammen access token. $e")
-            null
-        }
-        DRAMMEN_ACCESS_TOKEN = response?.access_token ?: ""
-        delay(response?.expires_in?.div(2)?.times(1000) ?: 1000)
+fun fetchAndSetDrammenAccessToken() {
+    val response = try {
+        logger.info("Fetching Drammen access token.")
+        parseResponse<DrammenAccessToken>(DRAMMEN_ACCESS_TOKEN_URL)
+    } catch (e: Exception) {
+        logger.error("Failed to fetch Drammen access token. $e")
+        null
     }
+    DRAMMEN_ACCESS_TOKEN = response?.access_token ?: ""
 }
 
-suspend fun fetch(url: String): String {
-    val client = HttpClient()
-    val response = client.get<String>(url) { header("Client-Identifier", "entur-bikeservice") }
-    client.close()
+fun fetch(url: String): String {
+    val response = runBlocking { client.get<String>(url) { header("Client-Identifier", "entur-bikeservice") } }
     return response
 }
