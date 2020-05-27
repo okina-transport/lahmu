@@ -3,6 +3,7 @@ package org.entur.mobility.bikes
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.ktor.application.Application
+import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.client.HttpClient
@@ -22,6 +23,7 @@ import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import java.lang.Exception
 import java.util.Timer
+import java.util.UUID
 import kotlin.concurrent.schedule
 import kotlin.concurrent.thread
 import kotlinx.coroutines.GlobalScope
@@ -50,6 +52,7 @@ import org.entur.mobility.bikes.bikeOperators.toStationStatuses
 import org.entur.mobility.bikes.bikeOperators.toSystemInformation
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 
 val logger: Logger = LoggerFactory.getLogger("org.entur.mobility.bikes")
 val client = HttpClient()
@@ -76,6 +79,25 @@ fun Application.module() {
         registry = meterRegistry
     }
     routing {
+        intercept(ApplicationCallPipeline.Call) {
+            try {
+                val httpRequestCorrelationId = call.request.headers.get("x-correlation-id")
+                val correlationId =
+                    if (httpRequestCorrelationId != null) sanitize(httpRequestCorrelationId) else UUID.randomUUID()
+                        .toString()
+                val requestId = UUID.randomUUID().toString()
+
+                MDC.put("correlationId", correlationId)
+                MDC.put("requestId", requestId)
+
+                call.response.header("x-correlation-id", correlationId)
+                call.response.header("x-request-id", requestId)
+
+                runBlocking { proceed() }
+            } finally {
+                MDC.clear()
+            }
+        }
         get("/") {
             val host = call.request.host()
             val port = call.request.port()
