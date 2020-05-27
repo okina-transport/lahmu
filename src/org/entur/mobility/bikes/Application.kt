@@ -80,21 +80,23 @@ fun Application.module() {
     }
     routing {
         intercept(ApplicationCallPipeline.Call) {
-            val httpRequestCorrelationId = call.request.headers.get("x-correlation-id")
-            val correlationId =
-                if (httpRequestCorrelationId != null) sanitize(httpRequestCorrelationId) else UUID.randomUUID()
-                    .toString()
-            val requestId = UUID.randomUUID().toString()
+            try {
+                val httpRequestCorrelationId = call.request.headers.get("x-correlation-id")
+                val correlationId =
+                    if (httpRequestCorrelationId != null) sanitize(httpRequestCorrelationId) else UUID.randomUUID()
+                        .toString()
+                val requestId = UUID.randomUUID().toString()
 
-            MDC.put("correlationId", correlationId)
-            MDC.put("requestId", requestId)
+                MDC.put("correlationId", correlationId)
+                MDC.put("requestId", requestId)
 
-            call.response.header("x-correlation-id", correlationId)
-            call.response.header("x-request-id", requestId)
+                call.response.header("x-correlation-id", correlationId)
+                call.response.header("x-request-id", requestId)
 
-            logger.info("Request received")
-            runBlocking { proceed() }
-            MDC.clear()
+                runBlocking { proceed() }
+            } finally {
+                MDC.clear()
+            }
         }
         get("/") {
             val host = call.request.host()
