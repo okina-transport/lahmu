@@ -5,8 +5,9 @@ menu: Mobility
 
 # Bikes
 
-Currently we offer data from Oslo Bysykkel, Bergen Bysykkel, Trondheim Bysykkel and Kolumbus Bysykkel. All of our data is served in GBFS format which is
-a standardized data feed for bikesharing systems. More information about GBFS can be found at https://github.com/NABSA/gbfs.
+Currently we offer data from Oslo Bysykkel, Bergen Bysykkel, Trondheim Bysykkel, Kolumbus Bysykkel, Drammen Bysykkel and Lillestrøm Bysykkel. 
+All of our data is served in GBFS format which is a standardized data feed for bikesharing systems. 
+More information about GBFS can be found at https://github.com/NABSA/gbfs.
 
 The bikes are also available through the [Journey Planner API](/pages-journeyplanner-journeyplanner). See the [example query](https://api.entur.io/journey-planner/v2/ide/?query=%7B%0A%20%20bikeRentalStations%20%7B%0A%20%20%20%20name%0A%20%20%20%20bikesAvailable%0A%20%20%20%20spacesAvailable%0A%20%20%7D%0A%7D) in the GraphiQL editor.
 
@@ -47,7 +48,7 @@ Get the different GBFS endpoints for a specific operator.
 
 `GET https://api.entur.io/mobility/v1/bikes/{operator}/gbfs.json`
 
-Where `{operator}` is one of the above mentioned operators, i.e either `oslobysykkel`, `kolombusbysykkel`, `bergenbysykkel`, `trondheimbysykkel`.
+Where `{operator}` is one of the above mentioned operators, for instance `oslobysykkel`.
 
 ### Example response
 
