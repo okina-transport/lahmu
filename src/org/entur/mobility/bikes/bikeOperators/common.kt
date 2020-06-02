@@ -34,7 +34,10 @@ enum class Operator {
 
 fun getOperatorsWithDiscovery(port: String, host: Int): Map<String, List<Map<String, String>>> =
     mapOf("operators" to Operator.values().map {
-        mapOf("$it".toLowerCase() to getGbfsEndpoint(it, port, host)[GbfsStandardEnum.gbfs]!!)
+        mapOf(
+            "name" to "$it".toLowerCase(),
+            "url" to getGbfsEndpoint(it, port, host).getValue(GbfsStandardEnum.gbfs)
+        )
     })
 
 fun mapIdToNeTEx(id: String, operator: Operator) = "${operator.getCodeSpace()}:VehicleSharingParkingArea:$id"
