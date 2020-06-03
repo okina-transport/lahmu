@@ -1,7 +1,5 @@
 # Bikeservice
 
-This is a work in progress
-
 ## Running
 
 Either run the application from the command line or from IntelliJ. 
