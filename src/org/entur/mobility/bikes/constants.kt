@@ -1,7 +1,6 @@
 package org.entur.mobility.bikes
 
-const val POLL_INTERVAL_MS = 60000L
-const val POLL_INTERVAL_DEV_MS = 10 * 60000L
+val POLL_INTERVAL_MS = if (isProd) 60000L else (10 * 60000L)
 const val TIME_TO_LIVE_CACHE_SEC = 60L
 const val TTL = 15L
 const val TIME_TO_LIVE_DRAMMEN_ACCESS_KEY_MS = 10 * 60000L

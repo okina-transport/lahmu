@@ -56,8 +56,8 @@ import org.slf4j.MDC
 
 val logger: Logger = LoggerFactory.getLogger("org.entur.mobility.bikes")
 val client = HttpClient()
-val env get() = System.getenv("ENV")
-val isProd get() = env == "prod"
+val env: String? = System.getenv("ENV")
+val isProd = env == "prod"
 
 fun main() {
     val server = embeddedServer(Jetty, watchPaths = listOf("bikeservice"), port = 8080, module = Application::module)
@@ -69,11 +69,10 @@ fun Application.module() {
     val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     thread(start = true) {
-        val pollInterval = if (isProd) POLL_INTERVAL_MS else POLL_INTERVAL_DEV_MS
         Timer().schedule(0L, TIME_TO_LIVE_DRAMMEN_ACCESS_KEY_MS) {
             fetchAndSetDrammenAccessToken()
         }
-        Timer().schedule(0L, pollInterval) {
+        Timer().schedule(0L, POLL_INTERVAL_MS) {
             poll(cache)
         }
     }
