@@ -4,10 +4,13 @@ import java.time.LocalDateTime
 import java.time.Month
 import java.time.ZoneOffset
 
-const val POLL_INTERVAL_MS = 10 * 60000L
-const val TIME_TO_LIVE_CACHE_SEC = 60L
-const val TTL = 15L
-const val TIME_TO_LIVE_DRAMMEN_ACCESS_KEY_MS = 10 * 60000L
+// The poll interval should probably be somewhere between 10sec and 60sec. As of 04.06.2020, Urban Sharing delivers data
+// with the lowest TTL of the operators (10 sec). Therefore, there are no reason to poll more often than that.
+// However, to protect the other operators, we recommend to increase the interval a bit.
+const val POLL_INTERVAL_MS = 60000L
+// The TTL should be of same value as the Poll Interval, but in order to avoid some corner cases, we increase it with a second
+const val TTL = (POLL_INTERVAL_MS / 1000) + 1
+const val TIME_TO_LIVE_DRAMMEN_ACCESS_KEY_MS = 60 * 60000L
 
 val LILLESTROM_API_KEY = System.getenv("LILLESTROM_API_KEY")
 
