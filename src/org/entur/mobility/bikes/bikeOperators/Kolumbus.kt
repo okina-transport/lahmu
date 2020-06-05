@@ -10,7 +10,10 @@ import org.entur.mobility.bikes.StationStatus
 import org.entur.mobility.bikes.StationStatuses
 import org.entur.mobility.bikes.StationsInformation
 import org.entur.mobility.bikes.SystemInformation
+import org.entur.mobility.bikes.SystemPricePlan
 import org.entur.mobility.bikes.TTL
+import org.entur.mobility.bikes.epochOf31Dec2020
+import org.entur.mobility.bikes.epochOf5thJune2020
 
 data class KolumbusResponse(val data: List<KolumbusStation>)
 data class KolumbusStation(
@@ -76,9 +79,36 @@ fun KolumbusResponse.toStationInformation(): GBFSResponse.StationsInformationRes
         })
     )
 
+fun kolumbusSystemPricingPlans() = GBFSResponse.SystemPricingPlans(
+    last_updated = epochOf5thJune2020,
+    ttl = getSecondsFrom(epochOf5thJune2020, epochOf31Dec2020),
+    plans = listOf(
+        SystemPricePlan(
+            plan_id = "636B0671-ED87-42FB-8FAC-6AE8F3A25826",
+            url = "https://www.kolumbus.no/Billetter/-priser-og-produkter/bysykkelbillett/",
+            name = PricePlan.DAY_PASS_30.toString(),
+            currency = "NOK",
+            price = 125.0,
+            is_taxable = 1,
+            description = "For usage above an hour, it will follow a running cost of 1.0 NOK per minute."
+        ),
+        SystemPricePlan(
+            plan_id = "2AFBF7AD-4EE6-483F-A32A-3A8C94840996",
+            url = "https://www.kolumbus.no/verdt-a-vite/sykkel-oversikt/bysykkelen/",
+            name = PricePlan.ADD_ON_PASS.toString(),
+            currency = "NOK",
+            price = 0.0,
+            is_taxable = 1,
+            description = "With any valid ticket in the Kolumbus app, the city bike is available for free up to an hour. " +
+                "For usage above an hour, it will follow a running cost of 1.0 NOK per minute."
+        )
+    )
+)
+
 val kolumbusBysykkelURL = mapOf(
     GbfsStandardEnum.gbfs to "",
     GbfsStandardEnum.system_information to "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike",
     GbfsStandardEnum.station_information to "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike",
-    GbfsStandardEnum.station_status to "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike"
+    GbfsStandardEnum.station_status to "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike",
+    GbfsStandardEnum.system_pricing_plans to ""
 )

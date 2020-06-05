@@ -11,13 +11,17 @@ import org.entur.mobility.bikes.StationStatus
 import org.entur.mobility.bikes.StationStatuses
 import org.entur.mobility.bikes.StationsInformation
 import org.entur.mobility.bikes.SystemInformation
+import org.entur.mobility.bikes.SystemPricePlan
 import org.entur.mobility.bikes.TTL
+import org.entur.mobility.bikes.epochOf31Dec2020
+import org.entur.mobility.bikes.epochOf5thJune2020
 
 val lillestromBysykkelURL = mapOf(
     GbfsStandardEnum.gbfs to "",
     GbfsStandardEnum.system_information to "https://api.jcdecaux.com/vls/v3/stations?contract=lillestrom&apiKey=$LILLESTROM_API_KEY",
     GbfsStandardEnum.station_information to "https://api.jcdecaux.com/vls/v3/stations?contract=lillestrom&apiKey=$LILLESTROM_API_KEY",
-    GbfsStandardEnum.station_status to "https://api.jcdecaux.com/vls/v3/stations?contract=lillestrom&apiKey=$LILLESTROM_API_KEY"
+    GbfsStandardEnum.station_status to "https://api.jcdecaux.com/vls/v3/stations?contract=lillestrom&apiKey=$LILLESTROM_API_KEY",
+    GbfsStandardEnum.system_pricing_plans to ""
 )
 
 data class JCDecauxResponse(val data: List<JCDecauxStation>)
@@ -112,4 +116,32 @@ fun JCDecauxResponse.toStationStatus(): GBFSResponse.StationStatusesResponse =
                 num_docks_available = it.totalStands.availabilities.stands
             )
         })
+    )
+
+fun jcDecauxSystemPricingPlans(): GBFSResponse.SystemPricingPlans =
+    GBFSResponse.SystemPricingPlans(
+        last_updated = epochOf5thJune2020,
+        ttl = getSecondsFrom(epochOf5thJune2020, epochOf31Dec2020),
+        plans = listOf(
+            SystemPricePlan(
+                plan_id = "D16E7EC0-47F5-427D-9B71-CD079F989CC6",
+                url = "http://www.bysykkel.org/Abonnement/Satser",
+                name = PricePlan.SEASON_PASS.toString(),
+                currency = "NOK",
+                price = 50.0,
+                is_taxable = 0,
+                description = "Additional charges will run if the bike is unlocked continuously for more than 1 hour. " +
+                    "The next half-hour will then cost 20.0 NOK, while every commenced half-hour after that costs 40.0 NOK"
+            ),
+            SystemPricePlan(
+                plan_id = "867E4558-77E3-4608-8941-0C667E924280",
+                url = "http://www.bysykkel.org/Abonnement/Satser",
+                name = PricePlan.DAY_PASS_3.toString(),
+                currency = "NOK",
+                price = 10.0,
+                is_taxable = 0,
+                description = "Additional charges will run if the bike is unlocked continuously for more than 1 hour. " +
+                    "The next half-hour will then cost 20.0 NOK, while every commenced half-hour after that costs 40.0 NOK"
+            )
+        )
     )
