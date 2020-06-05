@@ -1,9 +1,11 @@
 package org.entur.mobility.bikes
 
-val POLL_INTERVAL_MS = if (isProd) 60000L else (10 * 60000L)
 const val TIME_TO_LIVE_CACHE_SEC = 60L
 const val TTL = 15L
 const val TIME_TO_LIVE_DRAMMEN_ACCESS_KEY_MS = 10 * 60000L
+val env: String? = System.getenv("ENV")
+val isProd = env == "prod"
+val POLL_INTERVAL_MS = if (isProd) 60000L else (10 * 60000L)
 
 val LILLESTROM_API_KEY = System.getenv("LILLESTROM_API_KEY")
 

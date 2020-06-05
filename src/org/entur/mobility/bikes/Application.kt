@@ -56,8 +56,6 @@ import org.slf4j.MDC
 
 val logger: Logger = LoggerFactory.getLogger("org.entur.mobility.bikes")
 val client = HttpClient()
-val env: String? = System.getenv("ENV")
-val isProd = env == "prod"
 
 fun main() {
     val server = embeddedServer(Jetty, watchPaths = listOf("bikeservice"), port = 8080, module = Application::module)
