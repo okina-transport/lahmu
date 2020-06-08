@@ -46,7 +46,7 @@ fun urbanSharingSystemPricePlan(operator: Operator): GBFSResponse.SystemPricingP
                 currency = "NOK",
                 price = 399.0,
                 is_taxable = 0,
-                description = "For usage above an hour, it will follow a running cost of 15.0 NOK per quarter."
+                description = "Ved sammenhengende bruk i over en time vil det forekomme et ekstra gebyr på 15.0 NOK per kvarter."
             ),
             SystemPricePlan(
                 plan_id = "3F6450C4-05F7-4E4E-8E71-2E641E011FEE",
@@ -60,7 +60,7 @@ fun urbanSharingSystemPricePlan(operator: Operator): GBFSResponse.SystemPricingP
                 currency = "NOK",
                 price = 49.0,
                 is_taxable = 0,
-                description = "For usage above an hour, it will follow a running cost of 15.0 NOK per quarter."
+                description = "Ved sammenhengende bruk i over en time, vil det forekomme et ekstra gebyr på 15.0 NOK per kvarter."
             )
         )
     )
