@@ -51,10 +51,10 @@ enum class PricePlan {
     SEASON_PASS, DAY_PASS_30, DAY_PASS_3, DAY_PASS_1, ADD_ON_PASS;
 
     override fun toString() = when (this) {
-        SEASON_PASS -> "season pass"
-        DAY_PASS_30 -> "30-days pass"
-        DAY_PASS_1 -> "1-day pass"
-        ADD_ON_PASS -> "add-on pass"
-        DAY_PASS_3 -> "3-days pass"
+        SEASON_PASS -> "sesongkort"
+        DAY_PASS_30 -> "30-dagerskort"
+        DAY_PASS_1 -> "dagskort"
+        ADD_ON_PASS -> "tilleggskort"
+        DAY_PASS_3 -> "3-dagerskort"
     }
 }

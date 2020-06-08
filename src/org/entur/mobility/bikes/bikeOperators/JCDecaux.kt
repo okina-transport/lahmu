@@ -92,7 +92,7 @@ fun jcDecauxSystemInformation(): GBFSResponse.SystemInformationResponse =
         ttl = TTL,
         data = SystemInformation(
             system_id = "lillestrom",
-            language = "no",
+            language = "nb",
             name = "Lillestrøm bysykkel",
             timezone = "Europe/Oslo",
             operator = null,
@@ -130,8 +130,8 @@ fun jcDecauxSystemPricingPlans(): GBFSResponse.SystemPricingPlans =
                 currency = "NOK",
                 price = 50.0,
                 is_taxable = 0,
-                description = "Additional charges will run if the bike is unlocked continuously for more than 1 hour. " +
-                    "The next half-hour will then cost 20.0 NOK, while every commenced half-hour after that costs 40.0 NOK"
+                description = "Hvis sykkelturen varer i mer enn 60 minutter, påløper et bruksgebyr på 20.0 NOK den " +
+                    "første halvtimen, og 40.0 NOK for alle påbegynte halvtimer etter det."
             ),
             SystemPricePlan(
                 plan_id = "867E4558-77E3-4608-8941-0C667E924280",
@@ -140,8 +140,8 @@ fun jcDecauxSystemPricingPlans(): GBFSResponse.SystemPricingPlans =
                 currency = "NOK",
                 price = 10.0,
                 is_taxable = 0,
-                description = "Additional charges will run if the bike is unlocked continuously for more than 1 hour. " +
-                    "The next half-hour will then cost 20.0 NOK, while every commenced half-hour after that costs 40.0 NOK"
+                description = "Hvis sykkelturen varer i mer enn 60 minutter, påløper et bruksgebyr på 20.0 NOK den " +
+                    "første halvtimen, og 40.0 NOK for alle påbegynte halvtimer etter det."
             )
         )
     )

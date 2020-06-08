@@ -90,7 +90,7 @@ fun kolumbusSystemPricingPlans() = GBFSResponse.SystemPricingPlans(
             currency = "NOK",
             price = 125.0,
             is_taxable = 0,
-            description = "For usage above an hour, it will follow a running cost of 1.0 NOK per minute."
+            description = "Ved sammenhengende bruk i over en time, vil det forekomme et ekstra gebyr på 1.0 NOK per minutt."
         ),
         SystemPricePlan(
             plan_id = "2AFBF7AD-4EE6-483F-A32A-3A8C94840996",
@@ -99,8 +99,7 @@ fun kolumbusSystemPricingPlans() = GBFSResponse.SystemPricingPlans(
             currency = "NOK",
             price = 0.0,
             is_taxable = 0,
-            description = "With any valid ticket in the Kolumbus app, the city bike is available for free up to an hour. " +
-                "For usage above an hour, it will follow a running cost of 1.0 NOK per minute."
+            description = "Har du en hvilken som helst gyldig billett i appen Kolumbus Billett, eller du jobber i en HjemJobbHjem-bedrift, kan du bruke sykkelen i en time uten å betale noe ekstra."
         )
     )
 )
