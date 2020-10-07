@@ -12,7 +12,8 @@ enum class GbfsStandardEnum {
     system_information,
     station_information,
     station_status,
-    system_pricing_plans;
+    system_pricing_plans,
+    free_bike_status;
 
     companion object {
         fun GbfsStandardEnum.getFetchUrl(operator: Operator, accessToken: String = ""): String =

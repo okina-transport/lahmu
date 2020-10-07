@@ -212,6 +212,9 @@ fun fetchAndStoreInCache(
                 )
             }
             GbfsStandardEnum.system_pricing_plans -> urbanSharingSystemPricePlan(operator)
+            GbfsStandardEnum.free_bike_status -> {
+                null
+            }
         }
         if (response != null) cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
     } else if (operator.isKolumbus()) {
@@ -296,6 +299,9 @@ fun fetchAndStoreInCache(
                 ).toStationStatuses()
             }
             GbfsStandardEnum.system_pricing_plans -> drammenSystemPricingPlan()
+            GbfsStandardEnum.free_bike_status -> {
+                null
+            }
         }
         if (response != null) cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
     }
