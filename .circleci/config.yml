@@ -42,9 +42,9 @@ jobs:
             - store_test_results:
                 path: ./test-results/
       - persist_to_workspace:
-        root: "."
-        paths:
-          - "*"
+          root: "."
+          paths:
+            - "*"
       - store_artifacts:
           path: ./build/reports/tests/test
       - store_test_results:
