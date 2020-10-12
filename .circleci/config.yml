@@ -26,9 +26,9 @@ jobs:
           steps:
             - run: ./gradlew --no-daemon clean build compileTestKotlin compileTestJava processTestResources -x test
       - persist_to_workspace:
-          root: .
+          root: "."
           paths:
-            - build/libs/
+            - "*"
   test:
     executor: java-11
     steps:
