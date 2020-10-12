@@ -10,6 +10,13 @@ orbs:
   docker: circleci/docker@1.0.1
   owasp: entur/owasp@0.0.10
 
+aliases:
+  - &test-command |
+    ./gradlew --no-daemon test jacocoTestReport sonarqube \
+    -Dsonar.projectKey=enturas_$CIRCLE_PROJECT_REPONAME \
+    -Dsonar.organization=$SONAR_ORG -Dsonar.projectName=$CIRCLE_PROJECT_REPONAME \
+    -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$ENTUR_SONAR_PASSWORD
+
 jobs:
   build:
     executor: java-11
@@ -17,16 +24,40 @@ jobs:
       - checkout
       - gradle/with_cache:
           steps:
-            - run: ./gradlew --no-daemon clean build
+            - run: ./gradlew --no-daemon clean build compileTestKotlin compileTestJava processTestResources -x test
       - persist_to_workspace:
           root: .
           paths:
             - build/libs/
+  test:
+    executor: java-11
+    steps:
+      - attach_workspace:
+          at: "."
+      - gradle/with_cache:
+          steps:
+            - run:
+                command: *test-command
+                no_output_timeout: 30m
+            - store_test_results:
+                path: ./test-results/
+      - persist_to_workspace:
+        root: "."
+        paths:
+          - "*"
+      - store_artifacts:
+          path: ./build/reports/tests/test
+      - store_test_results:
+          path: ./build/test-results/test/
+
 
 workflows:
   Build-Publish:
     jobs:
       - build
+      - test:
+          requires:
+            - build
       - docker/publish:
           name: release
           registry: $DOCKER_REGISTRY
