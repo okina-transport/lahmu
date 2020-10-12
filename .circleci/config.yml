@@ -81,7 +81,7 @@ workflows:
                   git tag $VERSION
                   git push origin $VERSION
           requires:
-            - build
+            - test
 
       - owasp/owasp_dependency_check:
           executor: java-11
