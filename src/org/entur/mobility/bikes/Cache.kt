@@ -7,7 +7,7 @@ import org.entur.mobility.bikes.bikeOperators.Operator
 interface Cache {
     val cacheMap: HashMap<Operator, HashMap<GbfsStandardEnum, GBFSResponse>>
 
-    fun isValidCache(operator: Operator, gbfsEnum: GbfsStandardEnum): Boolean
+    fun isValidCache(bikeOperator: Operator, gbfsStandardEnum: GbfsStandardEnum): Boolean
     fun getResponseFromCache(bikeOperator: Operator, gbfsStandardEnum: GbfsStandardEnum): GBFSResponse?
     fun setResponseInCacheAndGet(operator: Operator, gbfsStandardEnum: GbfsStandardEnum, response: GBFSResponse): GBFSResponse
 }
