@@ -23,7 +23,6 @@ import org.entur.mobility.bikes.StationStatus
 import org.entur.mobility.bikes.StationStatuses
 import org.entur.mobility.bikes.StationsInformation
 import org.entur.mobility.bikes.SystemInformation
-import org.entur.mobility.bikes.SystemPricePlan
 import org.entur.mobility.bikes.bikeOperators.Operator
 import org.entur.mobility.bikes.bikeOperators.urbanSharingSystemPricePlan
 import org.entur.mobility.bikes.parseResponse
