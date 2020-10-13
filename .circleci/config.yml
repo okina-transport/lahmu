@@ -84,6 +84,9 @@ workflows:
                   git push origin $VERSION
           requires:
             - test
+          filters:
+            branches:
+              only: master
 
       - owasp/owasp_dependency_check:
           executor: java-11
