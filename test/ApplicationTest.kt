@@ -19,6 +19,8 @@ import org.entur.mobility.bikes.DiscoveryFeed
 import org.entur.mobility.bikes.GBFSResponse
 import org.entur.mobility.bikes.InMemoryCache
 import org.entur.mobility.bikes.StationInformation
+import org.entur.mobility.bikes.StationStatus
+import org.entur.mobility.bikes.StationStatuses
 import org.entur.mobility.bikes.StationsInformation
 import org.entur.mobility.bikes.SystemInformation
 import org.entur.mobility.bikes.bikeOperators.Operator
@@ -49,13 +51,24 @@ class ApplicationTest : KoinTest {
         "+4791589700",
         "post@oslobysykkel.no"
     )
+
     private val osloBysykkelStationInformation = StationInformation(
-        "oslobysykkel_station",
-        "Tøyen",
-        "Hagegata 5A",
+        "test_station_id",
+        "Test station",
+        "Test address",
         BigDecimal(59),
         BigDecimal(10),
         10
+    )
+
+    private val osloBysykkelStationStatus = StationStatus(
+        "test_station_id",
+        10,
+        10,
+        10,
+        BigDecimal(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)),
+        5,
+        5
     )
 
     private val client = HttpClient(MockEngine) {
@@ -74,6 +87,13 @@ class ApplicationTest : KoinTest {
                             LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
                             10,
                             StationsInformation(listOf(osloBysykkelStationInformation))
+                        )).toString(), headers = responseHeaders)
+                    }
+                    "https://gbfs.urbansharing.com/oslobysykkel.no/station_status.json" -> {
+                        respond(Gson().toJson(GBFSResponse.StationStatusesResponse(
+                            LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+                            10,
+                            StationStatuses(listOf(osloBysykkelStationStatus))
                         )).toString(), headers = responseHeaders)
                     }
                     else -> error("Unhandled ${request.url}")
@@ -133,6 +153,14 @@ class ApplicationTest : KoinTest {
         with(handleRequest(HttpMethod.Get, "/oslobysykkel/station_information.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals(osloBysykkelStationInformation.toNeTEx(Operator.OSLOBYSYKKEL), response.content?.let { parseResponse<GBFSResponse.StationsInformationResponse>(it).data.stations[0] })
+        }
+    }
+
+    @Test
+    fun `get oslobysykkel station status`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/oslobysykkel/station_status.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals(osloBysykkelStationStatus.toNeTEx(Operator.OSLOBYSYKKEL), response.content?.let { parseResponse<GBFSResponse.StationStatusesResponse>(it).data.stations[0] })
         }
     }
 }
