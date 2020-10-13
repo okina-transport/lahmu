@@ -23,7 +23,9 @@ import org.entur.mobility.bikes.StationStatus
 import org.entur.mobility.bikes.StationStatuses
 import org.entur.mobility.bikes.StationsInformation
 import org.entur.mobility.bikes.SystemInformation
+import org.entur.mobility.bikes.SystemPricePlan
 import org.entur.mobility.bikes.bikeOperators.Operator
+import org.entur.mobility.bikes.bikeOperators.urbanSharingSystemPricePlan
 import org.entur.mobility.bikes.parseResponse
 import org.entur.mobility.bikes.routingModule
 import org.entur.mobility.bikes.toNeTEx
@@ -161,6 +163,14 @@ class ApplicationTest : KoinTest {
         with(handleRequest(HttpMethod.Get, "/oslobysykkel/station_status.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals(osloBysykkelStationStatus.toNeTEx(Operator.OSLOBYSYKKEL), response.content?.let { parseResponse<GBFSResponse.StationStatusesResponse>(it).data.stations[0] })
+        }
+    }
+
+    @Test
+    fun `get oslobysykkel system pricing plans`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/oslobysykkel/system_pricing_plans.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals(urbanSharingSystemPricePlan(Operator.OSLOBYSYKKEL).plans[0], response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0] })
         }
     }
 }
