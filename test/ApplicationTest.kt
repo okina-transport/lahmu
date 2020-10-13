@@ -21,8 +21,10 @@ import org.entur.mobility.bikes.InMemoryCache
 import org.entur.mobility.bikes.StationInformation
 import org.entur.mobility.bikes.StationsInformation
 import org.entur.mobility.bikes.SystemInformation
+import org.entur.mobility.bikes.bikeOperators.Operator
 import org.entur.mobility.bikes.parseResponse
 import org.entur.mobility.bikes.routingModule
+import org.entur.mobility.bikes.toNeTEx
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -119,7 +121,7 @@ class ApplicationTest : KoinTest {
     }
 
     @Test
-    fun `get oslobysykkel system information feed`() = withTestApplication({ routingModule() }) {
+    fun `get oslobysykkel system information`() = withTestApplication({ routingModule() }) {
         with(handleRequest(HttpMethod.Get, "/oslobysykkel/system_information.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals(osloBysykkelSystemInformation, response.content?.let { parseResponse<GBFSResponse.SystemInformationResponse>(it).data })
@@ -127,11 +129,10 @@ class ApplicationTest : KoinTest {
     }
 
     @Test
-    fun `get oslobysykkel station information feed`() = withTestApplication({ routingModule() }) {
-        val expectedStationId = "YOS:VehicleSharingParkingArea:oslobysykkel_station"
+    fun `get oslobysykkel station information`() = withTestApplication({ routingModule() }) {
         with(handleRequest(HttpMethod.Get, "/oslobysykkel/station_information.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
-            assertEquals(expectedStationId, response.content?.let { parseResponse<GBFSResponse.StationsInformationResponse>(it).data.stations[0].station_id })
+            assertEquals(osloBysykkelStationInformation.toNeTEx(Operator.OSLOBYSYKKEL), response.content?.let { parseResponse<GBFSResponse.StationsInformationResponse>(it).data.stations[0] })
         }
     }
 }
