@@ -9,6 +9,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import org.entur.mobility.bikes.BikeService
@@ -17,6 +18,8 @@ import org.entur.mobility.bikes.Cache
 import org.entur.mobility.bikes.DiscoveryFeed
 import org.entur.mobility.bikes.GBFSResponse
 import org.entur.mobility.bikes.InMemoryCache
+import org.entur.mobility.bikes.StationInformation
+import org.entur.mobility.bikes.StationsInformation
 import org.entur.mobility.bikes.SystemInformation
 import org.entur.mobility.bikes.parseResponse
 import org.entur.mobility.bikes.routingModule
@@ -34,6 +37,7 @@ import org.koin.test.KoinTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ApplicationTest : KoinTest {
 
+    private val responseHeaders = headersOf("Content-Type" to listOf(ContentType.Application.Json.toString()))
     private val osloBysykkelSystemInformation = SystemInformation(
         "oslobysykkel",
         "nb",
@@ -43,11 +47,13 @@ class ApplicationTest : KoinTest {
         "+4791589700",
         "post@oslobysykkel.no"
     )
-
-    private val osloBysykkelSystemInformationResponse = GBFSResponse.SystemInformationResponse(
-        LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-        10,
-        osloBysykkelSystemInformation
+    private val osloBysykkelStationInformation = StationInformation(
+        "oslobysykkel_station",
+        "Tøyen",
+        "Hagegata 5A",
+        BigDecimal(59),
+        BigDecimal(10),
+        10
     )
 
     private val client = HttpClient(MockEngine) {
@@ -55,8 +61,18 @@ class ApplicationTest : KoinTest {
             addHandler { request ->
                 when (request.url.toString()) {
                     "https://gbfs.urbansharing.com/oslobysykkel.no/system_information.json" -> {
-                        val responseHeaders = headersOf("Content-Type" to listOf(ContentType.Application.Json.toString()))
-                        respond(Gson().toJson(osloBysykkelSystemInformationResponse).toString(), headers = responseHeaders)
+                        respond(Gson().toJson(GBFSResponse.SystemInformationResponse(
+                            LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+                            10,
+                            osloBysykkelSystemInformation
+                        )).toString(), headers = responseHeaders)
+                    }
+                    "https://gbfs.urbansharing.com/oslobysykkel.no/station_information.json" -> {
+                        respond(Gson().toJson(GBFSResponse.StationsInformationResponse(
+                            LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+                            10,
+                            StationsInformation(listOf(osloBysykkelStationInformation))
+                        )).toString(), headers = responseHeaders)
                     }
                     else -> error("Unhandled ${request.url}")
                 }
@@ -106,18 +122,16 @@ class ApplicationTest : KoinTest {
     fun `get oslobysykkel system information feed`() = withTestApplication({ routingModule() }) {
         with(handleRequest(HttpMethod.Get, "/oslobysykkel/system_information.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
-            val systemInformationResponse = response.content?.let { parseResponse<GBFSResponse.SystemInformationResponse>(it) }
-            assertEquals(10.toLong(), systemInformationResponse?.ttl)
-            val expected = SystemInformation(
-                "oslobysykkel",
-                "nb",
-                "Oslo Bysykkel",
-                "UIP Oslo Bysykkel AS",
-                "Europe/Oslo",
-                "+4791589700",
-                "post@oslobysykkel.no"
-            )
-            assertEquals(expected, systemInformationResponse?.data)
+            assertEquals(osloBysykkelSystemInformation, response.content?.let { parseResponse<GBFSResponse.SystemInformationResponse>(it).data })
+        }
+    }
+
+    @Test
+    fun `get oslobysykkel station information feed`() = withTestApplication({ routingModule() }) {
+        val expectedStationId = "YOS:VehicleSharingParkingArea:oslobysykkel_station"
+        with(handleRequest(HttpMethod.Get, "/oslobysykkel/station_information.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals(expectedStationId, response.content?.let { parseResponse<GBFSResponse.StationsInformationResponse>(it).data.stations[0].station_id })
         }
     }
 }
