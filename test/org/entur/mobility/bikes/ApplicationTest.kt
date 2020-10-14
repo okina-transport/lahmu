@@ -1,4 +1,5 @@
 package org.entur.mobility.bikes
+import com.google.gson.Gson
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -9,6 +10,7 @@ import io.ktor.http.headersOf
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
 import java.math.BigDecimal
+import org.entur.mobility.bikes.bikeOperators.DrammenAccessToken
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -52,6 +54,21 @@ class ApplicationTest : KoinTest {
                     "https://api.jcdecaux.com/vls/v3/stations?contract=lillestrom&apiKey=null" -> {
                         respond(
                             getTestFixture("/lillestrombysykkelStationsResponse.json"),
+                            headers = responseHeaders)
+                    }
+                    "https://drammen.pub.api.smartbike.com/oauth/v2/token?client_id=null&client_secret=null&grant_type=client_credentials" -> {
+                        respond(
+                            Gson().toJson(DrammenAccessToken("test", 3600, "bearer", null)),
+                            headers = responseHeaders)
+                    }
+                    "https://drammen.pub.api.smartbike.com/api/en/v3/stations/status.json?access_token=test" -> {
+                        respond(
+                            getTestFixture("/drammenStationsStatusResponse.json"),
+                            headers = responseHeaders)
+                    }
+                    "https://drammen.pub.api.smartbike.com/api/en/v3/stations.json?access_token=test" -> {
+                        respond(
+                            getTestFixture("/drammenStationsResponse.json"),
                             headers = responseHeaders)
                     }
                     else -> error("Unhandled ${request.url}")
@@ -287,6 +304,73 @@ class ApplicationTest : KoinTest {
         with(handleRequest(HttpMethod.Get, "/lillestrombysykkel/system_pricing_plans.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals("D16E7EC0-47F5-427D-9B71-CD079F989CC6", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].plan_id })
+        }
+    }
+
+    @Test
+    fun `get drammenbysykkel discovery feed`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/drammenbysykkel/gbfs.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            val discoveryResponse = response.content?.let { parseResponse<GBFSResponse.DiscoveryResponse>(it) }
+            assertEquals(15.toLong(), discoveryResponse?.ttl)
+            val expected = DiscoveryFeed(
+                "system_information",
+                "http://localhost:80/drammenbysykkel/system_information.json"
+            )
+            assertEquals(expected, discoveryResponse?.data?.nb?.feeds?.get(0))
+        }
+    }
+
+    @Test
+    fun `get drammenbysykkel system information`() = withTestApplication({ routingModule() }) {
+        val drammenbysykkelSystemInformation = SystemInformation(
+            "drammen",
+            "nb",
+            "Drammen Bysykkel",
+            null,
+            "Europe/Oslo",
+            null,
+            null
+        )
+
+        with(handleRequest(HttpMethod.Get, "/drammenbysykkel/system_information.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals(drammenbysykkelSystemInformation, response.content?.let { parseResponse<GBFSResponse.SystemInformationResponse>(it).data })
+        }
+    }
+
+    @Test
+    fun `get drammenbysykkel station information`() = withTestApplication({ routingModule() }) {
+        val drammenbysykkelStationInformation = StationInformation(
+            "YDR:VehicleSharingParkingArea:001",
+            "Fylkeshuset",
+            "Fylkeshuset",
+            BigDecimal("59.74819162081"),
+            BigDecimal("10.18867093254"),
+            12
+        )
+        with(handleRequest(HttpMethod.Get, "/drammenbysykkel/station_information.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals(drammenbysykkelStationInformation, response.content?.let { parseResponse<GBFSResponse.StationsInformationResponse>(it).data.stations[0] })
+        }
+    }
+
+    @Test
+    fun `get drammenbysykkel station status`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/drammenbysykkel/station_status.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            val stationStatus = response.content?.let { parseResponse<GBFSResponse.StationStatusesResponse>(it).data.stations[0] }
+            assertEquals("YDR:VehicleSharingParkingArea:001", stationStatus?.station_id)
+            assertEquals(0, stationStatus?.num_bikes_available)
+            assertEquals(12, stationStatus?.num_docks_available)
+        }
+    }
+
+    @Test
+    fun `get drammenbysykkel system pricing plans`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/drammenbysykkel/system_pricing_plans.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals("8B00A621-82E8-4AC0-9B89-ABEAF99BD238", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].plan_id })
         }
     }
 
