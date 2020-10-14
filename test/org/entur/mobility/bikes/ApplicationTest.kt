@@ -49,6 +49,11 @@ class ApplicationTest : KoinTest {
                             getTestFixture("/kolumbusResponse.json"),
                             headers = responseHeaders)
                     }
+                    "https://api.jcdecaux.com/vls/v3/stations?contract=lillestrom&apiKey=null" -> {
+                        respond(
+                            getTestFixture("/lillestrombysykkelStationsResponse.json"),
+                            headers = responseHeaders)
+                    }
                     else -> error("Unhandled ${request.url}")
                 }
             }
@@ -215,6 +220,73 @@ class ApplicationTest : KoinTest {
         with(handleRequest(HttpMethod.Get, "/kolumbusbysykkel/system_pricing_plans.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals("636B0671-ED87-42FB-8FAC-6AE8F3A25826", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].plan_id })
+        }
+    }
+
+    @Test
+    fun `get lillestrombysykkel discovery feed`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/lillestrombysykkel/gbfs.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            val discoveryResponse = response.content?.let { parseResponse<GBFSResponse.DiscoveryResponse>(it) }
+            assertEquals(15.toLong(), discoveryResponse?.ttl)
+            val expected = DiscoveryFeed(
+                "system_information",
+                "http://localhost:80/lillestrombysykkel/system_information.json"
+            )
+            assertEquals(expected, discoveryResponse?.data?.nb?.feeds?.get(0))
+        }
+    }
+
+    @Test
+    fun `get lillestrombysykkel system information`() = withTestApplication({ routingModule() }) {
+        val lillestrombysykkelSystemInformation = SystemInformation(
+            "lillestrom",
+            "nb",
+            "Lillestrøm bysykkel",
+            null,
+            "Europe/Oslo",
+            null,
+            null
+        )
+
+        with(handleRequest(HttpMethod.Get, "/lillestrombysykkel/system_information.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals(lillestrombysykkelSystemInformation, response.content?.let { parseResponse<GBFSResponse.SystemInformationResponse>(it).data })
+        }
+    }
+
+    @Test
+    fun `get lillestrombysykkel station information`() = withTestApplication({ routingModule() }) {
+        val lillestrombysykkelStationInformation = StationInformation(
+            "YLI:VehicleSharingParkingArea:3",
+            "TORVGATA",
+            "Torvgata 8, Lillestrøm",
+            BigDecimal("59.95585"),
+            BigDecimal("11.04745"),
+            3
+        )
+        with(handleRequest(HttpMethod.Get, "/lillestrombysykkel/station_information.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals(lillestrombysykkelStationInformation, response.content?.let { parseResponse<GBFSResponse.StationsInformationResponse>(it).data.stations[0] })
+        }
+    }
+
+    @Test
+    fun `get lillestrombysykkel station status`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/lillestrombysykkel/station_status.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            val stationStatus = response.content?.let { parseResponse<GBFSResponse.StationStatusesResponse>(it).data.stations[0] }
+            assertEquals("YLI:VehicleSharingParkingArea:3", stationStatus?.station_id)
+            assertEquals(12, stationStatus?.num_bikes_available)
+            assertEquals(8, stationStatus?.num_docks_available)
+        }
+    }
+
+    @Test
+    fun `get lillestrombysykkel system pricing plans`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/lillestrombysykkel/system_pricing_plans.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals("D16E7EC0-47F5-427D-9B71-CD079F989CC6", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].plan_id })
         }
     }
 
