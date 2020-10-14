@@ -1,5 +1,4 @@
 package org.entur.mobility.bikes
-import com.google.gson.Gson
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -10,10 +9,6 @@ import io.ktor.http.headersOf
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
 import java.math.BigDecimal
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import org.entur.mobility.bikes.bikeOperators.Operator
-import org.entur.mobility.bikes.bikeOperators.urbanSharingSystemPricePlan
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -29,59 +24,30 @@ import org.koin.test.KoinTest
 class ApplicationTest : KoinTest {
 
     private val responseHeaders = headersOf("Content-Type" to listOf(ContentType.Application.Json.toString()))
-    private val osloBysykkelSystemInformation = SystemInformation(
-        "oslobysykkel",
-        "nb",
-        "Oslo Bysykkel",
-        "UIP Oslo Bysykkel AS",
-        "Europe/Oslo",
-        "+4791589700",
-        "post@oslobysykkel.no"
-    )
-
-    private val osloBysykkelStationInformation = StationInformation(
-        "test_station_id",
-        "Test station",
-        "Test address",
-        BigDecimal(59),
-        BigDecimal(10),
-        10
-    )
-
-    private val osloBysykkelStationStatus = StationStatus(
-        "test_station_id",
-        10,
-        10,
-        10,
-        BigDecimal(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)),
-        5,
-        5
-    )
-
     private val client = HttpClient(MockEngine) {
         engine {
             addHandler { request ->
                 when (request.url.toString()) {
                     "https://gbfs.urbansharing.com/oslobysykkel.no/system_information.json" -> {
-                        respond(Gson().toJson(GBFSResponse.SystemInformationResponse(
-                            LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-                            10,
-                            osloBysykkelSystemInformation
-                        )).toString(), headers = responseHeaders)
+                        respond(
+                            getTestFixture("/oslobysykkelSystemInformation.json"),
+                            headers = responseHeaders
+                        )
                     }
                     "https://gbfs.urbansharing.com/oslobysykkel.no/station_information.json" -> {
-                        respond(Gson().toJson(GBFSResponse.StationsInformationResponse(
-                            LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-                            10,
-                            StationsInformation(listOf(osloBysykkelStationInformation))
-                        )).toString(), headers = responseHeaders)
+                        respond(
+                            getTestFixture("/oslobysykkelStationInformation.json"),
+                            headers = responseHeaders)
                     }
                     "https://gbfs.urbansharing.com/oslobysykkel.no/station_status.json" -> {
-                        respond(Gson().toJson(GBFSResponse.StationStatusesResponse(
-                            LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-                            10,
-                            StationStatuses(listOf(osloBysykkelStationStatus))
-                        )).toString(), headers = responseHeaders)
+                        respond(
+                            getTestFixture("/oslobysykkelStationStatus.json"),
+                            headers = responseHeaders)
+                    }
+                    "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike" -> {
+                        respond(
+                            getTestFixture("/kolumbusResponse.json"),
+                            headers = responseHeaders)
                     }
                     else -> error("Unhandled ${request.url}")
                 }
@@ -129,6 +95,15 @@ class ApplicationTest : KoinTest {
 
     @Test
     fun `get oslobysykkel system information`() = withTestApplication({ routingModule() }) {
+        val osloBysykkelSystemInformation = SystemInformation(
+            "oslobysykkel",
+            "nb",
+            "Oslo Bysykkel",
+            "UIP Oslo Bysykkel AS",
+            "Europe/Oslo",
+            "+4791589700",
+            "post@oslobysykkel.no"
+        )
         with(handleRequest(HttpMethod.Get, "/oslobysykkel/system_information.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals(osloBysykkelSystemInformation, response.content?.let { parseResponse<GBFSResponse.SystemInformationResponse>(it).data })
@@ -137,17 +112,34 @@ class ApplicationTest : KoinTest {
 
     @Test
     fun `get oslobysykkel station information`() = withTestApplication({ routingModule() }) {
+        val osloBysykkelStationInformation = StationInformation(
+            "YOS:VehicleSharingParkingArea:1919",
+            "Kværnerveien",
+            "Kværnerveien 5",
+            BigDecimal("59.90591083488326"),
+            BigDecimal("10.778592132296495"),
+            6
+        )
         with(handleRequest(HttpMethod.Get, "/oslobysykkel/station_information.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
-            assertEquals(osloBysykkelStationInformation.toNeTEx(Operator.OSLOBYSYKKEL), response.content?.let { parseResponse<GBFSResponse.StationsInformationResponse>(it).data.stations[0] })
+            assertEquals(osloBysykkelStationInformation, response.content?.let { parseResponse<GBFSResponse.StationsInformationResponse>(it).data.stations[0] })
         }
     }
 
     @Test
     fun `get oslobysykkel station status`() = withTestApplication({ routingModule() }) {
+        val osloBysykkelStationStatus = StationStatus(
+            "YOS:VehicleSharingParkingArea:1919",
+            1,
+            1,
+            1,
+            BigDecimal("1602681289"),
+            4,
+            2
+        )
         with(handleRequest(HttpMethod.Get, "/oslobysykkel/station_status.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
-            assertEquals(osloBysykkelStationStatus.toNeTEx(Operator.OSLOBYSYKKEL), response.content?.let { parseResponse<GBFSResponse.StationStatusesResponse>(it).data.stations[0] })
+            assertEquals(osloBysykkelStationStatus, response.content?.let { parseResponse<GBFSResponse.StationStatusesResponse>(it).data.stations[0] })
         }
     }
 
@@ -155,7 +147,78 @@ class ApplicationTest : KoinTest {
     fun `get oslobysykkel system pricing plans`() = withTestApplication({ routingModule() }) {
         with(handleRequest(HttpMethod.Get, "/oslobysykkel/system_pricing_plans.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
-            assertEquals(urbanSharingSystemPricePlan(Operator.OSLOBYSYKKEL).plans[0], response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0] })
+            assertEquals("CD863B56-B502-4FDE-B872-C21CD1F8F15C", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].plan_id })
         }
+    }
+
+    @Test
+    fun `get kolumbusbysykkel discovery feed`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/kolumbusbysykkel/gbfs.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            val discoveryResponse = response.content?.let { parseResponse<GBFSResponse.DiscoveryResponse>(it) }
+            assertEquals(15.toLong(), discoveryResponse?.ttl)
+            val expected = DiscoveryFeed(
+                "system_information",
+                "http://localhost:80/kolumbusbysykkel/system_information.json"
+            )
+            assertEquals(expected, discoveryResponse?.data?.nb?.feeds?.get(0))
+        }
+    }
+
+    @Test
+    fun `get kolumbusbysykkel system information`() = withTestApplication({ routingModule() }) {
+        val kolumbusBysykkelSystemInformation = SystemInformation(
+            "kolumbusbysykkel",
+            "nb",
+            "Kolumbus bysykkel",
+            null,
+            "Europe/Oslo",
+            null,
+            null
+        )
+
+        with(handleRequest(HttpMethod.Get, "/kolumbusbysykkel/system_information.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals(kolumbusBysykkelSystemInformation, response.content?.let { parseResponse<GBFSResponse.SystemInformationResponse>(it).data })
+        }
+    }
+
+    @Test
+    fun `get kolumbusbysykkel station information`() = withTestApplication({ routingModule() }) {
+        val kolumbusbysykkelStationInformation = StationInformation(
+            "YKO:VehicleSharingParkingArea:66",
+            "Sandvika",
+            null,
+            BigDecimal("58.8708"),
+            BigDecimal("5.7657"),
+            4
+        )
+        with(handleRequest(HttpMethod.Get, "/kolumbusbysykkel/station_information.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals(kolumbusbysykkelStationInformation, response.content?.let { parseResponse<GBFSResponse.StationsInformationResponse>(it).data.stations[0] })
+        }
+    }
+
+    @Test
+    fun `get kolumbusbysykkel station status`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/kolumbusbysykkel/station_status.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            val stationStatus = response.content?.let { parseResponse<GBFSResponse.StationStatusesResponse>(it).data.stations[0] }
+            assertEquals("YKO:VehicleSharingParkingArea:66", stationStatus?.station_id)
+            assertEquals(1, stationStatus?.num_bikes_available)
+            assertEquals(3, stationStatus?.num_docks_available)
+        }
+    }
+
+    @Test
+    fun `get kolumbusbysykkel system pricing plans`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/kolumbusbysykkel/system_pricing_plans.json")) {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertEquals("636B0671-ED87-42FB-8FAC-6AE8F3A25826", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].plan_id })
+        }
+    }
+
+    private fun getTestFixture(resource: String): String {
+        return this.javaClass.getResource(resource).readText()
     }
 }
