@@ -26,7 +26,7 @@ hs_err_pid*
 .idea/
 !.idea/runConfigurations/ApplicationKt.xml
 !.idea/runConfigurations/AutoReload.xml
-!.idea/runConfigurations/Bikeservice.xml
+!.idea/runConfigurations/Lahmu.xml
 build/
 
 # Gradle
