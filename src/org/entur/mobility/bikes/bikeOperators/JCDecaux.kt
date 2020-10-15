@@ -70,12 +70,12 @@ data class JCDecauxAvailabilities(
 
 fun JCDecauxResponse.toStationInformation(): GBFSResponse.StationsInformationResponse =
     GBFSResponse.StationsInformationResponse(
-        last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+        lastUpdated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
         ttl = TTL,
         data = StationsInformation(
             stations = data.map {
                 StationInformation(
-                    station_id = mapIdToNeTEx(it.number.toString(), Operator.LILLESTROMBYSYKKEL),
+                    stationId = mapIdToNeTEx(it.number.toString(), Operator.LILLESTROMBYSYKKEL),
                     name = it.name,
                     address = it.address,
                     lat = it.position.latitude,
@@ -88,58 +88,58 @@ fun JCDecauxResponse.toStationInformation(): GBFSResponse.StationsInformationRes
 
 fun jcDecauxSystemInformation(): GBFSResponse.SystemInformationResponse =
     GBFSResponse.SystemInformationResponse(
-        last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+        lastUpdated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
         ttl = TTL,
         data = SystemInformation(
-            system_id = "lillestrom",
+            systemId = "lillestrom",
             language = "nb",
             name = "Lillestrøm bysykkel",
             timezone = "Europe/Oslo",
             operator = null,
-            phone_number = null,
+            phoneNumber = null,
             email = null
         )
     )
 
 fun JCDecauxResponse.toStationStatus(): GBFSResponse.StationStatusesResponse =
     GBFSResponse.StationStatusesResponse(
-        last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+        lastUpdated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
         ttl = TTL,
         data = StationStatuses(stations = data.map {
             StationStatus(
-                station_id = mapIdToNeTEx(it.number.toString(), Operator.LILLESTROMBYSYKKEL),
-                is_installed = if (it.connected) 1 else 0,
-                is_renting = if (it.status == JCDecauxStatus.OPEN) 1 else 0,
-                is_returning = if (it.status == JCDecauxStatus.OPEN) 1 else 0,
-                last_reported = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC).toBigDecimal(),
-                num_bikes_available = it.totalStands.availabilities.bikes,
-                num_docks_available = it.totalStands.availabilities.stands
+                stationId = mapIdToNeTEx(it.number.toString(), Operator.LILLESTROMBYSYKKEL),
+                isInstalled = if (it.connected) 1 else 0,
+                isRenting = if (it.status == JCDecauxStatus.OPEN) 1 else 0,
+                isReturning = if (it.status == JCDecauxStatus.OPEN) 1 else 0,
+                lastReported = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC).toBigDecimal(),
+                numBikesAvailable = it.totalStands.availabilities.bikes,
+                numDocksAvailable = it.totalStands.availabilities.stands
             )
         })
     )
 
 fun jcDecauxSystemPricingPlans(): GBFSResponse.SystemPricingPlans =
     GBFSResponse.SystemPricingPlans(
-        last_updated = epochOf5thJune2020,
+        lastUpdated = epochOf5thJune2020,
         ttl = getSecondsFrom(epochOf5thJune2020, epochOf31Dec2020),
         plans = listOf(
             SystemPricePlan(
-                plan_id = "D16E7EC0-47F5-427D-9B71-CD079F989CC6",
+                planId = "D16E7EC0-47F5-427D-9B71-CD079F989CC6",
                 url = "http://www.bysykkel.org/Abonnement/Satser",
                 name = PricePlan.SEASON_PASS.toString(),
                 currency = "NOK",
                 price = 50.0,
-                is_taxable = 0,
+                isTaxable = 0,
                 description = "Hvis sykkelturen varer i mer enn 60 minutter, påløper et bruksgebyr på 20.0 NOK den " +
                     "første halvtimen, og 40.0 NOK for alle påbegynte halvtimer etter det."
             ),
             SystemPricePlan(
-                plan_id = "867E4558-77E3-4608-8941-0C667E924280",
+                planId = "867E4558-77E3-4608-8941-0C667E924280",
                 url = "http://www.bysykkel.org/Abonnement/Satser",
                 name = PricePlan.DAY_PASS_3.toString(),
                 currency = "NOK",
                 price = 10.0,
-                is_taxable = 0,
+                isTaxable = 0,
                 description = "Hvis sykkelturen varer i mer enn 60 minutter, påløper et bruksgebyr på 20.0 NOK den " +
                     "første halvtimen, og 40.0 NOK for alle påbegynte halvtimer etter det."
             )

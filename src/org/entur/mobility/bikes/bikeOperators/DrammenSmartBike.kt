@@ -1,5 +1,6 @@
 package org.entur.mobility.bikes.bikeOperators
 
+import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import org.entur.mobility.bikes.GBFSResponse
@@ -14,18 +15,18 @@ import org.entur.mobility.bikes.TTL
 import org.entur.mobility.bikes.epochOf31Dec2020
 import org.entur.mobility.bikes.epochOf5thJune2020
 
-fun drammenBysykkelURL(access_token: String) = mapOf(
+fun drammenBysykkelURL(accessToken: String) = mapOf(
     GbfsStandardEnum.gbfs to "",
     GbfsStandardEnum.system_information to "",
-    GbfsStandardEnum.station_information to "https://drammen.pub.api.smartbike.com/api/en/v3/stations.json?access_token=$access_token",
-    GbfsStandardEnum.station_status to "https://drammen.pub.api.smartbike.com/api/en/v3/stations/status.json?access_token=$access_token",
+    GbfsStandardEnum.station_information to "https://drammen.pub.api.smartbike.com/api/en/v3/stations.json?access_token=$accessToken",
+    GbfsStandardEnum.station_status to "https://drammen.pub.api.smartbike.com/api/en/v3/stations/status.json?access_token=$accessToken",
     GbfsStandardEnum.system_pricing_plans to ""
 )
 
 data class DrammenAccessToken(
-    val access_token: String,
-    val expires_in: Long,
-    val token_type: String,
+    @SerializedName("access_token") val accessToken: String,
+    @SerializedName("expires_in") val expiresIn: Long,
+    @SerializedName("token_type") val tokenType: String,
     val scope: String?
 )
 
@@ -65,30 +66,30 @@ data class DrammenLocation(
 )
 
 fun drammenSystemInformation() = GBFSResponse.SystemInformationResponse(
-    last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+    lastUpdated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
     ttl = TTL,
     data = SystemInformation(
-        system_id = "drammen",
+        systemId = "drammen",
         language = "nb",
         name = "Drammen Bysykkel",
         timezone = "Europe/Oslo",
         operator = null,
-        phone_number = null,
+        phoneNumber = null,
         email = null
     )
 )
 
 fun drammenSystemPricingPlan() = GBFSResponse.SystemPricingPlans(
-    last_updated = epochOf5thJune2020,
+    lastUpdated = epochOf5thJune2020,
     ttl = getSecondsFrom(epochOf5thJune2020, epochOf31Dec2020),
     plans = listOf(
         SystemPricePlan(
-            plan_id = "8B00A621-82E8-4AC0-9B89-ABEAF99BD238",
+            planId = "8B00A621-82E8-4AC0-9B89-ABEAF99BD238",
             url = "https://www.drammenbysykler.no/nb/info/abonnementer-og-priser",
             name = PricePlan.SEASON_PASS.toString(),
             currency = "NOK",
             price = 130.0,
-            is_taxable = 0,
+            isTaxable = 0,
             description = ""
         )
     )
@@ -96,40 +97,40 @@ fun drammenSystemPricingPlan() = GBFSResponse.SystemPricingPlans(
 
 fun DrammenStationsResponse.toStationInformation(statusResponse: GBFSResponse.StationStatusesResponse?) =
     GBFSResponse.StationsInformationResponse(
-        last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+        lastUpdated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
         ttl = TTL,
         data = StationsInformation(
             stations.map {
                 StationInformation(
-                    station_id = mapIdToNeTEx(it.id, Operator.DRAMMENBYSYKKEL),
+                    stationId = mapIdToNeTEx(it.id, Operator.DRAMMENBYSYKKEL),
                     address = it.address,
                     lat = it.location.lat.toBigDecimal(),
                     lon = it.location.lon.toBigDecimal(),
                     name = it.name,
                     capacity = statusResponse?.data?.stations?.find { status ->
-                        status.station_id == mapIdToNeTEx(
+                        status.stationId == mapIdToNeTEx(
                             it.id,
                             Operator.DRAMMENBYSYKKEL
                         )
-                    }?.let { station -> station.num_bikes_available + station.num_docks_available } ?: 0
+                    }?.let { station -> station.numBikesAvailable + station.numDocksAvailable } ?: 0
                 )
             }
         )
     )
 
 fun DrammenStationsStatusResponse.toStationStatuses() = GBFSResponse.StationStatusesResponse(
-    last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+    lastUpdated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
     ttl = TTL,
     data = StationStatuses(
         stationsStatus.map {
             StationStatus(
-                station_id = mapIdToNeTEx(it.id, Operator.DRAMMENBYSYKKEL),
-                is_installed = 1,
-                is_renting = if (it.status == DrammenStatusEnum.OPN) 1 else 0,
-                is_returning = if (it.status == DrammenStatusEnum.OPN) 1 else 0,
-                last_reported = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC).toBigDecimal(),
-                num_bikes_available = it.availability.bikes,
-                num_docks_available = it.availability.slots
+                stationId = mapIdToNeTEx(it.id, Operator.DRAMMENBYSYKKEL),
+                isInstalled = 1,
+                isRenting = if (it.status == DrammenStatusEnum.OPN) 1 else 0,
+                isReturning = if (it.status == DrammenStatusEnum.OPN) 1 else 0,
+                lastReported = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC).toBigDecimal(),
+                numBikesAvailable = it.availability.bikes,
+                numDocksAvailable = it.availability.slots
             )
         }
     )

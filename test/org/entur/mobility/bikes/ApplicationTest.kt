@@ -110,7 +110,7 @@ class ApplicationTest : KoinTest {
     fun `get oslobysykkel system pricing plans`() = withTestApplication({ routingModule() }) {
         with(handleRequest(HttpMethod.Get, "/oslobysykkel/system_pricing_plans.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
-            assertEquals("CD863B56-B502-4FDE-B872-C21CD1F8F15C", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].plan_id })
+            assertEquals("CD863B56-B502-4FDE-B872-C21CD1F8F15C", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].planId })
         }
     }
 
@@ -167,9 +167,9 @@ class ApplicationTest : KoinTest {
         with(handleRequest(HttpMethod.Get, "/kolumbusbysykkel/station_status.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
             val stationStatus = response.content?.let { parseResponse<GBFSResponse.StationStatusesResponse>(it).data.stations[0] }
-            assertEquals("YKO:VehicleSharingParkingArea:66", stationStatus?.station_id)
-            assertEquals(1, stationStatus?.num_bikes_available)
-            assertEquals(3, stationStatus?.num_docks_available)
+            assertEquals("YKO:VehicleSharingParkingArea:66", stationStatus?.stationId)
+            assertEquals(1, stationStatus?.numBikesAvailable)
+            assertEquals(3, stationStatus?.numDocksAvailable)
         }
     }
 
@@ -177,7 +177,7 @@ class ApplicationTest : KoinTest {
     fun `get kolumbusbysykkel system pricing plans`() = withTestApplication({ routingModule() }) {
         with(handleRequest(HttpMethod.Get, "/kolumbusbysykkel/system_pricing_plans.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
-            assertEquals("636B0671-ED87-42FB-8FAC-6AE8F3A25826", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].plan_id })
+            assertEquals("636B0671-ED87-42FB-8FAC-6AE8F3A25826", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].planId })
         }
     }
 
@@ -234,9 +234,9 @@ class ApplicationTest : KoinTest {
         with(handleRequest(HttpMethod.Get, "/lillestrombysykkel/station_status.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
             val stationStatus = response.content?.let { parseResponse<GBFSResponse.StationStatusesResponse>(it).data.stations[0] }
-            assertEquals("YLI:VehicleSharingParkingArea:3", stationStatus?.station_id)
-            assertEquals(12, stationStatus?.num_bikes_available)
-            assertEquals(8, stationStatus?.num_docks_available)
+            assertEquals("YLI:VehicleSharingParkingArea:3", stationStatus?.stationId)
+            assertEquals(12, stationStatus?.numBikesAvailable)
+            assertEquals(8, stationStatus?.numDocksAvailable)
         }
     }
 
@@ -244,7 +244,7 @@ class ApplicationTest : KoinTest {
     fun `get lillestrombysykkel system pricing plans`() = withTestApplication({ routingModule() }) {
         with(handleRequest(HttpMethod.Get, "/lillestrombysykkel/system_pricing_plans.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
-            assertEquals("D16E7EC0-47F5-427D-9B71-CD079F989CC6", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].plan_id })
+            assertEquals("D16E7EC0-47F5-427D-9B71-CD079F989CC6", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].planId })
         }
     }
 
@@ -301,9 +301,9 @@ class ApplicationTest : KoinTest {
         with(handleRequest(HttpMethod.Get, "/drammenbysykkel/station_status.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
             val stationStatus = response.content?.let { parseResponse<GBFSResponse.StationStatusesResponse>(it).data.stations[0] }
-            assertEquals("YDR:VehicleSharingParkingArea:001", stationStatus?.station_id)
-            assertEquals(0, stationStatus?.num_bikes_available)
-            assertEquals(12, stationStatus?.num_docks_available)
+            assertEquals("YDR:VehicleSharingParkingArea:001", stationStatus?.stationId)
+            assertEquals(0, stationStatus?.numBikesAvailable)
+            assertEquals(12, stationStatus?.numDocksAvailable)
         }
     }
 
@@ -311,7 +311,7 @@ class ApplicationTest : KoinTest {
     fun `get drammenbysykkel system pricing plans`() = withTestApplication({ routingModule() }) {
         with(handleRequest(HttpMethod.Get, "/drammenbysykkel/system_pricing_plans.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
-            assertEquals("8B00A621-82E8-4AC0-9B89-ABEAF99BD238", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].plan_id })
+            assertEquals("8B00A621-82E8-4AC0-9B89-ABEAF99BD238", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].planId })
         }
     }
 }

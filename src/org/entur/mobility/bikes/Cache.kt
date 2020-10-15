@@ -47,7 +47,7 @@ fun cacheCheck(
     gbfsStandardEnum: GbfsStandardEnum
 ) =
     LocalDateTime.ofEpochSecond(
-        cacheMap[bikeOperator]?.get(gbfsStandardEnum)?.last_updated ?: 0L,
+        cacheMap[bikeOperator]?.get(gbfsStandardEnum)?.lastUpdated ?: 0L,
         0,
         ZoneOffset.UTC
     ) > LocalDateTime.now().minusSeconds(TTL)

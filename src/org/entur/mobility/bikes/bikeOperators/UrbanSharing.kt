@@ -31,11 +31,11 @@ val trondheimBysykkelURL = mapOf(
 
 fun urbanSharingSystemPricePlan(operator: Operator): GBFSResponse.SystemPricingPlans =
     GBFSResponse.SystemPricingPlans(
-        last_updated = epochOf5thJune2020,
+        lastUpdated = epochOf5thJune2020,
         ttl = getSecondsFrom(epochOf5thJune2020, epochOf31Dec2020),
         plans = listOf(
             SystemPricePlan(
-                plan_id = "CD863B56-B502-4FDE-B872-C21CD1F8F15C",
+                planId = "CD863B56-B502-4FDE-B872-C21CD1F8F15C",
                 url = when (operator) {
                     Operator.OSLOBYSYKKEL -> "https://oslobysykkel.no/"
                     Operator.BERGENBYSYKKEL -> "https://bergenbysykkel.no/"
@@ -45,11 +45,11 @@ fun urbanSharingSystemPricePlan(operator: Operator): GBFSResponse.SystemPricingP
                 name = PricePlan.SEASON_PASS.toString(),
                 currency = "NOK",
                 price = 399.0,
-                is_taxable = 0,
+                isTaxable = 0,
                 description = "Ved sammenhengende bruk i over en time vil det forekomme et ekstra gebyr på 15.0 NOK per kvarter."
             ),
             SystemPricePlan(
-                plan_id = "3F6450C4-05F7-4E4E-8E71-2E641E011FEE",
+                planId = "3F6450C4-05F7-4E4E-8E71-2E641E011FEE",
                 url = when (operator) {
                     Operator.OSLOBYSYKKEL -> "https://oslobysykkel.no/"
                     Operator.BERGENBYSYKKEL -> "https://bergenbysykkel.no/"
@@ -59,7 +59,7 @@ fun urbanSharingSystemPricePlan(operator: Operator): GBFSResponse.SystemPricingP
                 name = PricePlan.DAY_PASS_1.toString(),
                 currency = "NOK",
                 price = 49.0,
-                is_taxable = 0,
+                isTaxable = 0,
                 description = "Ved sammenhengende bruk i over en time, vil det forekomme et ekstra gebyr på 15.0 NOK per kvarter."
             )
         )
