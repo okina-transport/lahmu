@@ -29,6 +29,6 @@ class BikeServiceTest {
             GbfsStandardEnum.station_status
         ) as GBFSResponse.StationStatusesResponse
 
-        assertEquals("YOS:VehicleSharingParkingArea:1919", response.data.stations[0].station_id)
+        assertEquals("YOS:VehicleSharingParkingArea:1919", response.data.stations[0].stationId)
     }
 }

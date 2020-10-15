@@ -202,7 +202,7 @@ class BikeServiceImpl(override val client: HttpClient) : BikeService {
             logger.error("Failed to fetch Drammen access token. $e")
             null
         }
-        DRAMMEN_ACCESS_TOKEN = response?.access_token ?: ""
+        DRAMMEN_ACCESS_TOKEN = response?.accessToken ?: ""
     }
 
     private fun parseKolumbusResponse(): List<KolumbusStation> {

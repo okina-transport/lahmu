@@ -1,5 +1,6 @@
 package org.entur.mobility.bikes
 
+import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -22,35 +23,35 @@ enum class GbfsStandardEnum {
     }
 
 sealed class GBFSResponse(
-    val last_updated: Long,
+    @SerializedName("last_updated") val lastUpdated: Long,
     val ttl: Long
 ) {
-    class DiscoveryResponse(last_updated: Long, ttl: Long, val data: Discovery) :
-        GBFSResponse(last_updated, ttl)
+    class DiscoveryResponse(lastUpdated: Long, ttl: Long, val data: Discovery) :
+        GBFSResponse(lastUpdated, ttl)
 
-    class SystemInformationResponse(last_updated: Long, ttl: Long, val data: SystemInformation) :
-        GBFSResponse(last_updated, ttl)
+    class SystemInformationResponse(lastUpdated: Long, ttl: Long, val data: SystemInformation) :
+        GBFSResponse(lastUpdated, ttl)
 
-    class StationsInformationResponse(last_updated: Long, ttl: Long, val data: StationsInformation) :
-        GBFSResponse(last_updated, ttl) {
+    class StationsInformationResponse(lastUpdated: Long, ttl: Long, val data: StationsInformation) :
+        GBFSResponse(lastUpdated, ttl) {
         fun toNeTEx(operator: Operator): StationsInformationResponse =
             StationsInformationResponse(
-                last_updated = last_updated,
+                lastUpdated = lastUpdated,
                 ttl = ttl,
                 data = this.data.toNeTEx(operator)
             )
     }
 
-    class StationStatusesResponse(last_updated: Long, ttl: Long, val data: StationStatuses) :
-        GBFSResponse(last_updated, ttl) {
+    class StationStatusesResponse(lastUpdated: Long, ttl: Long, val data: StationStatuses) :
+        GBFSResponse(lastUpdated, ttl) {
         fun toNeTEx(operator: Operator) = StationStatusesResponse(
-            last_updated = last_updated,
+            lastUpdated = lastUpdated,
             ttl = ttl,
             data = data.toNeTEx(operator)
         )
     }
 
-    class SystemPricingPlans(last_updated: Long, ttl: Long, val plans: List<SystemPricePlan>) : GBFSResponse(last_updated, ttl)
+    class SystemPricingPlans(lastUpdated: Long, ttl: Long, val plans: List<SystemPricePlan>) : GBFSResponse(lastUpdated, ttl)
 }
 
 data class Discovery(val nb: DiscoveryLanguage)
@@ -58,18 +59,18 @@ data class DiscoveryLanguage(val feeds: List<DiscoveryFeed>)
 data class DiscoveryFeed(val name: String, val url: String)
 
 data class SystemInformation(
-    val system_id: String,
+    @SerializedName("system_id") val systemId: String,
     val language: String,
     val name: String,
     val operator: String?,
     val timezone: String,
-    val phone_number: String?,
+    @SerializedName("phone_number") val phoneNumber: String?,
     val email: String?
 )
 
 data class StationsInformation(val stations: List<StationInformation>)
 data class StationInformation(
-    val station_id: String,
+    @SerializedName("station_id") val stationId: String,
     val name: String,
     val address: String?,
     val lat: BigDecimal,
@@ -79,22 +80,22 @@ data class StationInformation(
 
 data class StationStatuses(val stations: List<StationStatus>)
 data class StationStatus(
-    val station_id: String,
-    val is_installed: Int,
-    val is_renting: Int,
-    val is_returning: Int,
-    val last_reported: BigDecimal,
-    val num_bikes_available: Int,
-    val num_docks_available: Int
+    @SerializedName("station_id") val stationId: String,
+    @SerializedName("is_installed") val isInstalled: Int,
+    @SerializedName("is_renting") val isRenting: Int,
+    @SerializedName("is_returning") val isReturning: Int,
+    @SerializedName("last_reported") val lastReported: BigDecimal,
+    @SerializedName("num_bikes_available") val numBikesAvailable: Int,
+    @SerializedName("num_docks_available") val numDocksAvailable: Int
 )
 
 data class SystemPricePlan(
-    val plan_id: String,
+    @SerializedName("plan_id") val planId: String,
     val url: String?,
     val name: String,
     val currency: String,
     val price: Double,
-    val is_taxable: Int,
+    @SerializedName("is_taxable") val isTaxable: Int,
     val description: String
 )
 
@@ -107,7 +108,7 @@ fun StationsInformation.toNeTEx(operator: Operator): StationsInformation =
 
 fun StationInformation.toNeTEx(operator: Operator): StationInformation =
     StationInformation(
-        station_id = mapIdToNeTEx(station_id, operator),
+        stationId = mapIdToNeTEx(stationId, operator),
         name = name,
         address = address,
         lat = lat,
@@ -122,18 +123,18 @@ fun StationStatuses.toNeTEx(operator: Operator): StationStatuses =
 
 fun StationStatus.toNeTEx(operator: Operator): StationStatus =
     StationStatus(
-        station_id = mapIdToNeTEx(station_id, operator),
-        is_installed = is_installed,
-        is_renting = is_renting,
-        is_returning = is_returning,
-        last_reported = last_reported,
-        num_bikes_available = num_bikes_available,
-        num_docks_available = num_docks_available
+        stationId = mapIdToNeTEx(stationId, operator),
+        isInstalled = isInstalled,
+        isRenting = isRenting,
+        isReturning = isReturning,
+        lastReported = lastReported,
+        numBikesAvailable = numBikesAvailable,
+        numDocksAvailable = numDocksAvailable
     )
 
 fun getDiscovery(gbfsStandard: Map<GbfsStandardEnum, String>): GBFSResponse =
     GBFSResponse.DiscoveryResponse(
-        last_updated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+        lastUpdated = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
         ttl = 15,
         data = Discovery(
             nb = DiscoveryLanguage(
