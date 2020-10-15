@@ -19,7 +19,7 @@
     </root>
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
-    <logger name="org.entur.mobility.bikes" additivity="false" level="INFO">
+    <logger name="org.entur.lahmu" additivity="false" level="INFO">
         <appender-ref ref="STDOUT_JSON"/>
     </logger>
 </configuration>

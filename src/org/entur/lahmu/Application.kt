@@ -33,7 +33,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 
-val logger: Logger = LoggerFactory.getLogger("org.entur.mobility.bikes")
+val logger: Logger = LoggerFactory.getLogger("org.entur.lahmu")
 
 val appModule = module {
     single<BikeService> { BikeServiceImpl(HttpClient()) }
@@ -41,7 +41,7 @@ val appModule = module {
 }
 
 fun main() {
-    val server = embeddedServer(Jetty, watchPaths = listOf("bikeservice"), port = 8080, module = Application::module)
+    val server = embeddedServer(Jetty, watchPaths = listOf("lahmu"), port = 8080, module = Application::module)
     server.start(wait = true)
 }
 

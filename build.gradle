@@ -43,7 +43,7 @@ dependencyCheck {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'org.entur.mobility.bikes.ApplicationKt'
+        attributes 'Main-Class': 'org.entur.lahmu.ApplicationKt'
     }
     from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 }

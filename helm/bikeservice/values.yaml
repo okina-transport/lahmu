@@ -1,6 +1,6 @@
 labels:
-  team: mobilitet
-  slack: talk-mobilitet
+  team: ror
+  slack: talk-ror
   type: backend
 
 namespace: dev
