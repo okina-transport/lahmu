@@ -1,0 +1,229 @@
+{
+  "stations": [
+    {
+      "id": "001",
+      "name": "Fylkeshuset",
+      "address": "Fylkeshuset",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.74819162081",
+        "lon": "10.18867093254"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "002",
+      "name": "Sykehuset",
+      "address": "Sykehuset",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.748311880429",
+        "lon": "10.199534783081"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "003",
+      "name": "Bragernes Torg Øvre",
+      "address": "Bragernes Torg Øvre",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.74464",
+        "lon": "10.20456"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "004",
+      "name": "Bragernes Torg Midtre",
+      "address": "Bragernes Torg Midtre",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.743857297049",
+        "lon": "10.205378863754"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "006",
+      "name": "Losjeplassen",
+      "address": "Losjeplassen",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.74246",
+        "lon": "10.21388"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "007",
+      "name": "Fayeparken",
+      "address": "Fayeparken",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.74371",
+        "lon": "10.22771"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "008",
+      "name": "Sundland NSB kompetanssesenter",
+      "address": "Sundland NSB kompetanssesenter",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.74097",
+        "lon": "10.18138"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "009",
+      "name": "Grønland - Papirbredden",
+      "address": "Grønland - Papirbredden",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.743404",
+        "lon": "10.193289"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "010",
+      "name": "Strømsø Torg ved Busstasjonen",
+      "address": "Strømsø Torg ved Busstasjonen",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.74051",
+        "lon": "10.19993"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "011",
+      "name": "Strømsø Torg ved Jernbanestasjonen",
+      "address": "Strømsø Torg ved Jernbanestasjonen",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.73982",
+        "lon": "10.20416"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "012",
+      "name": "Marienlyst ved Drammensbadet",
+      "address": "Marienlyst ved Drammensbadet",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.73694",
+        "lon": "10.20046"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "013",
+      "name": "Gyldenløves plass",
+      "address": "Gyldenløves plass",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.73693",
+        "lon": "10.21116"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "014",
+      "name": "Bangeløkka ekspressbussholdeplass",
+      "address": "Bangeløkka ekspressbussholdeplass",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.73123",
+        "lon": "10.2141"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "015",
+      "name": "Rundtom",
+      "address": "Rundtom",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.72997",
+        "lon": "10.22475"
+      },
+      "stationType": "BIKE"
+    },
+    {
+      "id": "017",
+      "name": "Bragernes Torg Nedre H",
+      "address": "Bragernes Torg Nedre H",
+      "addressNumber": null,
+      "zipCode": null,
+      "districtCode": null,
+      "districtName": null,
+      "altitude": null,
+      "location": {
+        "lat": "59.743353",
+        "lon": "10.203860"
+      },
+      "stationType": "BIKE"
+    }
+  ]
+}
