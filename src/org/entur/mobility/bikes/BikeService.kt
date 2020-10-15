@@ -6,7 +6,8 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import java.lang.Exception
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.entur.mobility.bikes.GbfsStandardEnum.Companion.getFetchUrl
 import org.entur.mobility.bikes.bikeOperators.DrammenAccessToken
@@ -36,7 +37,7 @@ import org.entur.mobility.bikes.bikeOperators.urbanSharingSystemPricePlan
 interface BikeService {
     val client: HttpClient
 
-    fun poll(cache: Cache)
+    fun poll(cache: Cache): Job
     fun fetchAndStoreInCache(
         cache: Cache,
         operator: Operator,
@@ -48,9 +49,9 @@ interface BikeService {
 class BikeServiceImpl(override val client: HttpClient) : BikeService {
     var DRAMMEN_ACCESS_TOKEN = ""
 
-    override fun poll(cache: Cache) {
+    override fun poll(cache: Cache) = GlobalScope.launch {
         Operator.values().forEach { operator ->
-            GlobalScope.async {
+            launch {
                 logger.info("Polling $operator")
                 try {
                     if (operator.isUrbanSharing()) {
@@ -73,6 +74,7 @@ class BikeServiceImpl(override val client: HttpClient) : BikeService {
             }
         }
     }
+
     override fun fetchAndStoreInCache(
         cache: Cache,
         operator: Operator,
