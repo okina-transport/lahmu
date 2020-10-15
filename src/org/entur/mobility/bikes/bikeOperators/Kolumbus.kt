@@ -105,10 +105,11 @@ fun kolumbusSystemPricingPlans() = GBFSResponse.SystemPricingPlans(
     )
 )
 
+val kolumbusStatusApiUrl = "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike"
 val kolumbusBysykkelURL = mapOf(
     GbfsStandardEnum.gbfs to "",
-    GbfsStandardEnum.system_information to "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike",
-    GbfsStandardEnum.station_information to "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike",
-    GbfsStandardEnum.station_status to "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike",
+    GbfsStandardEnum.system_information to kolumbusStatusApiUrl,
+    GbfsStandardEnum.station_information to kolumbusStatusApiUrl,
+    GbfsStandardEnum.station_status to kolumbusStatusApiUrl,
     GbfsStandardEnum.system_pricing_plans to ""
 )
