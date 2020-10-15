@@ -1,4 +1,4 @@
-package org.entur.mobility.bikes
+package org.entur.lahmu
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.handleRequest

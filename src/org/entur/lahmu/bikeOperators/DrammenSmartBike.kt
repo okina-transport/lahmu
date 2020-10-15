@@ -1,19 +1,19 @@
-package org.entur.mobility.bikes.bikeOperators
+package org.entur.lahmu.bikeOperators
 
 import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import org.entur.mobility.bikes.GBFSResponse
-import org.entur.mobility.bikes.GbfsStandardEnum
-import org.entur.mobility.bikes.StationInformation
-import org.entur.mobility.bikes.StationStatus
-import org.entur.mobility.bikes.StationStatuses
-import org.entur.mobility.bikes.StationsInformation
-import org.entur.mobility.bikes.SystemInformation
-import org.entur.mobility.bikes.SystemPricePlan
-import org.entur.mobility.bikes.TTL
-import org.entur.mobility.bikes.epochOf31Dec2020
-import org.entur.mobility.bikes.epochOf5thJune2020
+import org.entur.lahmu.GBFSResponse
+import org.entur.lahmu.GbfsStandardEnum
+import org.entur.lahmu.StationInformation
+import org.entur.lahmu.StationStatus
+import org.entur.lahmu.StationStatuses
+import org.entur.lahmu.StationsInformation
+import org.entur.lahmu.SystemInformation
+import org.entur.lahmu.SystemPricePlan
+import org.entur.lahmu.TTL
+import org.entur.lahmu.epochOf31Dec2020
+import org.entur.lahmu.epochOf5thJune2020
 
 fun drammenBysykkelURL(accessToken: String) = mapOf(
     GbfsStandardEnum.gbfs to "",

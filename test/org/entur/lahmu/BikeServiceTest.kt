@@ -1,10 +1,10 @@
-package org.entur.mobility.bikes
+package org.entur.lahmu
 
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.entur.mobility.bikes.bikeOperators.Operator
+import org.entur.lahmu.bikeOperators.Operator
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 

@@ -1,4 +1,4 @@
-package org.entur.mobility.bikes
+package org.entur.lahmu
 
 import com.google.gson.Gson
 import io.ktor.client.HttpClient
@@ -8,7 +8,7 @@ import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.HttpResponseData
 import io.ktor.http.ContentType
 import io.ktor.http.headersOf
-import org.entur.mobility.bikes.bikeOperators.DrammenAccessToken
+import org.entur.lahmu.bikeOperators.DrammenAccessToken
 
 class HttpMockEngine {
 

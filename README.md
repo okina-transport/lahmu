@@ -1,4 +1,5 @@
-# Bikeservice
+# Lahmu
+A micromobility aggregation service
 
 ## Running
 
@@ -22,9 +23,9 @@ hot reload. However, a description to create it on your own follows:
         * Arguments: `-t installDist`
         * Allow parallel run by checking the box in the top right corner
    * Hit `+` and create a new `Compound` configuration and select the two configurations descriped above. 
-   Lets call it `Bikeservice`
+   Lets call it `Lahmu`
    
-   * Run `Bikeservice`-configuration and the auto reload functionality is present 
+   * Run `Lahmu`-configuration and the auto reload functionality is present
 
 ### Ktlint
 This project is using a code formatter called Ktlint.
@@ -39,7 +40,7 @@ To run `ktlintFormat` as a pre-hook (recommended) do the following:
 
 
 ### Docker
-- `docker build --tag bikeservice:0.0.1 .`
-- `docker run --publish 8000:8080 --name bs bikeservice:0.0.1`
+- `docker build --tag lahmu:0.0.1 .`
+- `docker run --publish 8000:8080 --name lahmu lahmu:0.0.1`
 
-If the docker image already exists, you can remove it by: `docker rm --force bs`
+If the docker image already exists, you can remove it by: `docker rm --force lahmu`

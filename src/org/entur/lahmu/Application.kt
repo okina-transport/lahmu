@@ -1,4 +1,4 @@
-package org.entur.mobility.bikes
+package org.entur.lahmu
 
 import com.google.gson.Gson
 import io.ktor.application.Application
@@ -24,8 +24,8 @@ import java.util.UUID
 import kotlin.concurrent.schedule
 import kotlin.concurrent.thread
 import kotlinx.coroutines.runBlocking
-import org.entur.mobility.bikes.bikeOperators.Operator
-import org.entur.mobility.bikes.bikeOperators.getOperatorsWithDiscovery
+import org.entur.lahmu.bikeOperators.Operator
+import org.entur.lahmu.bikeOperators.getOperatorsWithDiscovery
 import org.koin.dsl.module
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
@@ -33,7 +33,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 
-val logger: Logger = LoggerFactory.getLogger("org.entur.mobility.bikes")
+val logger: Logger = LoggerFactory.getLogger("org.entur.lahmu")
 
 val appModule = module {
     single<BikeService> { BikeServiceImpl(HttpClient()) }
@@ -41,7 +41,7 @@ val appModule = module {
 }
 
 fun main() {
-    val server = embeddedServer(Jetty, watchPaths = listOf("bikeservice"), port = 8080, module = Application::module)
+    val server = embeddedServer(Jetty, watchPaths = listOf("lahmu"), port = 8080, module = Application::module)
     server.start(wait = true)
 }
 

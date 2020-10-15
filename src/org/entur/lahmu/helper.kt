@@ -1,4 +1,4 @@
-package org.entur.mobility.bikes
+package org.entur.lahmu
 
 import com.google.gson.Gson
 import java.io.UnsupportedEncodingException
