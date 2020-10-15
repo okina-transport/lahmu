@@ -36,17 +36,17 @@ container:
    - name: LILLESTROM_API_KEY
      valueFrom:
        secretKeyRef:
-         name: bikeservice-secrets
+         name: lahmu-secrets
          key: lillestromApiKey
    - name: DRAMMEN_SECRET
      valueFrom:
        secretKeyRef:
-         name: bikeservice-secrets
+         name: lahmu-secrets
          key: drammenSecret
    - name: DRAMMEN_PUBLIC_ID
      valueFrom:
        secretKeyRef:
-         name: bikeservice-secrets
+         name: lahmu-secrets
          key: drammenPublicId
    - name: ENVIRONMENT_NAMESPACE
      valueFrom:
@@ -161,7 +161,7 @@ podSecurityPolicy:
 
 secrets:
   app:
-    name: bikeservice-secrets
+    name: lahmu-secrets
     lillestromApiKey: ${serviceVariable.lillestromApiKey}
     drammenPublicId: ${serviceVariable.drammenPublicId}
     drammenSecret: ${serviceVariable.drammenSecret}
