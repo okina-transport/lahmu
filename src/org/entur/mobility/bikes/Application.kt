@@ -41,14 +41,22 @@ val appModule = module {
 }
 
 fun main() {
-    val server = embeddedServer(Jetty, watchPaths = listOf("bikeservice"), port = 8080, module = Application::main)
+    val server = embeddedServer(Jetty, watchPaths = listOf("bikeservice"), port = 8080, module = Application::module)
     server.start(wait = true)
 }
 
-fun Application.main() {
+fun Application.module() {
     val meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
     val bikeService: BikeService by inject()
     val cache: Cache by inject()
+
+    install(Koin) {
+        modules(appModule)
+    }
+
+    install(MicrometerMetrics) {
+        registry = meterRegistry
+    }
 
     thread(start = true) {
         Timer().schedule(0L, TIME_TO_LIVE_DRAMMEN_ACCESS_KEY_MS) {
@@ -57,14 +65,6 @@ fun Application.main() {
         Timer().schedule(0L, POLL_INTERVAL_MS) {
             bikeService.poll(cache)
         }
-    }
-
-    install(Koin) {
-        modules(appModule)
-    }
-
-    install(MicrometerMetrics) {
-        registry = meterRegistry
     }
 
     routing {
