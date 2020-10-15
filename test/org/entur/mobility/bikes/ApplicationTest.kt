@@ -2,7 +2,9 @@ package org.entur.mobility.bikes
 import com.google.gson.Gson
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
+import io.ktor.client.request.HttpResponseData
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -30,51 +32,40 @@ class ApplicationTest : KoinTest {
         engine {
             addHandler { request ->
                 when (request.url.toString()) {
-                    "https://gbfs.urbansharing.com/oslobysykkel.no/system_information.json" -> {
-                        respond(
-                            getTestFixture("/oslobysykkelSystemInformation.json"),
-                            headers = responseHeaders
-                        )
-                    }
-                    "https://gbfs.urbansharing.com/oslobysykkel.no/station_information.json" -> {
-                        respond(
-                            getTestFixture("/oslobysykkelStationInformation.json"),
-                            headers = responseHeaders)
-                    }
-                    "https://gbfs.urbansharing.com/oslobysykkel.no/station_status.json" -> {
-                        respond(
-                            getTestFixture("/oslobysykkelStationStatus.json"),
-                            headers = responseHeaders)
-                    }
-                    "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike" -> {
-                        respond(
-                            getTestFixture("/kolumbusResponse.json"),
-                            headers = responseHeaders)
-                    }
-                    "https://api.jcdecaux.com/vls/v3/stations?contract=lillestrom&apiKey=null" -> {
-                        respond(
-                            getTestFixture("/lillestrombysykkelStationsResponse.json"),
-                            headers = responseHeaders)
-                    }
-                    "https://drammen.pub.api.smartbike.com/oauth/v2/token?client_id=null&client_secret=null&grant_type=client_credentials" -> {
-                        respond(
-                            Gson().toJson(DrammenAccessToken("test", 3600, "bearer", null)),
-                            headers = responseHeaders)
-                    }
-                    "https://drammen.pub.api.smartbike.com/api/en/v3/stations/status.json?access_token=test" -> {
-                        respond(
-                            getTestFixture("/drammenStationsStatusResponse.json"),
-                            headers = responseHeaders)
-                    }
-                    "https://drammen.pub.api.smartbike.com/api/en/v3/stations.json?access_token=test" -> {
-                        respond(
-                            getTestFixture("/drammenStationsResponse.json"),
-                            headers = responseHeaders)
-                    }
+                    "https://gbfs.urbansharing.com/oslobysykkel.no/system_information.json" ->
+                        respondWithFixture("/oslobysykkelSystemInformation.json")
+                    "https://gbfs.urbansharing.com/oslobysykkel.no/station_information.json" ->
+                        respondWithFixture("/oslobysykkelStationInformation.json")
+                    "https://gbfs.urbansharing.com/oslobysykkel.no/station_status.json" ->
+                        respondWithFixture("/oslobysykkelStationStatus.json")
+                    "https://sanntidapi-web-prod.azurewebsites.net/api/parkings?type=CityBike" ->
+                        respondWithFixture("/kolumbusResponse.json")
+                    "https://api.jcdecaux.com/vls/v3/stations?contract=lillestrom&apiKey=null" ->
+                        respondWithFixture("/lillestrombysykkelStationsResponse.json")
+                    "https://drammen.pub.api.smartbike.com/oauth/v2/token?client_id=null&client_secret=null&grant_type=client_credentials" ->
+                        respondWithJson(DrammenAccessToken("test", 3600, "bearer", null))
+                    "https://drammen.pub.api.smartbike.com/api/en/v3/stations/status.json?access_token=test" ->
+                        respondWithFixture("/drammenStationsStatusResponse.json")
+                    "https://drammen.pub.api.smartbike.com/api/en/v3/stations.json?access_token=test" ->
+                        respondWithFixture("/drammenStationsResponse.json")
                     else -> error("Unhandled ${request.url}")
                 }
             }
         }
+    }
+
+    private fun MockRequestHandleScope.respondWithFixture(fixturePath: String): HttpResponseData {
+        return respond(
+            getTestFixture(fixturePath), headers = responseHeaders
+        )
+    }
+
+    private fun getTestFixture(resource: String): String {
+        return this.javaClass.getResource(resource).readText()
+    }
+
+    private fun MockRequestHandleScope.respondWithJson(src: Any): HttpResponseData {
+        return respond(Gson().toJson(src), headers = responseHeaders)
     }
 
     private val mockedAppModule: Module = module(override = true) {
@@ -372,9 +363,5 @@ class ApplicationTest : KoinTest {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals("8B00A621-82E8-4AC0-9B89-ABEAF99BD238", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].plan_id })
         }
-    }
-
-    private fun getTestFixture(resource: String): String {
-        return this.javaClass.getResource(resource).readText()
     }
 }
