@@ -1,4 +1,4 @@
-package org.entur.mobility.bikes
+package org.entur.lahmu
 
 import java.time.LocalDateTime
 import java.time.Month

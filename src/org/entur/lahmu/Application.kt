@@ -1,4 +1,4 @@
-package org.entur.mobility.bikes
+package org.entur.lahmu
 
 import com.google.gson.Gson
 import io.ktor.application.Application
@@ -24,8 +24,8 @@ import java.util.UUID
 import kotlin.concurrent.schedule
 import kotlin.concurrent.thread
 import kotlinx.coroutines.runBlocking
-import org.entur.mobility.bikes.bikeOperators.Operator
-import org.entur.mobility.bikes.bikeOperators.getOperatorsWithDiscovery
+import org.entur.lahmu.bikeOperators.Operator
+import org.entur.lahmu.bikeOperators.getOperatorsWithDiscovery
 import org.koin.dsl.module
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
