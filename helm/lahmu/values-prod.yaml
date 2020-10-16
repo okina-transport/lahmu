@@ -5,8 +5,9 @@ ingress:
   loadBalancerIp: 35.205.233.237 # kubectl get svc -n kube-system (the external ip of service named traefik-apigee)
   host: bikeservice.entur.io
 
+deployment:
+  replicaCount: 2
+
 horizontalPodAutoscaler:
-  enabled: true
-  targetCPUUtilizationPercentage: 80
   minReplicas: 2
-  maxReplicas: 5
+  maxReplicas: 4
