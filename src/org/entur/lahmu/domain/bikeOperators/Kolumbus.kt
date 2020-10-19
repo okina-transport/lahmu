@@ -1,20 +1,20 @@
-package org.entur.lahmu.bikeOperators
+package org.entur.lahmu.domain.bikeOperators
 
 import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import org.entur.lahmu.GBFSResponse
-import org.entur.lahmu.GbfsStandardEnum
-import org.entur.lahmu.StationInformation
-import org.entur.lahmu.StationStatus
-import org.entur.lahmu.StationStatuses
-import org.entur.lahmu.StationsInformation
-import org.entur.lahmu.SystemInformation
-import org.entur.lahmu.SystemPricePlan
-import org.entur.lahmu.TTL
-import org.entur.lahmu.epochOf31Dec2020
-import org.entur.lahmu.epochOf5thJune2020
+import org.entur.lahmu.domain.GBFSResponse
+import org.entur.lahmu.domain.GbfsStandardEnum
+import org.entur.lahmu.domain.StationInformation
+import org.entur.lahmu.domain.StationStatus
+import org.entur.lahmu.domain.StationStatuses
+import org.entur.lahmu.domain.StationsInformation
+import org.entur.lahmu.domain.SystemInformation
+import org.entur.lahmu.domain.SystemPricePlan
+import org.entur.lahmu.config.TTL
+import org.entur.lahmu.config.epochOf31Dec2020
+import org.entur.lahmu.config.epochOf5thJune2020
 
 data class KolumbusResponse(val data: List<KolumbusStation>)
 data class KolumbusStation(

@@ -1,12 +1,12 @@
-package org.entur.lahmu
+package org.entur.lahmu.domain
 
 import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import org.entur.lahmu.bikeOperators.Operator
-import org.entur.lahmu.bikeOperators.Operator.Companion.getFetchUrls
-import org.entur.lahmu.bikeOperators.mapIdToNeTEx
+import org.entur.lahmu.domain.bikeOperators.Operator
+import org.entur.lahmu.domain.bikeOperators.Operator.Companion.getFetchUrls
+import org.entur.lahmu.domain.bikeOperators.mapIdToNeTEx
 
 enum class GbfsStandardEnum {
     gbfs,
