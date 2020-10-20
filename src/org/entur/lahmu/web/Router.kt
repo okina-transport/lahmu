@@ -14,6 +14,20 @@ fun Routing.bikes() {
     val cache: Cache by inject()
     val bikesController: BikesController by inject { parametersOf(bikeService, cache) }
 
+    route("") {
+        get("/") {
+            bikesController.getServiceDirectory(this.context)
+        }
+
+        get("{operator}/gbfs.json") {
+            bikesController.getDiscoveryFeed(this.context)
+        }
+
+        get("{operator}/{service}.json") {
+            bikesController.getGbfsFeed(this.context)
+        }
+    }
+
     route("bikes") {
         get("/") {
             bikesController.getServiceDirectory(this.context)
