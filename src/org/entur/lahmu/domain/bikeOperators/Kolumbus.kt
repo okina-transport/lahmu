@@ -4,6 +4,9 @@ import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import org.entur.lahmu.config.TTL
+import org.entur.lahmu.config.epochOf31Dec2020
+import org.entur.lahmu.config.epochOf5thJune2020
 import org.entur.lahmu.domain.GBFSResponse
 import org.entur.lahmu.domain.GbfsStandardEnum
 import org.entur.lahmu.domain.StationInformation
@@ -12,9 +15,6 @@ import org.entur.lahmu.domain.StationStatuses
 import org.entur.lahmu.domain.StationsInformation
 import org.entur.lahmu.domain.SystemInformation
 import org.entur.lahmu.domain.SystemPricePlan
-import org.entur.lahmu.config.TTL
-import org.entur.lahmu.config.epochOf31Dec2020
-import org.entur.lahmu.config.epochOf5thJune2020
 
 data class KolumbusResponse(val data: List<KolumbusStation>)
 data class KolumbusStation(

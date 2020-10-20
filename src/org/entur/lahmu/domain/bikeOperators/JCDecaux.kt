@@ -3,18 +3,18 @@ package org.entur.lahmu.domain.bikeOperators
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import org.entur.lahmu.config.LILLESTROM_API_KEY
+import org.entur.lahmu.config.TTL
+import org.entur.lahmu.config.epochOf31Dec2020
+import org.entur.lahmu.config.epochOf5thJune2020
 import org.entur.lahmu.domain.GBFSResponse
 import org.entur.lahmu.domain.GbfsStandardEnum
-import org.entur.lahmu.config.LILLESTROM_API_KEY
 import org.entur.lahmu.domain.StationInformation
 import org.entur.lahmu.domain.StationStatus
 import org.entur.lahmu.domain.StationStatuses
 import org.entur.lahmu.domain.StationsInformation
 import org.entur.lahmu.domain.SystemInformation
 import org.entur.lahmu.domain.SystemPricePlan
-import org.entur.lahmu.config.TTL
-import org.entur.lahmu.config.epochOf31Dec2020
-import org.entur.lahmu.config.epochOf5thJune2020
 
 val lillestromBysykkelURL = mapOf(
     GbfsStandardEnum.gbfs to "",

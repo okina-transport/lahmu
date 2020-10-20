@@ -4,9 +4,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.entur.lahmu.domain.bikeOperators.Operator
 import org.entur.lahmu.domain.GBFSResponse
 import org.entur.lahmu.domain.GbfsStandardEnum
+import org.entur.lahmu.domain.bikeOperators.Operator
 import org.entur.lahmu.domain.service.BikeServiceImpl
 import org.entur.lahmu.domain.service.InMemoryCache
 import org.junit.jupiter.api.Test
