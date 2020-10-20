@@ -1,10 +1,10 @@
-package org.entur.lahmu.bikeOperators
+package org.entur.lahmu.domain.bikeOperators
 
-import org.entur.lahmu.GBFSResponse
-import org.entur.lahmu.GbfsStandardEnum
-import org.entur.lahmu.SystemPricePlan
-import org.entur.lahmu.epochOf31Dec2020
-import org.entur.lahmu.epochOf5thJune2020
+import org.entur.lahmu.config.epochOf31Dec2020
+import org.entur.lahmu.config.epochOf5thJune2020
+import org.entur.lahmu.domain.GBFSResponse
+import org.entur.lahmu.domain.GbfsStandardEnum
+import org.entur.lahmu.domain.SystemPricePlan
 
 val osloBysykkelURL = mapOf(
     GbfsStandardEnum.gbfs to "https://gbfs.urbansharing.com/oslobysykkel.no/gbfs.json",

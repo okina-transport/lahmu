@@ -1,4 +1,4 @@
-package org.entur.lahmu
+package org.entur.lahmu.util
 
 import com.google.gson.Gson
 import java.io.UnsupportedEncodingException

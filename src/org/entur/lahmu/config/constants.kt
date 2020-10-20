@@ -1,4 +1,4 @@
-package org.entur.lahmu
+package org.entur.lahmu.config
 
 import java.time.LocalDateTime
 import java.time.Month

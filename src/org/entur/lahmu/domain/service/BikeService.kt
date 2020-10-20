@@ -1,4 +1,4 @@
-package org.entur.lahmu
+package org.entur.lahmu.domain.service
 
 import com.google.gson.reflect.TypeToken
 import io.ktor.client.HttpClient
@@ -9,30 +9,35 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.entur.lahmu.GbfsStandardEnum.Companion.getFetchUrl
-import org.entur.lahmu.bikeOperators.DrammenAccessToken
-import org.entur.lahmu.bikeOperators.DrammenStationsResponse
-import org.entur.lahmu.bikeOperators.DrammenStationsStatusResponse
-import org.entur.lahmu.bikeOperators.JCDecauxResponse
-import org.entur.lahmu.bikeOperators.JCDecauxStation
-import org.entur.lahmu.bikeOperators.KolumbusResponse
-import org.entur.lahmu.bikeOperators.KolumbusStation
-import org.entur.lahmu.bikeOperators.Operator
-import org.entur.lahmu.bikeOperators.Operator.Companion.isDrammenSmartBike
-import org.entur.lahmu.bikeOperators.Operator.Companion.isJCDecaux
-import org.entur.lahmu.bikeOperators.Operator.Companion.isKolumbus
-import org.entur.lahmu.bikeOperators.Operator.Companion.isUrbanSharing
-import org.entur.lahmu.bikeOperators.drammenSystemInformation
-import org.entur.lahmu.bikeOperators.drammenSystemPricingPlan
-import org.entur.lahmu.bikeOperators.jcDecauxSystemInformation
-import org.entur.lahmu.bikeOperators.jcDecauxSystemPricingPlans
-import org.entur.lahmu.bikeOperators.kolumbusBysykkelURL
-import org.entur.lahmu.bikeOperators.kolumbusSystemPricingPlans
-import org.entur.lahmu.bikeOperators.lillestromBysykkelURL
-import org.entur.lahmu.bikeOperators.toStationInformation
-import org.entur.lahmu.bikeOperators.toStationStatus
-import org.entur.lahmu.bikeOperators.toStationStatuses
-import org.entur.lahmu.bikeOperators.urbanSharingSystemPricePlan
+import org.entur.lahmu.config.DRAMMEN_ACCESS_TOKEN_URL
+import org.entur.lahmu.domain.GBFSResponse
+import org.entur.lahmu.domain.GbfsStandardEnum
+import org.entur.lahmu.domain.GbfsStandardEnum.Companion.getFetchUrl
+import org.entur.lahmu.domain.bikeOperators.DrammenAccessToken
+import org.entur.lahmu.domain.bikeOperators.DrammenStationsResponse
+import org.entur.lahmu.domain.bikeOperators.DrammenStationsStatusResponse
+import org.entur.lahmu.domain.bikeOperators.JCDecauxResponse
+import org.entur.lahmu.domain.bikeOperators.JCDecauxStation
+import org.entur.lahmu.domain.bikeOperators.KolumbusResponse
+import org.entur.lahmu.domain.bikeOperators.KolumbusStation
+import org.entur.lahmu.domain.bikeOperators.Operator
+import org.entur.lahmu.domain.bikeOperators.Operator.Companion.isDrammenSmartBike
+import org.entur.lahmu.domain.bikeOperators.Operator.Companion.isJCDecaux
+import org.entur.lahmu.domain.bikeOperators.Operator.Companion.isKolumbus
+import org.entur.lahmu.domain.bikeOperators.Operator.Companion.isUrbanSharing
+import org.entur.lahmu.domain.bikeOperators.drammenSystemInformation
+import org.entur.lahmu.domain.bikeOperators.drammenSystemPricingPlan
+import org.entur.lahmu.domain.bikeOperators.jcDecauxSystemInformation
+import org.entur.lahmu.domain.bikeOperators.jcDecauxSystemPricingPlans
+import org.entur.lahmu.domain.bikeOperators.kolumbusBysykkelURL
+import org.entur.lahmu.domain.bikeOperators.kolumbusSystemPricingPlans
+import org.entur.lahmu.domain.bikeOperators.lillestromBysykkelURL
+import org.entur.lahmu.domain.bikeOperators.toStationInformation
+import org.entur.lahmu.domain.bikeOperators.toStationStatus
+import org.entur.lahmu.domain.bikeOperators.toStationStatuses
+import org.entur.lahmu.domain.bikeOperators.urbanSharingSystemPricePlan
+import org.entur.lahmu.logger
+import org.entur.lahmu.util.parseResponse
 
 interface BikeService {
     val client: HttpClient
