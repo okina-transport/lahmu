@@ -3,7 +3,7 @@ namespace: staging
 ingress:
   enabled: true
   loadBalancerIp: 130.211.80.129 # kubectl get svc -n kube-system (the external ip of service named traefik-apigee)
-  host: bikeservice.staging.entur.io
+  domainName: staging.entur.io
 
 deployment:
   replicaCount: 1
