@@ -32,7 +32,7 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   rules:
-    - host: lahmu.{{ .Values.ingress.kube }}
+    - host: lahmu.{{ .Values.ingress.domainName }}
       http:
         paths:
           - backend:
