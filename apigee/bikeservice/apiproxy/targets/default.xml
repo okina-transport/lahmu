@@ -23,6 +23,6 @@
         <Response/>
     </PostFlow>
     <HTTPTargetConnection>
-        <URL>https://bikeservice.INGRESS_ENVIRONMENT/</URL>
+        <URL>https://lahmu.INGRESS_ENVIRONMENT/</URL>
     </HTTPTargetConnection>
 </TargetEndpoint>
