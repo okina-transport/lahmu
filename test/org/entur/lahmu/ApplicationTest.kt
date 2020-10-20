@@ -48,14 +48,6 @@ class ApplicationTest : KoinTest {
         stopKoin()
     }
 
-//    @Test
-//    fun `health endpoint returns "OK"`() = withTestApplication({ routingModule() }) {
-//        with(handleRequest(HttpMethod.Get, "/health")) {
-//            assertEquals(HttpStatusCode.OK, response.status())
-//            assertEquals("OK", response.content)
-//        }
-//    }
-
     @Test
     fun `get oslobysykkel discovery feed`() = withTestApplication({ routingModule() }) {
         with(handleRequest(HttpMethod.Get, "/bikes/oslobysykkel/gbfs.json")) {
