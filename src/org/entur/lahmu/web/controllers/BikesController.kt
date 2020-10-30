@@ -2,6 +2,7 @@ package org.entur.lahmu.web.controllers
 
 import com.google.gson.Gson
 import io.ktor.application.ApplicationCall
+import io.ktor.features.NotFoundException
 import io.ktor.http.ContentType
 import io.ktor.request.host
 import io.ktor.request.port
@@ -31,7 +32,7 @@ class BikesControllerImpl(private val bikeService: BikeService, private val cach
     }
 
     override suspend fun getDiscoveryFeed(call: ApplicationCall) {
-        val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
+        val operator = getOperator(call) ?: throw NotFoundException()
         val gbfsEndpoints = getGbfsEndpoint(operator, call.request.host(), call.request.port())
         val response = getDiscovery(gbfsEndpoints)
 
@@ -39,8 +40,8 @@ class BikesControllerImpl(private val bikeService: BikeService, private val cach
     }
 
     override suspend fun getGbfsFeed(call: ApplicationCall) {
-        val operator = Operator.valueOf(call.parameters["operator"]?.toUpperCase() ?: throw NullPointerException())
-        val gbfsEnum = GbfsStandardEnum.valueOf(call.parameters["service"] ?: throw NullPointerException())
+        val operator = getOperator(call) ?: throw NotFoundException()
+        val gbfsEnum = getGbfsEnum(call) ?: throw NotFoundException()
         if (!cache.isValidCache(operator, gbfsEnum)) {
             try {
                 bikeService.fetchAndStoreInCache(
@@ -52,7 +53,19 @@ class BikesControllerImpl(private val bikeService: BikeService, private val cach
                 logger.error("Failed to fetch $gbfsEnum from $operator. $e")
             }
         }
-        val result = cache.getResponseFromCache(operator, gbfsEnum)
+        val result = cache.getResponseFromCache(operator, gbfsEnum) ?: throw NotFoundException()
         call.respondText(Gson().toJson(result), ContentType.Application.Json)
+    }
+
+    private fun getOperator(call: ApplicationCall): Operator? {
+        return enumValueOfOrNull<Operator>(call.parameters["operator"]?.toUpperCase())
+    }
+
+    private fun getGbfsEnum(call: ApplicationCall): GbfsStandardEnum? {
+        return enumValueOfOrNull<GbfsStandardEnum>(call.parameters["service"]?.toLowerCase())
+    }
+
+    private inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String?): T? {
+        return enumValues<T>().find { it.name == name }
     }
 }

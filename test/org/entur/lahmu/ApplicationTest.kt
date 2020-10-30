@@ -49,6 +49,27 @@ class ApplicationTest : KoinTest {
     }
 
     @Test
+    fun `get discovery feed for unknown operator`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/bikes/foobar/gbfs.json")) {
+            assertEquals(HttpStatusCode.NotFound, response.status())
+        }
+    }
+
+    @Test
+    fun `get system information feed for unknown operator`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/bikes/foobar/system_information.json")) {
+            assertEquals(HttpStatusCode.NotFound, response.status())
+        }
+    }
+
+    @Test
+    fun `get unknown gbfs feed`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/bikes/oslobysykkel/foo_bar.json")) {
+            assertEquals(HttpStatusCode.NotFound, response.status())
+        }
+    }
+
+    @Test
     fun `get oslobysykkel discovery feed`() = withTestApplication({ routingModule() }) {
         with(handleRequest(HttpMethod.Get, "/bikes/oslobysykkel/gbfs.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
@@ -117,6 +138,13 @@ class ApplicationTest : KoinTest {
         with(handleRequest(HttpMethod.Get, "/bikes/oslobysykkel/system_pricing_plans.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals("CD863B56-B502-4FDE-B872-C21CD1F8F15C", response.content?.let { parseResponse<GBFSResponse.SystemPricingPlans>(it).plans[0].planId })
+        }
+    }
+
+    @Test
+    fun `get oslobysykkel free bike status not found`() = withTestApplication({ routingModule() }) {
+        with(handleRequest(HttpMethod.Get, "/bikes/oslobysykkel/free_bike_status.json")) {
+            assertEquals(HttpStatusCode.NotFound, response.status())
         }
     }
 

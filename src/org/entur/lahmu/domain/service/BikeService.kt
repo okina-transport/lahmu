@@ -104,9 +104,7 @@ class BikeServiceImpl(override val client: HttpClient) : BikeService {
                     )
                 }
                 GbfsStandardEnum.system_pricing_plans -> urbanSharingSystemPricePlan(operator)
-                GbfsStandardEnum.free_bike_status -> {
-                    null
-                }
+                GbfsStandardEnum.free_bike_status -> null
             }
             if (response != null) cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
         } else if (operator.isKolumbus()) {
@@ -191,9 +189,7 @@ class BikeServiceImpl(override val client: HttpClient) : BikeService {
                     )).toStationStatuses()
                 }
                 GbfsStandardEnum.system_pricing_plans -> drammenSystemPricingPlan()
-                GbfsStandardEnum.free_bike_status -> {
-                    null
-                }
+                GbfsStandardEnum.free_bike_status -> null
             }
             if (response != null) cache.setResponseInCacheAndGet(operator, gbfsStandardEnum, response)
         }
