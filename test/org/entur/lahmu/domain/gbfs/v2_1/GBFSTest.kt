@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 class GBFSTest {
     @Test
     fun testDeserialize() {
-        Assertions.assertDoesNotThrow{
+        Assertions.assertDoesNotThrow {
             Json.decodeFromString<GBFS>("""
             {
               "last_updated": 1434054678,
@@ -85,6 +85,5 @@ class GBFSTest {
             """
             )
         }
-
     }
 }

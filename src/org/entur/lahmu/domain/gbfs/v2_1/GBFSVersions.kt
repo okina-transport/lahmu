@@ -10,15 +10,15 @@ data class GBFSVersions(
     @Required override val ttl: Int,
     @Required override val version: String,
     @Required override val data: VersionsData
-): GBFSBase()
+) : GBFSBase()
 
 @Serializable
-data class VersionsData (
+data class VersionsData(
     @Required val versions: List<Version>
 )
 
 @Serializable
-data class Version (
+data class Version(
     @Required val version: String,
     @Required val url: String
 )

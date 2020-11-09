@@ -1,7 +1,7 @@
-package org.entur.lahmu.domain.gbfs.v2_1;
+package org.entur.lahmu.domain.gbfs.v2_1
 
-import kotlinx.serialization.SerialName;
-import kotlinx.serialization.Serializable;
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
 enum class GBFSFeedName {

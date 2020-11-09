@@ -10,7 +10,7 @@ data class SystemInformation(
     @Required override val ttl: Int,
     @Required override val version: String,
     @Required override val data: SystemInformationData
-): GBFSBase()
+) : GBFSBase()
 
 @Serializable
 data class SystemInformationData(
@@ -27,7 +27,7 @@ data class SystemInformationData(
     @SerialName("feed_contact_email") val feedContactEmail: String? = null,
     @Required val timezone: String,
     @SerialName("license_url") val licenseUrl: String? = null,
-    @SerialName("rental_apps") val rentalApps: RentalApps? = null,
+    @SerialName("rental_apps") val rentalApps: RentalApps? = null
 )
 
 @Serializable
