@@ -7,7 +7,7 @@ data class GBFS(
     @Required @SerialName("last_updated") override val lastUpdated: Long,
     @Required override val ttl: Int,
     @Required override val version: String,
-    @Required override val data: Map<String, Language>
+    @Required override val data: Map<String, GBFSData>
 ) : GBFSBase() {
     init {
         validate()
@@ -15,8 +15,7 @@ data class GBFS(
 }
 
 @Serializable
-data class Language(
-    @Required val language: String,
+data class GBFSData(
     @Required val feeds: List<Feed>
 )
 
