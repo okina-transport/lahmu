@@ -1,8 +1,8 @@
-package org.entur.lahmu.domain.bikeOperators
+package org.entur.lahmu.legacy.bikeOperators
 
-import org.entur.lahmu.domain.GbfsStandardEnum
-import org.entur.lahmu.domain.bikeOperators.Operator.Companion.getCodeSpace
-import org.entur.lahmu.domain.getGbfsEndpoint
+import org.entur.lahmu.legacy.GbfsStandardEnum
+import org.entur.lahmu.legacy.bikeOperators.Operator.Companion.getCodeSpace
+import org.entur.lahmu.legacy.getGbfsEndpoint
 
 enum class Operator {
     OSLOBYSYKKEL, BERGENBYSYKKEL, TRONDHEIMBYSYKKEL, KOLUMBUSBYSYKKEL, LILLESTROMBYSYKKEL, DRAMMENBYSYKKEL;

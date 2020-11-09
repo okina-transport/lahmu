@@ -8,7 +8,7 @@ import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.HttpResponseData
 import io.ktor.http.ContentType
 import io.ktor.http.headersOf
-import org.entur.lahmu.domain.bikeOperators.DrammenAccessToken
+import org.entur.lahmu.legacy.bikeOperators.DrammenAccessToken
 
 class HttpMockEngine {
 

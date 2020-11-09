@@ -1,11 +1,11 @@
-package org.entur.lahmu.domain.service
+package org.entur.lahmu.legacy.service
 
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import org.entur.lahmu.config.TTL
-import org.entur.lahmu.domain.GBFSResponse
-import org.entur.lahmu.domain.GbfsStandardEnum
-import org.entur.lahmu.domain.bikeOperators.Operator
+import org.entur.lahmu.legacy.GBFSResponse
+import org.entur.lahmu.legacy.GbfsStandardEnum
+import org.entur.lahmu.legacy.bikeOperators.Operator
 
 interface Cache {
     val cacheMap: HashMap<Operator, HashMap<GbfsStandardEnum, GBFSResponse>>
