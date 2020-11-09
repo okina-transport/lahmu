@@ -8,11 +8,11 @@ data class GBFSVersions(
     @SerialName("last_updated") override val lastUpdated: Long,
     override val ttl: Int,
     override val version: String,
-    override val data: Versions
+    override val data: VersionsData
     ): GBFSBase()
 
 @Serializable
-data class Versions (
+data class VersionsData (
     val versions: List<Version>
 )
 
