@@ -2,13 +2,15 @@ package org.entur.lahmu.domain.gbfs.v2_1
 
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class GBFSVersionsTest {
 
     @Test
     fun testDeserialize() {
-        val GBFSVersions = Json.decodeFromString<GBFSVersions>("""
+        Assertions.assertDoesNotThrow {
+            Json.decodeFromString<GBFSVersions>("""
             {
               "last_updated": 1434054678,
               "ttl": 0,
@@ -26,6 +28,8 @@ class GBFSVersionsTest {
                 ]
               }
             }
-        """)
+            """
+            )
+        }
     }
 }
