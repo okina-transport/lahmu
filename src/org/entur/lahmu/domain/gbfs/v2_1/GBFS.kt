@@ -4,10 +4,10 @@ import kotlinx.serialization.*
 
 @Serializable
 data class GBFS(
-    @SerialName("last_updated") override val lastUpdated: Long,
-    override val ttl: Int,
-    override val version: String,
-    override val data: Map<String, Language>
+    @Required @SerialName("last_updated") override val lastUpdated: Long,
+    @Required override val ttl: Int,
+    @Required override val version: String,
+    @Required override val data: Map<String, Language>
 ) : GBFSBase() {
     init {
         validate()
@@ -16,11 +16,12 @@ data class GBFS(
 
 @Serializable
 data class Language(
-    val feeds: List<Feed>
+    @Required val language: String,
+    @Required val feeds: List<Feed>
 )
 
 @Serializable
 data class Feed(
-    val name: GBFSFeedName,
-    val url: String
+    @Required val name: GBFSFeedName,
+    @Required val url: String
 )
