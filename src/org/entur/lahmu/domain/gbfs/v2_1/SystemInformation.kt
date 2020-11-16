@@ -42,5 +42,3 @@ data class SystemInformation(
         @Required @SerialName("discovery_uri") val discoveryURI: String
     )
 }
-
-

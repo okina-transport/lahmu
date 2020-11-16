@@ -10,7 +10,7 @@ data class SystemHours(
     @Required override val ttl: Int,
     @Required override val version: String,
     @Required override val data: Data
-): GBFSBase() {
+) : GBFSBase() {
 
     @Serializable
     data class Data(

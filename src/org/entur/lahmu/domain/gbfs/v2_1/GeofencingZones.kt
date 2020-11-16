@@ -1,10 +1,8 @@
 package org.entur.lahmu.domain.gbfs.v2_1
 
-import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.entur.lahmu.domain.geojson.MultiPolygon
 
 @Serializable
 data class GeofencingZones(
@@ -12,7 +10,7 @@ data class GeofencingZones(
     @Required override val ttl: Int,
     @Required override val version: String,
     @Required override val data: Data
-): GBFSBase() {
+) : GBFSBase() {
 
     @Serializable
     data class Data(
@@ -28,7 +26,7 @@ data class GeofencingZones(
     @Serializable
     data class Feature(
         val geometry: MultiPolygon,
-        val properties: Properties,
+        val properties: Properties
     )
 
     @Serializable

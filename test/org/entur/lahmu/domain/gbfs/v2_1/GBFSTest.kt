@@ -1,6 +1,5 @@
 package org.entur.lahmu.domain.gbfs.v2_1
 
-import java.lang.IllegalArgumentException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Assertions

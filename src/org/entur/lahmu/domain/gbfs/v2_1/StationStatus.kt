@@ -9,16 +9,16 @@ data class StationStatus(
     @Required @SerialName("last_updated") override val lastUpdated: Long,
     @Required override val ttl: Int,
     @Required override val version: String,
-    @Required override val data: Data,
-): GBFSBase() {
+    @Required override val data: Data
+) : GBFSBase() {
 
     @Serializable
-    data class Data (
+    data class Data(
         @Required val stations: List<Station>
     )
 
     @Serializable
-    data class Station (
+    data class Station(
         @Required @SerialName("station_id") val stationId: String,
         @Required @SerialName("is_installed") val isInstalled: Boolean,
         @Required @SerialName("is_renting") val isRenting: Boolean,
@@ -29,11 +29,11 @@ data class StationStatus(
         @SerialName("vehicle_docks_available") val vehicleDocksAvailable: List<VehicleDockAvailability>? = null,
         @SerialName("vehicle_types_available") val vehicleTypesAvailable: List<VehicleTypeAvailability>? = null,
         @SerialName("num_bikes_disabled") val numBikesDisabled: Int? = null,
-        @SerialName("num_docks_disabled") val numDocksDisabled: Int? = null,
+        @SerialName("num_docks_disabled") val numDocksDisabled: Int? = null
     )
 
     @Serializable
-    data class VehicleTypeAvailability (
+    data class VehicleTypeAvailability(
         @Required @SerialName("vehicle_type_id") val vehicleTypeId: String,
         @Required val count: Int
     )
@@ -44,9 +44,3 @@ data class StationStatus(
         @Required val count: Int
     )
 }
-
-
-
-
-
-

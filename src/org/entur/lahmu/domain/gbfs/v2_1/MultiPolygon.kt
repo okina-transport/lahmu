@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("MultiPolygon")
 data class MultiPolygon(
-    val coordinates: Surface,
+    val coordinates: Surface
 )

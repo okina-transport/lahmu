@@ -10,7 +10,7 @@ data class SystemCalendar(
     @Required override val ttl: Int,
     @Required override val version: String,
     @Required override val data: Data
-): GBFSBase() {
+) : GBFSBase() {
 
     @Serializable
     data class Data(
@@ -24,6 +24,6 @@ data class SystemCalendar(
         @SerialName("start_year") val startYear: Int? = null,
         @Required @SerialName("end_month") val endMonth: Int,
         @Required @SerialName("end_day") val endDay: Int,
-        @SerialName("end_year") val endYear: Int? = null,
+        @SerialName("end_year") val endYear: Int? = null
     )
 }

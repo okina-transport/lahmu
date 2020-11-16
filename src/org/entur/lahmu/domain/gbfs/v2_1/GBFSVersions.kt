@@ -23,5 +23,3 @@ data class GBFSVersions(
         @Required val url: String
     )
 }
-
-

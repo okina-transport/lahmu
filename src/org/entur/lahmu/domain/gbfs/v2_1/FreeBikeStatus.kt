@@ -10,7 +10,7 @@ data class FreeBikeStatus(
     @Required override val ttl: Int,
     @Required override val version: String,
     @Required override val data: Data
-): GBFSBase() {
+) : GBFSBase() {
 
     @Serializable
     data class Data(
@@ -29,6 +29,6 @@ data class FreeBikeStatus(
         @SerialName("rental_uris") val rentalUris: RentalUris? = null,
         @SerialName("current_range_meters") val currentRangeMeters: Float? = null,
         @SerialName("station_id") val stationId: String? = null,
-        @SerialName("pricing_plan_id") val pricingPlanId: String? = null,
+        @SerialName("pricing_plan_id") val pricingPlanId: String? = null
     )
 }

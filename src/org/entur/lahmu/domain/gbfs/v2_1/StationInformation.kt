@@ -11,7 +11,7 @@ data class StationInformation(
     @Required override val ttl: Int,
     @Required override val version: String,
     @Required override val data: Data
-): GBFSBase() {
+) : GBFSBase() {
     @Serializable
     data class Data(
         @Required val stations: List<Station>
@@ -48,8 +48,5 @@ data class StationInformation(
             ACCOUNTNUMBER,
             PHONE
         }
-
     }
-
 }
-
