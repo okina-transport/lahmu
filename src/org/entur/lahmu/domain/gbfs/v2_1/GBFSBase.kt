@@ -10,8 +10,4 @@ abstract class GBFSBase {
     @Required abstract val ttl: Int
     @Required abstract val version: String
     @Required abstract val data: Any
-
-    fun validate() {
-        require(ttl > -1)
-    }
 }

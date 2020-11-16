@@ -9,20 +9,17 @@ data class GBFS(
     @Required @SerialName("last_updated") override val lastUpdated: Long,
     @Required override val ttl: Int,
     @Required override val version: String,
-    @Required override val data: Map<String, GBFSData>
+    @Required override val data: Map<String, Data>
 ) : GBFSBase() {
-    init {
-        validate()
-    }
+
+    @Serializable
+    data class Data(
+        @Required val feeds: List<Feed>
+    )
+
+    @Serializable
+    data class Feed(
+        @Required val name: GBFSFeedName,
+        @Required val url: String
+    )
 }
-
-@Serializable
-data class GBFSData(
-    @Required val feeds: List<Feed>
-)
-
-@Serializable
-data class Feed(
-    @Required val name: GBFSFeedName,
-    @Required val url: String
-)

@@ -5,23 +5,21 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GBFSVersions(
+data class SystemRegions(
     @Required @SerialName("last_updated") override val lastUpdated: Long,
     @Required override val ttl: Int,
     @Required override val version: String,
     @Required override val data: Data
-) : GBFSBase() {
+): GBFSBase() {
 
     @Serializable
     data class Data(
-        @Required val versions: List<Version>
+        @Required val regions: List<Region>
     )
 
     @Serializable
-    data class Version(
-        @Required val version: String,
-        @Required val url: String
+    data class Region(
+        @Required @SerialName("region_id") val regionId: String,
+        @Required val name: String
     )
 }
-
-

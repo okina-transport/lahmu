@@ -46,44 +46,4 @@ class GBFSTest {
             )
         }
     }
-
-    @Test
-    fun testNegativeTtlNotValid() {
-        Assertions.assertThrows(IllegalArgumentException::class.java) {
-            Json.decodeFromString<GBFS>("""
-            {
-              "last_updated": 1434054678,
-              "ttl": -100,
-              "version": "2.0",
-              "data": {
-                "en": {
-                  "feeds": [
-                    {
-                      "name": "system_information",
-                      "url": "https://www.example.com/gbfs/1/en/system_information"
-                    },
-                    {
-                      "name": "station_information",
-                      "url": "https://www.example.com/gbfs/1/en/station_information"
-                    }
-                  ]
-                },
-                "fr" : {
-                  "feeds": [
-                    {
-                      "name": "system_information",
-                      "url": "https://www.example.com/gbfs/1/fr/system_information"
-                    },
-                    {
-                      "name": "station_information",
-                      "url": "https://www.example.com/gbfs/1/fr/station_information"
-                    }
-                  ]
-                }
-              }
-            }
-            """
-            )
-        }
-    }
 }
