@@ -3,7 +3,6 @@ package org.entur.lahmu.domain.gbfs.v2_1
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.entur.lahmu.domain.geojson.MultiPolygon
 
 @Serializable
 data class StationInformation(
