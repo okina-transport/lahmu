@@ -8,13 +8,13 @@ import io.ktor.request.host
 import io.ktor.request.port
 import io.ktor.response.respondText
 import java.lang.Exception
-import org.entur.lahmu.domain.GbfsStandardEnum
-import org.entur.lahmu.domain.bikeOperators.Operator
-import org.entur.lahmu.domain.bikeOperators.getOperatorsWithDiscovery
-import org.entur.lahmu.domain.getDiscovery
-import org.entur.lahmu.domain.getGbfsEndpoint
-import org.entur.lahmu.domain.service.BikeService
-import org.entur.lahmu.domain.service.Cache
+import org.entur.lahmu.legacy.GbfsStandardEnum
+import org.entur.lahmu.legacy.bikeOperators.Operator
+import org.entur.lahmu.legacy.bikeOperators.getOperatorsWithDiscovery
+import org.entur.lahmu.legacy.getDiscovery
+import org.entur.lahmu.legacy.getGbfsEndpoint
+import org.entur.lahmu.legacy.service.BikeService
+import org.entur.lahmu.legacy.service.Cache
 import org.entur.lahmu.logger
 
 interface BikesController {

@@ -21,8 +21,8 @@ import java.util.UUID
 import kotlin.concurrent.schedule
 import kotlin.concurrent.thread
 import kotlinx.coroutines.runBlocking
-import org.entur.lahmu.domain.service.BikeService
-import org.entur.lahmu.domain.service.Cache
+import org.entur.lahmu.legacy.service.BikeService
+import org.entur.lahmu.legacy.service.Cache
 import org.entur.lahmu.util.sanitize
 import org.entur.lahmu.web.bikes
 import org.koin.ktor.ext.Koin
