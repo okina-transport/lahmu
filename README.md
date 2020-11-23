@@ -1,6 +1,6 @@
 # Lahmu [![CircleCI](https://circleci.com/gh/entur/lahmu.svg?style=svg)](https://circleci.com/gh/entur/lahmu) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=entur_lahmu&metric=alert_status)](https://sonarcloud.io/dashboard?id=entur_lahmu)
 
-A micromobility aggregation service
+A micromobility aggregation service (v1)
 
 ## Running
 
