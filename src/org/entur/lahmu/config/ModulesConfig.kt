@@ -1,6 +1,7 @@
 package org.entur.lahmu.config
 
 import io.ktor.client.HttpClient
+import java.util.concurrent.ConcurrentHashMap
 import org.entur.lahmu.legacy.service.BikeService
 import org.entur.lahmu.legacy.service.BikeServiceImpl
 import org.entur.lahmu.legacy.service.Cache
@@ -13,7 +14,7 @@ import org.koin.dsl.module
 
 val modulesConfig = module {
     single<BikeService> { BikeServiceImpl(HttpClient()) }
-    single<Cache> { InMemoryCache(HashMap()) }
+    single<Cache> { InMemoryCache(ConcurrentHashMap()) }
     single<BikesController> { (bikeService: BikeService, cache: Cache) -> BikesControllerImpl(bikeService, cache) }
     single<ProxyController> { (bikeService: BikeService, cache: Cache) -> ProxyControllerImpl(bikeService, cache) }
 }

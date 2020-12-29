@@ -2,13 +2,15 @@ package org.entur.lahmu.legacy.service
 
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 import org.entur.lahmu.config.TTL
 import org.entur.lahmu.legacy.GBFSResponse
 import org.entur.lahmu.legacy.GbfsStandardEnum
 import org.entur.lahmu.legacy.bikeOperators.Operator
 
 interface Cache {
-    val cacheMap: HashMap<Operator, HashMap<GbfsStandardEnum, GBFSResponse>>
+    val cacheMap: Map<Operator, Map<GbfsStandardEnum, GBFSResponse>>
 
     fun isValidCache(bikeOperator: Operator, gbfsStandardEnum: GbfsStandardEnum): Boolean
     fun getResponseFromCache(bikeOperator: Operator, gbfsStandardEnum: GbfsStandardEnum): GBFSResponse?
@@ -16,7 +18,7 @@ interface Cache {
 }
 
 class InMemoryCache(
-    override val cacheMap: HashMap<Operator, HashMap<GbfsStandardEnum, GBFSResponse>>
+    override val cacheMap: ConcurrentMap<Operator, ConcurrentMap<GbfsStandardEnum, GBFSResponse>>
 ) : Cache {
     override fun getResponseFromCache(bikeOperator: Operator, gbfsStandardEnum: GbfsStandardEnum): GBFSResponse? {
         return cacheMap[bikeOperator]?.get(gbfsStandardEnum)
@@ -28,7 +30,9 @@ class InMemoryCache(
         response: GBFSResponse
     ): GBFSResponse {
         if (cacheMap[operator] == null) {
-            cacheMap[operator] = hashMapOf(gbfsStandardEnum to response)
+            val map = ConcurrentHashMap<GbfsStandardEnum, GBFSResponse>()
+            map[gbfsStandardEnum] = response
+            cacheMap[operator] = map
         } else {
             cacheMap[operator]!![gbfsStandardEnum] = response
         }
@@ -45,7 +49,7 @@ class InMemoryCache(
 }
 
 fun cacheCheck(
-    cacheMap: HashMap<Operator, HashMap<GbfsStandardEnum, GBFSResponse>>,
+    cacheMap: Map<Operator, Map<GbfsStandardEnum, GBFSResponse>>,
     bikeOperator: Operator,
     gbfsStandardEnum: GbfsStandardEnum
 ) =
