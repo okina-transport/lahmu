@@ -1,5 +1,6 @@
 package org.entur.lahmu
 
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,7 +20,7 @@ class BikeServiceTest {
     @Test
     fun testPolling() = runBlocking {
         val bikeService = BikeServiceImpl(HttpMockEngine().client)
-        val cache = InMemoryCache(HashMap())
+        val cache = InMemoryCache(ConcurrentHashMap())
 
         assertNull(cache.getResponseFromCache(
             Operator.OSLOBYSYKKEL,

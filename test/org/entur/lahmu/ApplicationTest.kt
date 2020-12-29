@@ -4,6 +4,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
 import java.math.BigDecimal
+import java.util.concurrent.ConcurrentHashMap
 import org.entur.lahmu.config.routingModule
 import org.entur.lahmu.legacy.DiscoveryFeed
 import org.entur.lahmu.legacy.GBFSResponse
@@ -33,7 +34,7 @@ class ApplicationTest : KoinTest {
 
     private val mockedAppModule: Module = module(override = true) {
         single<BikeService> { BikeServiceImpl(HttpMockEngine().client) }
-        single<Cache> { InMemoryCache(HashMap()) }
+        single<Cache> { InMemoryCache(ConcurrentHashMap()) }
         single<BikesController> { (bikeService: BikeService, cache: Cache) -> BikesControllerImpl(bikeService, cache) }
     }
 
