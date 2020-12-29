@@ -42,7 +42,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
             ttl = discovery.ttl.toInt(),
             version = "2.1",
             data = mapOf(
-                "en" to GBFS.Data(
+                "nb" to GBFS.Data(
                     feeds = discovery.data.nb.feeds.stream().map {
                         GBFS.Feed(
                             name = GBFSFeedName.valueOf(it.name.toUpperCase()),
