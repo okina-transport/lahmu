@@ -55,11 +55,8 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
     }
 
     override suspend fun getGbfsFeed(call: ApplicationCall) {
-        logger.info("getGbfsFeed")
         val operator = getOperator(call) ?: throw NotFoundException()
-        logger.info("found operator: $operator")
         val gbfsEnum = getGbfsEnum(call) ?: throw NotFoundException()
-        logger.info("found gbfsEnum: $gbfsEnum")
 
         if (!cache.isValidCache(operator, gbfsEnum)) {
             try {
