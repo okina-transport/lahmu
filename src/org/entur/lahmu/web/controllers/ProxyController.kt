@@ -2,6 +2,7 @@ package org.entur.lahmu.web.controllers
 
 import io.ktor.application.ApplicationCall
 import io.ktor.features.NotFoundException
+import io.ktor.http.ContentType
 import io.ktor.request.host
 import io.ktor.request.port
 import io.ktor.response.respondText
@@ -51,7 +52,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
                 )
             ))
 
-        call.respondText { Json.encodeToString(v2) }
+        call.respondText(ContentType.Application.Json) { Json.encodeToString(v2) }
     }
 
     override suspend fun getGbfsFeed(call: ApplicationCall) {
@@ -73,22 +74,22 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
 
         when (gbfsEnum) {
             GbfsStandardEnum.system_information -> {
-                call.respondText {
+                call.respondText(ContentType.Application.Json) {
                     Json.encodeToString(mapSystemInformation(operator, result as GBFSResponse.SystemInformationResponse))
                 }
             }
             GbfsStandardEnum.station_information -> {
-                call.respondText {
+                call.respondText(ContentType.Application.Json) {
                     Json.encodeToString(mapStationInformation(result as GBFSResponse.StationsInformationResponse))
                 }
             }
             GbfsStandardEnum.station_status -> {
-                call.respondText {
+                call.respondText(ContentType.Application.Json) {
                     Json.encodeToString(mapStationStatus(result as GBFSResponse.StationStatusesResponse))
                 }
             }
             GbfsStandardEnum.system_pricing_plans -> {
-                call.respondText {
+                call.respondText(ContentType.Application.Json) {
                     Json.encodeToString(mapSystemPricingPlans(operator, result as GBFSResponse.SystemPricingPlans))
                 }
             }
