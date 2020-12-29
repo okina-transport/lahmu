@@ -30,7 +30,7 @@ interface ProxyController {
     suspend fun getGbfsFeed(call: ApplicationCall)
 }
 
-class ProxyControllerImpl(private val bikeService: BikeService, private val cache: Cache): ProxyController {
+class ProxyControllerImpl(private val bikeService: BikeService, private val cache: Cache) : ProxyController {
     override suspend fun getDiscoveryFeed(call: ApplicationCall) {
         val operator = getOperator(call) ?: throw NotFoundException()
         val gbfsEndpoints = getGbfsEndpoint(operator, call.request.host(), call.request.port())
@@ -71,7 +71,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
         }
         val result = cache.getResponseFromCache(operator, gbfsEnum) ?: throw NotFoundException()
 
-        when(gbfsEnum) {
+        when (gbfsEnum) {
             GbfsStandardEnum.system_information -> {
                 call.respondText {
                     Json.encodeToString(mapSystemInformation(operator, result as GBFSResponse.SystemInformationResponse))
@@ -102,7 +102,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
             ttl = result.ttl.toInt(),
             version = "2.1",
             data = SystemInformation.Data(
-                systemId =  "${operator.getCodeSpace()}:System:${result.data.systemId}",
+                systemId = "${operator.getCodeSpace()}:System:${result.data.systemId}",
                 language = result.data.language,
                 name = result.data.name,
                 operator = result.data.operator,
@@ -169,7 +169,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
                         currency = it.currency,
                         price = it.price.toFloat(),
                         isTaxable = it.isTaxable != 0,
-                        description = it.description,
+                        description = it.description
                     )
                 }.collect(Collectors.toList())
             )
