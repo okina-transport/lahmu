@@ -43,13 +43,13 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
         val feeds = discovery.data.nb.feeds.stream().map {
             GBFS.Feed(
                 name = GBFSFeedName.valueOf(it.name.toUpperCase()),
-                url = it.url
+                url = it.url.replace("/bikes", "/bikes/v2_1_proxy")
             )
         }.collect(Collectors.toList())
 
         feeds.add(GBFS.Feed(
             name = GBFSFeedName.VEHICLE_TYPES,
-            url = gbfsEndpoints.get(GbfsStandardEnum.vehicle_types) as String
+            url = (gbfsEndpoints.get(GbfsStandardEnum.vehicle_types) as String).replace("/bikes", "/bikes/v2_1_proxy")
         ))
 
         val v2 = GBFS(

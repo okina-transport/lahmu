@@ -78,7 +78,7 @@ class ApplicationTest : KoinTest {
             assertEquals(15.toLong(), discoveryResponse?.ttl)
             val expected = DiscoveryFeed(
                 "system_information",
-                "http://localhost:80/oslobysykkel/system_information.json"
+                "http://localhost:80/bikes/oslobysykkel/system_information.json"
             )
             assertEquals(expected, discoveryResponse?.data?.nb?.feeds?.get(0))
         }
@@ -157,7 +157,7 @@ class ApplicationTest : KoinTest {
             assertEquals(15.toLong(), discoveryResponse?.ttl)
             val expected = DiscoveryFeed(
                 "system_information",
-                "http://localhost:80/kolumbusbysykkel/system_information.json"
+                "http://localhost:80/bikes/kolumbusbysykkel/system_information.json"
             )
             assertEquals(expected, discoveryResponse?.data?.nb?.feeds?.get(0))
         }
@@ -224,7 +224,7 @@ class ApplicationTest : KoinTest {
             assertEquals(15.toLong(), discoveryResponse?.ttl)
             val expected = DiscoveryFeed(
                 "system_information",
-                "http://localhost:80/lillestrombysykkel/system_information.json"
+                "http://localhost:80/bikes/lillestrombysykkel/system_information.json"
             )
             assertEquals(expected, discoveryResponse?.data?.nb?.feeds?.get(0))
         }
@@ -291,7 +291,7 @@ class ApplicationTest : KoinTest {
             assertEquals(15.toLong(), discoveryResponse?.ttl)
             val expected = DiscoveryFeed(
                 "system_information",
-                "http://localhost:80/drammenbysykkel/system_information.json"
+                "http://localhost:80/bikes/drammenbysykkel/system_information.json"
             )
             assertEquals(expected, discoveryResponse?.data?.nb?.feeds?.get(0))
         }
