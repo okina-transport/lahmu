@@ -4,8 +4,12 @@ import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.application.install
+import io.ktor.features.NotFoundException
+import io.ktor.features.StatusPages
+import io.ktor.http.HttpStatusCode
 import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.response.header
+import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.routing
@@ -42,6 +46,12 @@ fun Application.mainModule() {
 
     install(Koin) {
         modules(modulesConfig)
+    }
+
+    install(StatusPages) {
+        exception<NotFoundException> {
+            call.respond(HttpStatusCode.NotFound)
+        }
     }
 
     install(MicrometerMetrics) {
