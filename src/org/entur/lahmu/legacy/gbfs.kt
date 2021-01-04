@@ -14,7 +14,8 @@ enum class GbfsStandardEnum {
     station_information,
     station_status,
     system_pricing_plans,
-    free_bike_status;
+    free_bike_status,
+    vehicle_types;
 
     companion object {
         fun GbfsStandardEnum.getFetchUrl(operator: Operator, accessToken: String = ""): String =
@@ -168,6 +169,7 @@ fun getGbfsEndpoint(operator: Operator, host: String, port: Int): Map<GbfsStanda
         GbfsStandardEnum.system_information to "$urlHost/$operator/system_information.json".toLowerCase(),
         GbfsStandardEnum.station_information to "$urlHost/$operator/station_information.json".toLowerCase(),
         GbfsStandardEnum.station_status to "$urlHost/$operator/station_status.json".toLowerCase(),
-        GbfsStandardEnum.system_pricing_plans to "$urlHost/$operator/system_pricing_plans.json".toLowerCase()
+        GbfsStandardEnum.system_pricing_plans to "$urlHost/$operator/system_pricing_plans.json".toLowerCase(),
+        GbfsStandardEnum.vehicle_types to "$urlHost/$operator/vehicle_types.json".toLowerCase()
     )
 }

@@ -16,10 +16,12 @@ import org.entur.lahmu.domain.gbfs.v2_1.StationInformation
 import org.entur.lahmu.domain.gbfs.v2_1.StationStatus
 import org.entur.lahmu.domain.gbfs.v2_1.SystemInformation
 import org.entur.lahmu.domain.gbfs.v2_1.SystemPricingPlans
+import org.entur.lahmu.domain.gbfs.v2_1.VehicleTypes
 import org.entur.lahmu.legacy.GBFSResponse
 import org.entur.lahmu.legacy.GbfsStandardEnum
 import org.entur.lahmu.legacy.bikeOperators.Operator
 import org.entur.lahmu.legacy.bikeOperators.Operator.Companion.getCodeSpace
+import org.entur.lahmu.legacy.bikeOperators.Operator.Companion.getPropulsionType
 import org.entur.lahmu.legacy.getDiscovery
 import org.entur.lahmu.legacy.getGbfsEndpoint
 import org.entur.lahmu.legacy.service.BikeService
@@ -28,6 +30,7 @@ import org.entur.lahmu.logger
 
 interface ProxyController {
     suspend fun getDiscoveryFeed(call: ApplicationCall)
+    suspend fun getVehicleTypesFeed(call: ApplicationCall)
     suspend fun getGbfsFeed(call: ApplicationCall)
 }
 
@@ -37,22 +40,54 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
         val gbfsEndpoints = getGbfsEndpoint(operator, call.request.host(), call.request.port())
         val discovery: GBFSResponse.DiscoveryResponse = getDiscovery(gbfsEndpoints) as GBFSResponse.DiscoveryResponse
 
+        val feeds = discovery.data.nb.feeds.stream().map {
+            GBFS.Feed(
+                name = GBFSFeedName.valueOf(it.name.toUpperCase()),
+                url = it.url
+            )
+        }.collect(Collectors.toList())
+
+        feeds.add(GBFS.Feed(
+            name = GBFSFeedName.VEHICLE_TYPES,
+            url = gbfsEndpoints.get(GbfsStandardEnum.vehicle_types) as String
+        ))
+
         val v2 = GBFS(
             lastUpdated = discovery.lastUpdated,
             ttl = discovery.ttl.toInt(),
             version = "2.1",
             data = mapOf(
-                "nb" to GBFS.Data(
-                    feeds = discovery.data.nb.feeds.stream().map {
-                        GBFS.Feed(
-                            name = GBFSFeedName.valueOf(it.name.toUpperCase()),
-                            url = it.url
-                        )
-                    }.collect(Collectors.toList())
-                )
+                "nb" to GBFS.Data(feeds)
             ))
 
         call.respondText(ContentType.Application.Json) { Json.encodeToString(v2) }
+    }
+
+    override suspend fun getVehicleTypesFeed(call: ApplicationCall) {
+        val operator = getOperator(call) ?: throw NotFoundException()
+        val gbfsEndpoints = getGbfsEndpoint(operator, call.request.host(), call.request.port())
+        call.respondText(ContentType.Application.Json) {
+            Json.encodeToString(mapVehicleTypes(operator, gbfsEndpoints))
+        }
+    }
+
+    private fun mapVehicleTypes(operator: Operator, gbfsEndpoints: Map<GbfsStandardEnum, String>): VehicleTypes {
+        val discovery: GBFSResponse.DiscoveryResponse = getDiscovery(gbfsEndpoints) as GBFSResponse.DiscoveryResponse
+        return VehicleTypes(
+            lastUpdated = discovery.lastUpdated,
+            ttl = discovery.ttl.toInt(),
+            version = "2.1",
+            data = VehicleTypes.Data(
+                vehicleTypes = listOf(
+                    VehicleTypes.VehicleType(
+                        vehicleTypeId = "${operator.getCodeSpace()}:VehicleType:CityBike",
+                        formFactor = VehicleTypes.FormFactor.BICYCLE,
+                        propulsionType = operator.getPropulsionType(),
+                        maxRangeMeters = if (operator.getPropulsionType() == VehicleTypes.PropulsionType.HUMAN) null else 0F
+                    )
+                )
+            )
+        )
     }
 
     override suspend fun getGbfsFeed(call: ApplicationCall) {
@@ -85,7 +120,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
             }
             GbfsStandardEnum.station_status -> {
                 call.respondText(ContentType.Application.Json) {
-                    Json.encodeToString(mapStationStatus(result as GBFSResponse.StationStatusesResponse))
+                    Json.encodeToString(mapStationStatus(operator, result as GBFSResponse.StationStatusesResponse))
                 }
             }
             GbfsStandardEnum.system_pricing_plans -> {
@@ -135,7 +170,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
         )
     }
 
-    private fun mapStationStatus(result: GBFSResponse.StationStatusesResponse): StationStatus {
+    private fun mapStationStatus(operator: Operator, result: GBFSResponse.StationStatusesResponse): StationStatus {
         return StationStatus(
             lastUpdated = result.lastUpdated,
             ttl = result.ttl.toInt(),
@@ -149,7 +184,13 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
                         isReturning = it.isReturning != 0,
                         lastReported = it.lastReported.toLong(),
                         numBikesAvailable = it.numBikesAvailable,
-                        numDocksAvailable = it.numDocksAvailable
+                        numDocksAvailable = it.numDocksAvailable,
+                        vehicleTypesAvailable = listOf(
+                            StationStatus.VehicleTypeAvailability(
+                                vehicleTypeId = "${operator.getCodeSpace()}:VehicleType:CityBike",
+                                count = it.numBikesAvailable
+                            )
+                        )
                     )
                 }.collect(Collectors.toList())
             )

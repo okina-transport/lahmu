@@ -1,5 +1,6 @@
 package org.entur.lahmu.legacy.bikeOperators
 
+import org.entur.lahmu.domain.gbfs.v2_1.VehicleTypes
 import org.entur.lahmu.legacy.GbfsStandardEnum
 import org.entur.lahmu.legacy.bikeOperators.Operator.Companion.getCodeSpace
 import org.entur.lahmu.legacy.getGbfsEndpoint
@@ -28,6 +29,11 @@ enum class Operator {
             KOLUMBUSBYSYKKEL -> kolumbusBysykkelURL
             LILLESTROMBYSYKKEL -> lillestromBysykkelURL
             DRAMMENBYSYKKEL -> drammenBysykkelURL(accessToken)
+        }
+
+        fun Operator.getPropulsionType() = when (this) {
+            KOLUMBUSBYSYKKEL -> VehicleTypes.PropulsionType.ELECTRIC_ASSIST
+            else -> VehicleTypes.PropulsionType.HUMAN
         }
     }
 }
