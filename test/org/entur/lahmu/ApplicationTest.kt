@@ -251,7 +251,7 @@ class ApplicationTest : KoinTest {
     @Test
     fun `get lillestrombysykkel station information`() = withTestApplication({ routingModule() }) {
         val lillestrombysykkelStationInformation = StationInformation(
-            "YLI:VehicleSharingParkingArea:3",
+            "YLS:VehicleSharingParkingArea:3",
             "TORVGATA",
             "Torvgata 8, Lillestrøm",
             BigDecimal("59.95585"),
@@ -269,7 +269,7 @@ class ApplicationTest : KoinTest {
         with(handleRequest(HttpMethod.Get, "/bikes/lillestrombysykkel/station_status.json")) {
             assertEquals(HttpStatusCode.OK, response.status())
             val stationStatus = response.content?.let { parseResponse<GBFSResponse.StationStatusesResponse>(it).data.stations[0] }
-            assertEquals("YLI:VehicleSharingParkingArea:3", stationStatus?.stationId)
+            assertEquals("YLS:VehicleSharingParkingArea:3", stationStatus?.stationId)
             assertEquals(12, stationStatus?.numBikesAvailable)
             assertEquals(8, stationStatus?.numDocksAvailable)
         }

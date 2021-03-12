@@ -18,7 +18,7 @@ enum class Operator {
             BERGENBYSYKKEL -> "YBE"
             TRONDHEIMBYSYKKEL -> "YTR"
             KOLUMBUSBYSYKKEL -> "YKO"
-            LILLESTROMBYSYKKEL -> "YLI"
+            LILLESTROMBYSYKKEL -> "YLS"
             DRAMMENBYSYKKEL -> "YDR"
         }
 
