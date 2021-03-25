@@ -43,19 +43,19 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
         val feeds = discovery.data.nb.feeds.stream().map {
             GBFS.Feed(
                 name = GBFSFeedName.valueOf(it.name.toUpperCase()),
-                url = it.url.replace("/bikes", "/bikes/v2_1_proxy")
+                url = it.url.replace("/bikes", "/bikes/v2_2_proxy")
             )
         }.collect(Collectors.toList())
 
         feeds.add(GBFS.Feed(
             name = GBFSFeedName.VEHICLE_TYPES,
-            url = (gbfsEndpoints.get(GbfsStandardEnum.vehicle_types) as String).replace("/bikes", "/bikes/v2_1_proxy")
+            url = (gbfsEndpoints.get(GbfsStandardEnum.vehicle_types) as String).replace("/bikes", "/bikes/v2_2_proxy")
         ))
 
         val v2 = GBFS(
             lastUpdated = discovery.lastUpdated,
             ttl = discovery.ttl.toInt(),
-            version = "2.1",
+            version = "2.2",
             data = mapOf(
                 "nb" to GBFS.Data(feeds)
             ))
@@ -76,7 +76,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
         return VehicleTypes(
             lastUpdated = discovery.lastUpdated,
             ttl = discovery.ttl.toInt(),
-            version = "2.1",
+            version = "2.2",
             data = VehicleTypes.Data(
                 vehicleTypes = listOf(
                     VehicleTypes.VehicleType(
@@ -136,7 +136,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
         return SystemInformation(
             lastUpdated = result.lastUpdated,
             ttl = result.ttl.toInt(),
-            version = "2.1",
+            version = "2.2",
             data = SystemInformation.Data(
                 systemId = "${operator.getCodeSpace()}:System:${result.data.systemId}",
                 language = result.data.language,
@@ -153,7 +153,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
         return StationInformation(
             lastUpdated = result.lastUpdated,
             ttl = result.ttl.toInt(),
-            version = "2.1",
+            version = "2.2",
             data = StationInformation.Data(
                 stations = result.data.stations.stream().map {
                         StationInformation.Data.Station(
@@ -174,7 +174,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
         return StationStatus(
             lastUpdated = result.lastUpdated,
             ttl = result.ttl.toInt(),
-            version = "2.1",
+            version = "2.2",
             data = StationStatus.Data(
                 stations = result.data.stations.stream().map {
                     StationStatus.Station(
@@ -201,7 +201,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
         return SystemPricingPlans(
             lastUpdated = result.lastUpdated,
             ttl = result.ttl.toInt(),
-            version = "2.1",
+            version = "2.2",
             data = SystemPricingPlans.Data(
                 plans = result.plans.stream().map {
                     SystemPricingPlans.Plan(
