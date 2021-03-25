@@ -1,6 +1,6 @@
 package org.entur.lahmu.legacy.bikeOperators
 
-import org.entur.lahmu.domain.gbfs.v2_1.VehicleTypes
+import org.entur.lahmu.domain.gbfs.v2_2.VehicleTypes
 import org.entur.lahmu.legacy.GbfsStandardEnum
 import org.entur.lahmu.legacy.bikeOperators.Operator.Companion.getCodeSpace
 import org.entur.lahmu.legacy.getGbfsEndpoint
