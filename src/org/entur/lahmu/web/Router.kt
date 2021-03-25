@@ -40,5 +40,17 @@ fun Routing.bikes() {
         get("/v2_1_proxy/{operator}/{service}.json") {
             proxyController.getGbfsFeed(this.context)
         }
+
+        get("/v2_2_proxy/{operator}/gbfs.json") {
+            proxyController.getDiscoveryFeed(this.context)
+        }
+
+        get("/v2_2_proxy/{operator}/vehicle_types.json") {
+            proxyController.getVehicleTypesFeed(this.context)
+        }
+
+        get("/v2_2_proxy/{operator}/{service}.json") {
+            proxyController.getGbfsFeed(this.context)
+        }
     }
 }
