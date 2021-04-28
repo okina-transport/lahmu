@@ -133,9 +133,9 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
     }
 
     private fun mapSystemInformation(operator: Operator, result: GBFSResponse.SystemInformationResponse): SystemInformation {
-        val systemId = "${operator.getCodeSpace()}:System:${result.data.systemId}"
+        var systemId = "${operator.getCodeSpace()}:System:${result.data.systemId}"
 
-        if (operator == TRONDHEIMBYSYKKEL) {
+        if (operator == Operator.TRONDHEIMBYSYKKEL) {
             systemId = "${operator.getCodeSpace()}:System:${result.data.systemId}bysykkel"
         }
 
