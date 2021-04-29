@@ -233,7 +233,7 @@ class ApplicationTest : KoinTest {
     @Test
     fun `get lillestrombysykkel system information`() = withTestApplication({ routingModule() }) {
         val lillestrombysykkelSystemInformation = SystemInformation(
-            "lillestrom",
+            "lillestrombysykkel",
             "nb",
             "Lillestrøm bysykkel",
             null,
