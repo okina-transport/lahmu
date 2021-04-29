@@ -72,10 +72,10 @@ container:
     initialDelaySeconds: 30
   resources:
     requests:
-      cpu: 100m
+      cpu: 1
       memory: 512Mi
     limits:
-      cpu: 200m
+      cpu: 1
       memory: 1024Mi
   volumeMounts:
     # - name: oidc-auth-volume
