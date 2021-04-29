@@ -144,7 +144,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
             ttl = result.ttl.toInt(),
             version = "2.2",
             data = SystemInformation.Data(
-                systemId = "${operator.getCodeSpace()}:System:${result.data.systemId}",
+                systemId = systemId,
                 language = result.data.language,
                 name = result.data.name,
                 operator = result.data.operator,
