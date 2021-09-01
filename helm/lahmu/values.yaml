@@ -72,11 +72,10 @@ container:
     initialDelaySeconds: 30
   resources:
     requests:
-      cpu: 1
-      memory: 512Mi
+      memory: 216Mi
     limits:
-      cpu: 1
-      memory: 1024Mi
+      cpu: 10m
+      memory: 216Mi
   volumeMounts:
     # - name: oidc-auth-volume
     #   mountPath: /etc/entur/oidc-auth
