@@ -78,7 +78,9 @@ spec:
            port: {{ .Values.service.internalPort }}
         resources:
           limits:
+            {{- if .Values.container.resources.limits.cpu }}
             cpu: {{ .Values.container.resources.limits.cpu }}
+            {{- end }}
             memory: {{ .Values.container.resources.limits.memory }}
           requests:
             cpu: {{ .Values.container.resources.requests.cpu }}
