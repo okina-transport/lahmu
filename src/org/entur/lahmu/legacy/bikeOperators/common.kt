@@ -46,7 +46,7 @@ fun getOperatorsWithDiscovery(port: String, host: Int): Map<String, List<Map<Str
         )
     })
 
-fun mapIdToNeTEx(id: String, operator: Operator) = "${operator.getCodeSpace()}:VehicleSharingParkingArea:$id"
+fun mapIdToNeTEx(id: String, operator: Operator) = "${operator.getCodeSpace()}:Station:$id"
 
 fun getSecondsFrom(fromEpoch: Long, toEpoch: Long): Long {
     val diffMS = toEpoch - fromEpoch
