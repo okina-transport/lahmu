@@ -6,7 +6,7 @@ ingress:
   domainName: entur.io
 
 deployment:
-  replicaCount: 1
+  replicaCount: 2
 
 horizontalPodAutoscaler:
   minReplicas: 1

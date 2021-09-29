@@ -11,3 +11,6 @@ deployment:
 horizontalPodAutoscaler:
   minReplicas: 1
   maxReplicas: 1
+
+PodDisruptionBudget:
+  enabled: false
