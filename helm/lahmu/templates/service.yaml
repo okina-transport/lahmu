@@ -29,10 +29,10 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   ports:
-    - port: {{ .Values.service.http.externalPort }}
+    - port: {{ .Values.service.externalPort }}
       protocol: TCP
-      targetPort: {{ .Values.service.http.internalPort }}
+      targetPort: {{ .Values.service.internalPort }}
   selector:
-    app: {{ template "app.name" . }}
+    {{- include "common.matchLabels" . | indent 4 }}
   sessionAffinity: None
   type: LoadBalancer
