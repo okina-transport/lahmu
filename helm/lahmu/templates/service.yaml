@@ -25,7 +25,7 @@ metadata:
     networking.gke.io/internal-load-balancer-allow-global-access: "true"
   labels:
     {{- include "common.labels" . | indent 4 }}
-  name: {{ template "app.name" . }}-internal
+  name: {{ template "name.name" . }}-internal
   namespace: {{ .Release.Namespace }}
 spec:
   ports:
