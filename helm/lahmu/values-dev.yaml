@@ -5,6 +5,10 @@ ingress:
   loadBalancerIp: 35.205.170.68 # kubectl get svc -n kube-system (the external ip of service named traefik-apigee)
   domainName: dev.entur.io
 
+service:
+  internal:
+    loadBalancerIP: 10.101.10.21
+
 deployment:
   replicaCount: 1
 
