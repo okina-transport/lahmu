@@ -25,16 +25,15 @@ interface BikesController {
 
 class BikesControllerImpl(private val bikeService: BikeService, private val cache: Cache) : BikesController {
     override suspend fun getServiceDirectory(call: ApplicationCall) {
-        val scheme = call.request.local.scheme
         val host = call.request.host()
         val port = call.request.port()
 
-        call.respondText(Gson().toJson(getOperatorsWithDiscovery(scheme, host, port)), ContentType.Application.Json)
+        call.respondText(Gson().toJson(getOperatorsWithDiscovery(host, port)), ContentType.Application.Json)
     }
 
     override suspend fun getDiscoveryFeed(call: ApplicationCall) {
         val operator = getOperator(call) ?: throw NotFoundException()
-        val gbfsEndpoints = getGbfsEndpoint(operator, call.request.local.scheme, call.request.host(), call.request.port())
+        val gbfsEndpoints = getGbfsEndpoint(operator, call.request.host(), call.request.port())
         val response = getDiscovery(gbfsEndpoints)
 
         call.respondText(Gson().toJson(response), ContentType.Application.Json)

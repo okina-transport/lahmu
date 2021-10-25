@@ -37,7 +37,7 @@ interface ProxyController {
 class ProxyControllerImpl(private val bikeService: BikeService, private val cache: Cache) : ProxyController {
     override suspend fun getDiscoveryFeed(call: ApplicationCall) {
         val operator = getOperator(call) ?: throw NotFoundException()
-        val gbfsEndpoints = getGbfsEndpoint(operator, call.request.local.scheme, call.request.host(), call.request.port())
+        val gbfsEndpoints = getGbfsEndpoint(operator, call.request.host(), call.request.port())
         val discovery: GBFSResponse.DiscoveryResponse = getDiscovery(gbfsEndpoints) as GBFSResponse.DiscoveryResponse
 
         val feeds = discovery.data.nb.feeds.stream().map {
@@ -65,7 +65,7 @@ class ProxyControllerImpl(private val bikeService: BikeService, private val cach
 
     override suspend fun getVehicleTypesFeed(call: ApplicationCall) {
         val operator = getOperator(call) ?: throw NotFoundException()
-        val gbfsEndpoints = getGbfsEndpoint(operator, call.request.local.scheme, call.request.host(), call.request.port())
+        val gbfsEndpoints = getGbfsEndpoint(operator, call.request.host(), call.request.port())
         call.respondText(ContentType.Application.Json) {
             Json.encodeToString(mapVehicleTypes(operator, gbfsEndpoints))
         }
