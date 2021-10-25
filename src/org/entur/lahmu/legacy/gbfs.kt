@@ -1,7 +1,7 @@
 package org.entur.lahmu.legacy
 
 import com.google.gson.annotations.SerializedName
-import io.ktor.http.*
+import io.ktor.http.hostIsIp
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
