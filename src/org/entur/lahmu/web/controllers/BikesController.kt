@@ -25,7 +25,7 @@ interface BikesController {
 
 class BikesControllerImpl(private val bikeService: BikeService, private val cache: Cache) : BikesController {
     override suspend fun getServiceDirectory(call: ApplicationCall) {
-        val scheme = call.request.local.scheme;
+        val scheme = call.request.local.scheme
         val host = call.request.host()
         val port = call.request.port()
 
