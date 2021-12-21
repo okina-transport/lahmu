@@ -2,7 +2,6 @@ namespace: production
 
 ingress:
   enabled: true
-  loadBalancerIp: 35.205.233.237 # kubectl get svc -n kube-system (the external ip of service named traefik-apigee)
   domainName: entur.io
 
 service:
