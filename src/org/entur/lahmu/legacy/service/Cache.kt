@@ -40,11 +40,7 @@ class InMemoryCache(
     }
 
     override fun isValidCache(bikeOperator: Operator, gbfsStandardEnum: GbfsStandardEnum): Boolean {
-        val drammenCheck =
-            if (bikeOperator == Operator.DRAMMENBYSYKKEL && gbfsStandardEnum == GbfsStandardEnum.station_information) {
-                cacheCheck(cacheMap, bikeOperator, GbfsStandardEnum.station_status)
-            } else true
-        return cacheCheck(cacheMap, bikeOperator, gbfsStandardEnum) && drammenCheck
+        return cacheCheck(cacheMap, bikeOperator, gbfsStandardEnum)
     }
 }
 
