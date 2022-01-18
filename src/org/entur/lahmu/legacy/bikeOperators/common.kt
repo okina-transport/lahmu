@@ -6,35 +6,20 @@ import org.entur.lahmu.legacy.bikeOperators.Operator.Companion.getCodeSpace
 import org.entur.lahmu.legacy.getGbfsEndpoint
 
 enum class Operator {
-    OSLOBYSYKKEL, BERGENBYSYKKEL, TRONDHEIMBYSYKKEL, KOLUMBUSBYSYKKEL, LILLESTROMBYSYKKEL, DRAMMENBYSYKKEL;
+    LILLESTROMBYSYKKEL;
 
     companion object {
-        fun Operator.isUrbanSharing() = this == OSLOBYSYKKEL || this == BERGENBYSYKKEL || this == TRONDHEIMBYSYKKEL
-        fun Operator.isKolumbus() = this == KOLUMBUSBYSYKKEL
         fun Operator.isJCDecaux() = this == LILLESTROMBYSYKKEL
-        fun Operator.isDrammenSmartBike() = this == DRAMMENBYSYKKEL
         fun Operator.getCodeSpace() = when (this) {
-            OSLOBYSYKKEL -> "YOS"
-            BERGENBYSYKKEL -> "YBE"
-            TRONDHEIMBYSYKKEL -> "YTR"
-            KOLUMBUSBYSYKKEL -> "YKO"
             LILLESTROMBYSYKKEL -> "YLS"
-            DRAMMENBYSYKKEL -> "YDR"
         }
 
         fun Operator.getFetchUrls(accessToken: String = "") = when (this) {
-            OSLOBYSYKKEL -> osloBysykkelURL
-            BERGENBYSYKKEL -> bergenBysykkelURL
-            TRONDHEIMBYSYKKEL -> trondheimBysykkelURL
-            KOLUMBUSBYSYKKEL -> kolumbusBysykkelURL
             LILLESTROMBYSYKKEL -> lillestromBysykkelURL
-            DRAMMENBYSYKKEL -> drammenBysykkelURL(accessToken)
         }
 
-        fun Operator.getPropulsionType() = when (this) {
-            KOLUMBUSBYSYKKEL -> VehicleTypes.PropulsionType.ELECTRIC_ASSIST
-            else -> VehicleTypes.PropulsionType.HUMAN
-        }
+        fun Operator.getPropulsionType() =
+            VehicleTypes.PropulsionType.HUMAN
     }
 }
 

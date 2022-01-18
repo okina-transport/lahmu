@@ -59,9 +59,6 @@ fun Application.mainModule() {
     }
 
     thread(start = true) {
-        Timer().schedule(0L, TIME_TO_LIVE_DRAMMEN_ACCESS_KEY_MS) {
-            bikeService.fetchAndSetDrammenAccessToken()
-        }
         Timer().schedule(0L, POLL_INTERVAL_MS) {
             bikeService.poll(cache)
         }
