@@ -126,8 +126,7 @@ container:
 #     name: oidc-auth-config
 
 affinity:
-  enabled: true
-  weight: 100
+  enabled: false
 
 rbac:
   enabled: false
@@ -147,8 +146,7 @@ horizontalPodAutoscaler:
   maxReplicas: 5
 
 PodDisruptionBudget:
-  enabled: true
-  minAvailable: 50%
+  enabled: false
 
 ingress:
   enabled: true
