@@ -99,7 +99,8 @@ jobs:
 workflows:
   Build-Publish:
     jobs:
-      - build
+      - build:
+          context: global
       - test:
           context: global
           requires:
@@ -107,7 +108,6 @@ workflows:
       - deploy-docker:
           context: global
           requires:
-            - build
             - test
           filters:
             branches:
