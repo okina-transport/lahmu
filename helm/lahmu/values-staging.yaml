@@ -1,4 +1,5 @@
 namespace: staging
+env: test
 
 ingress:
   enabled: true

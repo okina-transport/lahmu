@@ -37,7 +37,7 @@ app: {{ .Chart.Name }}
 team: {{ .Values.labels.team }}
 slack: {{ .Values.labels.slack }}
 type: {{ .Values.labels.type }}
-environment: {{ .Release.Namespace }}
+environment: {{ .Values.env }}
 release: {{ .Release.Name }}
 heritage: {{ .Release.Service }}
 {{- end }}

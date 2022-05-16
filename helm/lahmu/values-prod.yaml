@@ -1,4 +1,5 @@
 namespace: production
+env: prod
 
 ingress:
   enabled: true
